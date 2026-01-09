@@ -1,0 +1,119 @@
+# File: .htaccess
+# Descripción: Configuración de seguridad para Apache
+# Fecha: 2026-01-09
+
+# Prevenir listado de directorios
+Options -Indexes
+
+# Prevenir acceso a archivos sensibles
+<FilesMatch "^\.">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "^(composer\.json|package\.json|\.env|\.git)">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Prevenir acceso a archivos de configuración
+<FilesMatch "(config|database)\.php$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Prevenir acceso a logs
+<FilesMatch "\.log$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Prevenir acceso a sesiones
+<FilesMatch "\.(?:txt|dat|ini)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Restringir métodos HTTP
+<LimitExcept GET POST PUT DELETE OPTIONS>
+    Order Allow,Deny
+    Deny from all
+</LimitExcept>
+
+# Headers de seguridad
+<IfModule mod_headers.c>
+    # Prevenir clickjacking
+    Header always set X-Frame-Options "SAMEORIGIN"
+
+    # Prevenir MIME sniffing
+    Header always set X-Content-Type-Options "nosniff"
+
+    # XSS Protection
+    Header always set X-XSS-Protection "1; mode=block"
+
+    # Referrer Policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # HSTS (solo HTTPS, descomentar en producción)
+    # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+    # No-cache para respuestas sensibles
+    <IfModule mod_rewrite.c>
+        RewriteCond %{REQUEST_METHOD} ^(POST|PUT|DELETE)$
+        Header always set Cache-Control "no-store, no-cache, must-revalidate"
+        Header always set Pragma "no-cache"
+        Header always set Expires "0"
+    </IfModule>
+</IfModule>
+
+# Content Security Policy (ajustar según necesidades)
+<IfModule mod_headers.c>
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self';"
+</IfModule>
+
+# Prevenir acceso directo a archivos PHP en directorios sensibles
+<FilesMatch "(sessions|logs|config)/.*\.php$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Restringir tamaño de uploads (10MB)
+LimitRequestBody 10485760
+
+# Prevenir ataques de fuerza bruta en login
+<FilesMatch "login.php">
+    # Rate limiting (requiere mod_evasive o similar)
+    # Alternative: implementar en PHP
+</FilesMatch>
+
+# Prevenir inyección de archivos
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{QUERY_STRING} \.[a-zA-Z0-9]= [NC]
+    RewriteRule ^(.*)$ - [F,L]
+
+    # Prevenir acceso a archivos .php en uploads (si aplica)
+    RewriteRule ^uploads/.*\.php$ - [F,L]
+</IfModule>
+
+# Versionamiento de recursos estáticos
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType application/font-woff2 "access plus 1 year"
+</IfModule>
+
+# Prevenir MIME type incorrecto
+<IfModule mod_mime.c>
+    AddType application/octet-stream .php .phtml .php5 .pl .py .cgi
+</IfModule>
+
+# Comprimir recursos
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript
+</IfModule>

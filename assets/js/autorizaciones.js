@@ -72,23 +72,46 @@ class AutorizacionesView {
         }
 
         this.data.autorizaciones.forEach(a => {
-            tbody.innerHTML += `
-                <tr>
-                    <td><strong>${a.nombre} ${a.apellido}</strong></td>
-                    <td>${a.marca} ${a.modelo}</td>
-                    <td><span class="badge bg-primary">${a.patente}</span></td>
-                    <td>${this.formatDate(a.fecha_otorgamiento)}</td>
-                    <td>${this.getBadgeEstado(a.activa)}</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning btn-edit-autorizacion" data-id="${a.id}" title="Editar">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger btn-delete-autorizacion" data-id="${a.id}" title="Eliminar">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                </tr>
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><strong></strong></td>
+                <td></td>
+                <td><span class="badge bg-primary"></span></td>
+                <td></td>
+                <td></td>
+                <td></td>
             `;
+
+            const nombreCell = row.querySelector('td:first-child strong');
+            const marcaModeloCell = row.querySelector('td:nth-child(2)');
+            const patenteCell = row.querySelector('td:nth-child(3) span');
+            const fechaCell = row.querySelector('td:nth-child(4)');
+            const estadoCell = row.querySelector('td:nth-child(5)');
+            const accionesCell = row.querySelector('td:nth-child(6)');
+
+            nombreCell.textContent = `${a.nombre} ${a.apellido}`;
+            marcaModeloCell.textContent = `${a.marca} ${a.modelo}`;
+            patenteCell.textContent = `${a.patente}`;
+            fechaCell.textContent = `${this.formatDate(a.fecha_otorgamiento)}`;
+            estadoCell.innerHTML = `${this.getBadgeEstado(a.activa)}`;
+
+            const btnEdit = document.createElement('button');
+            btnEdit.className = 'btn btn-sm btn-warning btn-edit-autorizacion';
+            btnEdit.dataset.id = a.id;
+            btnEdit.title = 'Editar';
+            btnEdit.innerHTML = '<i class="bi bi-pencil"></i>';
+            btnEdit.addEventListener('click', () => this.edit(a.id));
+            accionesCell.appendChild(btnEdit);
+
+            const btnDelete = document.createElement('button');
+            btnDelete.className = 'btn btn-sm btn-danger btn-delete-autorizacion';
+            btnDelete.dataset.id = a.id;
+            btnDelete.title = 'Eliminar';
+            btnDelete.innerHTML = '<i class="bi bi-trash"></i>';
+            btnDelete.addEventListener('click', () => this.delete(a.id));
+            accionesCell.appendChild(btnDelete);
+
+            tbody.appendChild(row);
         });
     }
 

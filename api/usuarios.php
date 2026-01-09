@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../bootstrap.php';
+require_once __DIR__ . '/bootstrap.php';
 requiereAutenticacion();
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -7,49 +7,55 @@ $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
     case 'GET':
         if (isset($_GET['id'])) {
+            $id = sanitizeId($_GET['id']);
+            if ($id === null) {
+                json_response(['success' => false, 'message' => 'ID inválido'], 400);
+                return;
+            }
+
             $stmt = $pdo->prepare("SELECT id, nombre, apellido, email, rol, activo, ultimo_acceso FROM usuarios WHERE id = ?");
-            $stmt->execute([$_GET['id']]);
+            $stmt->execute([$id]);
             $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($usuario) {
-                echo json_encode(['success' => true, 'data' => $usuario]);
+                json_response(['success' => true, 'data' => $usuario]);
             } else {
-                echo json_encode(['success' => false, 'message' => 'Usuario no encontrado']);
+                json_response(['success' => false, 'message' => 'Usuario no encontrado'], 404);
             }
         } else {
             $stmt = $pdo->query("SELECT id, nombre, apellido, email, rol, activo, ultimo_acceso FROM usuarios ORDER BY id DESC");
             $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            echo json_encode(['success' => true, 'data' => $usuarios]);
+            json_response(['success' => true, 'data' => $usuarios]);
         }
         break;
 
     case 'POST':
         $token = $_POST['csrf_token'] ?? '';
         if (!verificar_csrf($token)) {
-            echo json_encode(['success' => false, 'message' => 'Error de CSRF']);
-            exit;
+            json_response(['success' => false, 'message' => 'Error de CSRF'], 403);
+            return;
         }
 
-        $nombre = trim($_POST['nombre'] ?? '');
-        $apellido = trim($_POST['apellido'] ?? '');
-        $email = trim($_POST['email'] ?? '');
-        $password = trim($_POST['password'] ?? '');
-        $rol = trim($_POST['rol'] ?? 'user');
+        $nombre = sanitizeInput($_POST['nombre'] ?? '', 'string');
+        $apellido = sanitizeInput($_POST['apellido'] ?? '', 'string');
+        $email = sanitizeInput($_POST['email'] ?? '', 'email');
+        $password = sanitizeInput($_POST['password'] ?? '', 'string');
+        $rol = sanitizeInput($_POST['rol'] ?? 'user', 'string');
         $activo = isset($_POST['activo']) ? 1 : 0;
 
         if (empty($nombre) || empty($apellido) || empty($email) || empty($password)) {
-            echo json_encode(['success' => false, 'message' => 'Todos los campos obligatorios son requeridos']);
-            exit;
+            json_response(['success' => false, 'message' => 'Todos los campos obligatorios son requeridos'], 400);
+            return;
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            echo json_encode(['success' => false, 'message' => 'Email inválido']);
-            exit;
+            json_response(['success' => false, 'message' => 'Email inválido'], 400);
+            return;
         }
 
         if (!in_array($rol, ['superadmin', 'admin', 'user'])) {
-            echo json_encode(['success' => false, 'message' => 'Rol inválido']);
-            exit;
+            json_response(['success' => false, 'message' => 'Rol inválido'], 400);
+            return;
         }
 
         try {
@@ -57,8 +63,8 @@ switch ($method) {
             $stmt->execute([$email]);
 
             if ($stmt->fetch()) {
-                echo json_encode(['success' => false, 'message' => 'El email ya está registrado']);
-                exit;
+                json_response(['success' => false, 'message' => 'El email ya está registrado'], 400);
+                return;
             }
 
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
@@ -68,9 +74,9 @@ switch ($method) {
 
             registrarLog($_SESSION['usuario_id'], 'CREAR_USUARIO', 'USUARIOS', "Usuario creado: $email", $pdo);
 
-            echo json_encode(['success' => true, 'message' => 'Usuario creado correctamente']);
+            json_response(['success' => true, 'message' => 'Usuario creado correctamente']);
         } catch (Exception $e) {
-            echo json_encode(['success' => false, 'message' => 'Error al crear usuario: ' . $e->getMessage()]);
+            json_response(['success' => false, 'message' => 'Error al crear usuario: ' . $e->getMessage()], 500);
         }
         break;
 
@@ -78,32 +84,32 @@ switch ($method) {
         parse_str(file_get_contents("php://input"), $data);
         $token = $data['csrf_token'] ?? '';
         if (!verificar_csrf($token)) {
-            echo json_encode(['success' => false, 'message' => 'Error de CSRF']);
-            exit;
+            json_response(['success' => false, 'message' => 'Error de CSRF'], 403);
+            return;
         }
 
-        $id = $data['id'] ?? '';
-        $nombre = trim($data['nombre'] ?? '');
-        $apellido = trim($data['apellido'] ?? '');
-        $email = trim($data['email'] ?? '');
-        $rol = trim($data['rol'] ?? 'user');
+        $id = sanitizeId($data['id'] ?? '');
+        $nombre = sanitizeInput($data['nombre'] ?? '', 'string');
+        $apellido = sanitizeInput($data['apellido'] ?? '', 'string');
+        $email = sanitizeInput($data['email'] ?? '', 'email');
+        $rol = sanitizeInput($data['rol'] ?? 'user', 'string');
         $activo = isset($data['activo']) ? 1 : 0;
         $cambiar_password = !empty(trim($data['password'] ?? ''));
-        $password = trim($data['password'] ?? '');
+        $password = sanitizeInput($data['password'] ?? '', 'string');
 
         if (empty($id) || empty($nombre) || empty($apellido) || empty($email)) {
-            echo json_encode(['success' => false, 'message' => 'Todos los campos obligatorios son requeridos']);
-            exit;
+            json_response(['success' => false, 'message' => 'Todos los campos obligatorios son requeridos'], 400);
+            return;
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            echo json_encode(['success' => false, 'message' => 'Email inválido']);
-            exit;
+            json_response(['success' => false, 'message' => 'Email inválido'], 400);
+            return;
         }
 
         if (!in_array($rol, ['superadmin', 'admin', 'user'])) {
-            echo json_encode(['success' => false, 'message' => 'Rol inválido']);
-            exit;
+            json_response(['success' => false, 'message' => 'Rol inválido'], 400);
+            return;
         }
 
         try {
@@ -111,8 +117,8 @@ switch ($method) {
             $stmt->execute([$email, $id]);
 
             if ($stmt->fetch()) {
-                echo json_encode(['success' => false, 'message' => 'El email ya está registrado en otro usuario']);
-                exit;
+                json_response(['success' => false, 'message' => 'El email ya está registrado en otro usuario'], 400);
+                return;
             }
 
             if ($cambiar_password) {
@@ -126,9 +132,9 @@ switch ($method) {
 
             registrarLog($_SESSION['usuario_id'], 'EDITAR_USUARIO', 'USUARIOS', "Usuario editado: ID $id", $pdo);
 
-            echo json_encode(['success' => true, 'message' => 'Usuario actualizado correctamente']);
+            json_response(['success' => true, 'message' => 'Usuario actualizado correctamente']);
         } catch (Exception $e) {
-            echo json_encode(['success' => false, 'message' => 'Error al actualizar usuario: ' . $e->getMessage()]);
+            json_response(['success' => false, 'message' => 'Error al actualizar usuario: ' . $e->getMessage()], 500);
         }
         break;
 
@@ -136,19 +142,20 @@ switch ($method) {
         parse_str(file_get_contents("php://input"), $data);
         $token = $data['csrf_token'] ?? '';
         if (!verificar_csrf($token)) {
-            echo json_encode(['success' => false, 'message' => 'Error de CSRF']);
-            exit;
+            json_response(['success' => false, 'message' => 'Error de CSRF'], 403);
+            return;
         }
-        $id = $data['id'] ?? '';
+
+        $id = sanitizeId($data['id'] ?? '');
 
         if (empty($id)) {
-            echo json_encode(['success' => false, 'message' => 'ID de usuario requerido']);
-            exit;
+            json_response(['success' => false, 'message' => 'ID de usuario requerido'], 400);
+            return;
         }
 
         if ($id == $_SESSION['usuario_id']) {
-            echo json_encode(['success' => false, 'message' => 'No puedes eliminar tu propio usuario']);
-            exit;
+            json_response(['success' => false, 'message' => 'No puedes eliminar tu propio usuario'], 403);
+            return;
         }
 
         try {
@@ -157,13 +164,13 @@ switch ($method) {
 
             registrarLog($_SESSION['usuario_id'], 'ELIMINAR_USUARIO', 'USUARIOS', "Usuario eliminado: ID $id", $pdo);
 
-            echo json_encode(['success' => true, 'message' => 'Usuario eliminado correctamente']);
+            json_response(['success' => true, 'message' => 'Usuario eliminado correctamente']);
         } catch (Exception $e) {
-            echo json_encode(['success' => false, 'message' => 'Error al eliminar usuario: ' . $e->getMessage()]);
+            json_response(['success' => false, 'message' => 'Error al eliminar usuario: ' . $e->getMessage()], 500);
         }
         break;
 
     default:
-        echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+        json_response(['success' => false, 'message' => 'Método no permitido'], 405);
         break;
 }

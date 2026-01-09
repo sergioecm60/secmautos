@@ -17,7 +17,8 @@ function loginUsuario($email, $password, $captcha, $pdo) {
         return ['success' => false, 'message' => 'Demasiados intentos fallidos desde esta IP. Intente más tarde.'];
     }
 
-    $pdo->exec("DELETE FROM intentos_login_ip WHERE ultimo_intento < DATE_SUB(NOW(), INTERVAL 1 DAY)");
+    $stmt = $pdo->prepare("DELETE FROM intentos_login_ip WHERE ultimo_intento < DATE_SUB(NOW(), INTERVAL 1 DAY)");
+    $stmt->execute();
 
     $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ? AND activo = 1");
     $stmt->execute([$email]);

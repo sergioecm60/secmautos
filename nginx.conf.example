@@ -1,0 +1,114 @@
+# File: nginx.conf
+# Descripción: Configuración de seguridad para Nginx
+# Fecha: 2026-01-09
+
+server {
+    listen 80;
+    server_name secmautos.local www.secmautos.local;
+    root /var/www/secmautos/public;
+    index index.php index.html;
+
+    # Security Headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    # Content Security Policy (ajustar según necesidades)
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self';" always;
+
+    # HSTS (solo HTTPS, descomentar en producción)
+    # add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    # Prevenir acceso a archivos sensibles
+    location ~ /\.(git|env|log|ini|conf|htaccess|sql)$ {
+        deny all;
+        return 404;
+    }
+
+    location ~ ^/(config|database|composer)\.php$ {
+        deny all;
+        return 403;
+    }
+
+    # Prevenir acceso directo a sesiones y logs
+    location ~ ^/(sessions|logs)/ {
+        deny all;
+        return 403;
+    }
+
+    # Prevenir listado de directorios
+    location ~* \. {
+        deny all;
+    }
+
+    # Restringir métodos HTTP
+    if ($request_method !~ ^(GET|POST|PUT|DELETE|OPTIONS)$ ) {
+        return 405;
+    }
+
+    # Limitar tamaño de request
+    client_max_body_size 10M;
+
+    # Prevenir inyección de archivos
+    location ~ \.php$ {
+        if ($query_string ~ "^[a-zA-Z0-9]+=") {
+            return 403;
+        }
+
+        try_files $uri =404;
+        fastcgi_pass unix:/var/run/php/php-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    # Prevenir ejecución en uploads (si aplica)
+    location ~ ^/uploads/.*\.php$ {
+        deny all;
+        return 403;
+    }
+
+    # Rate limiting
+    limit_req_zone $binary_remote_addr zone=api:10m rate=10r/m;
+    limit_req_zone $binary_remote_addr zone=login:10m rate=5r/m;
+    limit_req_zone $binary_remote_addr zone=general:10m rate=100r/m;
+
+    location /api/ {
+        limit_req zone=api burst=20 nodelay;
+        try_files $uri =404;
+        fastcgi_pass unix:/var/run/php/php-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location /login.php {
+        limit_req zone=login burst=10 nodelay;
+        try_files $uri =404;
+        fastcgi_pass unix:/var/run/php/php-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location / {
+        limit_req zone=general burst=50 nodelay;
+        try_files $uri $uri/ /index.php$is_args$args;
+        fastcgi_pass unix:/var/run/php/php-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    # Versionamiento de recursos estáticos
+    location ~* \.(css|js|jpg|jpeg|png|gif|svg|ico|woff|woff2)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+
+    # Ocultar versión de Nginx y PHP
+    server_tokens off;
+    fastcgi_hide_header X-Powered-By;
+}

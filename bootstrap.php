@@ -97,3 +97,12 @@ function requiereAutenticacion($redirect = true) {
     }
     return true;
 }
+
+// Funciones de seguridad mejoradas
+function sanitizeId($id) {
+    $id = (int)$id;
+    if ($id <= 0) {
+        return null;
+    }
+    return $id;
+}
