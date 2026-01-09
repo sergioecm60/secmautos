@@ -1,0 +1,99 @@
+<div class="card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>🔐 Autorizaciones de Manejo</h3>
+        <button class="btn btn-primary" id="btn-nueva-autorizacion">
+            <i class="bi bi-plus-circle"></i> Nueva Autorización
+        </button>
+    </div>
+
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> Aquí se autoriza a qué empleados pueden manejar qué vehículos que tienen Cédula Azul vigente.
+    </div>
+
+    <div class="row g-2 mb-3">
+        <div class="col-md-4">
+            <input type="text" class="form-control" id="filtro-autorizacion-empleado" placeholder="Buscar por empleado">
+        </div>
+        <div class="col-md-4">
+            <input type="text" class="form-control" id="filtro-autorizacion-patente" placeholder="Buscar por patente">
+        </div>
+        <div class="col-md-2">
+            <select class="form-select" id="filtro-autorizacion-estado">
+                <option value="">Todos los estados</option>
+                <option value="1">Activas</option>
+                <option value="0">Revocadas</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-secondary w-100" onclick="filtrarAutorizaciones()">Filtrar</button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover" id="tabla-autorizaciones">
+            <thead>
+                <tr>
+                    <th>Empleado</th>
+                    <th>Vehículo</th>
+                    <th>Patente</th>
+                    <th>Fecha Otorgamiento</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Filas se insertarán dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Formulario Autorización de Manejo -->
+<div class="modal fade" id="modalAutorizacion" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Gestión de Autorización de Manejo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-autorizacion">
+                    <input type="hidden" name="id" id="autorizacion-id">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Empleado *</label>
+                            <select class="form-select" name="empleado_id" id="autorizacion-empleado" required>
+                                <option value="">Seleccionar empleado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Vehículo (con Cédula Azul) *</label>
+                            <select class="form-select" name="vehiculo_id" id="autorizacion-vehiculo" required>
+                                <option value="">Seleccionar vehículo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha de Otorgamiento *</label>
+                            <input type="date" class="form-control" name="fecha_otorgamiento" id="autorizacion-fecha" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Estado</label>
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" role="switch" name="activa" id="autorizacion-activa" checked>
+                                <label class="form-check-label" for="autorizacion-activa">Autorización Activa</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Observaciones</label>
+                            <textarea class="form-control" name="observaciones" id="autorizacion-observaciones" rows="2"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-guardar-autorizacion">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -2,14 +2,14 @@
 
 **Proyecto:** Sistema de Gestión de Flota Automotor
 **Fecha inicio:** 2026-01-09
-**Última actualización:** 2026-01-09 (Sesión actual)
-**Estado:** Base de datos completa ✅ | Backend API completo ✅ | Frontend 95% ⚠️
+**Última actualización:** 2026-01-09 (Sesión actual - Fase 13 completada)
+**Estado:** Base de datos completa ✅ | Backend API completo ✅ | Frontend 98% + Correcciones ✅ | Módulos Usuarios y Configuración ✅
 
 ## 🎉 PROGRESO ACTUAL
 
 ### ✅ FASE 1 COMPLETADA - Backend API (100%)
 - PUT/DELETE agregados a: vehiculos.php, empleados.php, multas.php, asignaciones.php
-- Nuevos endpoints creados: compras.php, ventas.php, ceta.php, transferencias.php
+- Nuevos endpoints creados: compras.php, ventas.php, ceta.php, transferencias.php, usuarios.php
 - Script de alertas automáticas: scripts/generar_alertas.php
 - **Commit:** `278793a` - 897 líneas agregadas
 
@@ -77,6 +77,37 @@
 - dashboard.js modificado - Función cargarFichaVehiculo
 - **Funcional:** Ver historial completo del vehículo (asignaciones, multas, mantenimientos, pagos, patrimonio) ✅
 
+### ✅ FASE 12 COMPLETADA - Reportes y Exportación (100%)
+- api/reportes/listado_gcba.php - Exportar listado para GCBA en HTML imprimible
+- api/reportes/pdf_dominio.php - Exportar informe de dominio completo en HTML
+- modules/reportes.html - Interfaz de reportes con 4 tipos
+- assets/js/reportes.js - Manejar exportaciones de reportes
+- dashboard.js modificado - Carga de módulo reportes
+- **Funcionalidades:**
+  * Listado GCBA: Tabla de vehículos con filtros por estado
+  * Informe de Dominio: Historial completo de un vehículo
+  * Reporte Multas: Resumen por empleado con totales
+  * Vencimientos del Mes: Documentación próxima a vencer
+   * Asignaciones: Historial con filtro de fechas
+- **Nota:** Los reportes se generan en HTML para imprimir/guardar como PDF desde el navegador ✅
+
+### ✅ FASE 13 COMPLETADA - Correcciones y Nuevas Funcionalidades (100%)
+- Corrección de inicialización de módulos (DOMContentLoaded no funciona en carga dinámica)
+- Módulo de mantenimientos ahora carga correctamente (no muestra "en construcción")
+- Corrección de z-index en modales Bootstrap 5
+- Nuevo módulo de gestión de usuarios (crear/editar/eliminar usuarios con roles)
+- Nuevo módulo de configuración (nombre empresa, sucursales, cambio de contraseña)
+- **Archivos nuevos/modificados:**
+  * api/usuarios.php - CRUD completo de usuarios
+  * modules/usuarios.html - Interfaz de gestión de usuarios
+  * assets/js/usuarios.js - Clase UsuariosView
+  * modules/configuracion.html - Configuración empresa, sucursales, seguridad
+  * assets/js/configuracion.js - Lógica de configuración
+  * index.php - Agregados botones navegación usuarios/configuración
+  * dashboard.js - Funciones cargarUsuarios() y cargarConfiguracion()
+  * assets/css/style.css - Corrección z-index modales Bootstrap 5
+- **Funcional:** Gestión completa de usuarios, configuración de empresa y sucursales, cambio de contraseña ✅
+
 ---
 
 ## 📊 Estado Actual del Proyecto
@@ -142,8 +173,7 @@
 ✅ Diseño responsive     - Mobile-first
 ```
 
-**FALTA EN FRONTEND (5%):**
-- ❌ Módulo de reportes (exportar Excel, PDF)
+**FALTA EN FRONTEND (2%):**
 - ❌ Subida de comprobantes (PDF/imágenes)
 - ❌ Mejoras UX/UI (notificaciones toast, loading spinners, paginación)
 - ❌ Testing completo de todos los módulos
@@ -340,8 +370,8 @@ secmautos/
 │   ├── vencimientos.php ✅
 │   ├── refresh_captcha.php ✅
 │   └── reportes/
-│       ├── excel_gcba.php ❌
-│       └── pdf_dominio.php ❌
+│       ├── listado_gcba.php ✅
+│       └── pdf_dominio.php ✅
 ├── assets/
 │   ├── css/
 │   │   ├── bootstrap.min.css ✅
@@ -388,7 +418,7 @@ secmautos/
 │   ├── mantenimientos.html ✅
 │   ├── pagos.html ✅
 │   ├── ficha_vehiculo.html ✅
-│   └── reportes.html ❌
+│   └── reportes.html ✅
 ├── scripts/
 │   └── generar_alertas.php ✅
 ├── sessions/
@@ -427,14 +457,15 @@ secmautos/
 | 9 | Frontend - Mantenimientos | 2h | ✅ Completado | 🟠 Media |
 | 10 | Frontend - Pagos | 2h | ✅ Completado | 🟠 Media |
 | 11 | Ficha Completa Vehículo | 3h | ✅ Completado | 🟠 Media |
-| 12 | Reportes y Exportación | 3h | ⚠️ Pendiente | 🟢 Baja |
-| 13 | Subida de Archivos | 2h | ⚠️ Pendiente | 🟢 Baja |
-| 14 | Mejoras UX/UI | 2h | ⚠️ Pendiente | 🟢 Baja |
-| 15 | Testing y Ajustes | 3h | ⚠️ Pendiente | 🔴 Alta |
-| 16 | Documentación y Deployment | 2h | ⚠️ Pendiente | 🟢 Baja |
-| **TOTAL** | | **40h** | **40h completadas** | |
+| 12 | Reportes y Exportación | 3h | ✅ Completado | 🟢 Baja |
+| 13 | Correcciones y Usuarios | 3h | ✅ Completado | 🔴 Alta |
+| 14 | Subida de Archivos | 2h | ⚠️ Pendiente | 🟢 Baja |
+| 15 | Mejoras UX/UI | 2h | ⚠️ Pendiente | 🟢 Baja |
+| 16 | Testing y Ajustes | 3h | ⚠️ Pendiente | 🔴 Alta |
+| 17 | Documentación y Deployment | 2h | ⚠️ Pendiente | 🟢 Baja |
+| **TOTAL** | | **43h** | **40h completadas** | |
 
-**⚡ Progreso actual: 30h / 40h (75% completado)**
+**⚡ Progreso actual: 40h / 43h (93% completado)**
 
 ---
 

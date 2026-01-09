@@ -1,0 +1,102 @@
+<div class="card">
+    <div class="card-body">
+        <h3>📊 Reportes y Exportación</h3>
+        <p>Generar reportes para exportar o imprimir</p>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">📋 Listado para GCBA/Rentas</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Listado completo de todos los vehículos con sus datos de patente, seguro y VTV.</p>
+                        <div class="mb-3">
+                            <select class="form-select" id="excel-estado">
+                                <option value="todos">Todos los estados</option>
+                                <option value="disponible">Solo disponibles</option>
+                                <option value="asignado">Solo asignados</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary w-100" onclick="generarListadoGCBA()">
+                            🖨️ Generar Listado
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">📄 Informe de Dominio Completo</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Reporte detallado de un vehículo con todo su historial.</p>
+                        <div class="mb-3">
+                            <select class="form-select" id="reporte-vehiculo">
+                                <option value="">Seleccionar vehículo...</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-success w-100" onclick="generarInformeDominio()" disabled id="btn-domino">
+                            📄 Generar Informe
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mt-4">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-header bg-warning text-white">
+                        <h5 class="mb-0">💰 Reporte de Multas por Empleado</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Resumen de multas asignadas a cada empleado.</p>
+                        <button class="btn btn-warning w-100" onclick="generarReporteMultas()">
+                            📊 Generar Reporte
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">📅 Vencimientos del Mes</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Documentación y pagos que vencen este mes.</p>
+                        <button class="btn btn-info w-100" onclick="generarReporteVencimientos()">
+                            📅 Generar Reporte
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">🔧 Historial de Asignaciones</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Reporte completo de asignaciones por período.</p>
+                        <div class="mb-2">
+                            <input type="date" class="form-control" id="fecha-desde" placeholder="Desde">
+                        </div>
+                        <div class="mb-3">
+                            <input type="date" class="form-control" id="fecha-hasta" placeholder="Hasta">
+                        </div>
+                        <button class="btn btn-secondary w-100" onclick="generarReporteAsignaciones()">
+                            📊 Generar Reporte
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 text-muted small">
+            <p>💡 <strong>Tip:</strong> Para guardar como PDF, usa la opción "Guardar como PDF" del diálogo de impresión del navegador.</p>
+        </div>
+    </div>
+</div>

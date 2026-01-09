@@ -166,3 +166,5 @@ document.addEventListener('DOMContentLoaded', () => {
         new CetaView();
     }
 });
+
+new CetaView();

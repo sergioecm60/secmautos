@@ -562,17 +562,32 @@ tr:hover { background-color: var(--bg-tertiary); } /* Efecto al pasar el mouse s
 }
 
 /* ========== MODALES (VENTANAS EMERGENTES) ========== */
+
+/* Asegurar que los modales de Bootstrap 5 funcionen correctamente */
+.modal {
+    z-index: 1055 !important;
+}
+
+.modal-backdrop {
+    z-index: 1050 !important;
+}
+
+.modal.show {
+    display: block !important;
+}
+
+.modal-content {
+    z-index: 1056 !important;
+}
+
 .modal {
     display: none; /* Oculto por defecto */
     position: fixed; /* Se queda fijo en la pantalla */
-    z-index: 1001; /* Se asegura de estar por encima de todo */
     left: 0;
     top: 0;
-    width: 100%; 
-    height: 100%; 
+    width: 100%;
+    height: 100%;
     overflow: auto; /* Permite scroll si el contenido es muy grande */
-    background-color: rgba(0,0,0,0.6); /* Fondo oscuro semitransparente */
-    padding-top: 50px;
 }
 
 /* Contenido del modal */

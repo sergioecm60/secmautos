@@ -167,3 +167,5 @@ document.addEventListener('DOMContentLoaded', () => {
         new ComprasVentasView();
     }
 });
+
+new ComprasVentasView();

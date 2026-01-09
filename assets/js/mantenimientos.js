@@ -184,3 +184,5 @@ document.addEventListener('DOMContentLoaded', () => {
         new MantenimientosView();
     }
 });
+
+new MantenimientosView();

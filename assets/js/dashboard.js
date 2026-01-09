@@ -140,6 +140,9 @@ function cargarModulo(modulo) {
         case 'empleados':
             cargarEmpleados();
             break;
+        case 'autorizaciones':
+            cargarAutorizaciones();
+            break;
         case 'asignaciones':
             cargarAsignaciones();
             break;
@@ -166,6 +169,12 @@ function cargarModulo(modulo) {
             break;
         case 'reportes':
             cargarReportes();
+            break;
+        case 'usuarios':
+            cargarUsuarios();
+            break;
+        case 'configuracion':
+            cargarConfiguracion();
             break;
     }
 }
@@ -298,12 +307,22 @@ function cargarMultas() {
 
 function cargarMantenimientos() {
     const container = document.getElementById('module-mantenimientos');
-    container.innerHTML = `
-        <div class="card">
-            <h3>🔧 Control de Mantenimiento</h3>
-            <p>Módulo en construcción...</p>
-        </div>
-    `;
+    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
+        return;
+    }
+
+    fetch('modules/mantenimientos.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/mantenimientos.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/mantenimientos.js';
+                document.body.appendChild(script);
+            }
+        })
+        .catch(error => console.error('Error cargando módulo mantenimientos:', error));
 }
 
 function cargarPagos() {
@@ -355,12 +374,22 @@ function cargarFichaVehiculo(id) {
 
 function cargarReportes() {
     const container = document.getElementById('module-reportes');
-    container.innerHTML = `
-        <div class="card">
-            <h3>📈 Reportes y Estadísticas</h3>
-            <p>Módulo en construcción...</p>
-        </div>
-    `;
+    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
+        return;
+    }
+
+    fetch('modules/reportes.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/reportes.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/reportes.js';
+                document.body.appendChild(script);
+            }
+        })
+        .catch(error => console.error('Error cargando módulo reportes:', error));
 }
 
 function nuevoVehiculo() {
@@ -449,4 +478,76 @@ function cargarTransferencias() {
             }
         })
         .catch(error => console.error('Error cargando módulo transferencias:', error));
+}
+
+function cargarUsuarios() {
+    const container = document.getElementById('module-usuarios');
+    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
+        if (window.usuariosView) {
+            window.usuariosView.loadInitialData();
+        }
+        return;
+    }
+
+    fetch('modules/usuarios.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/usuarios.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/usuarios.js';
+                script.onload = () => {
+                    if (window.UsuariosView) {
+                        window.usuariosView = new UsuariosView();
+                    }
+                };
+                document.body.appendChild(script);
+            } else {
+                if (window.UsuariosView) {
+                    window.usuariosView = new UsuariosView();
+                }
+            }
+        })
+        .catch(error => console.error('Error cargando módulo usuarios:', error));
+}
+
+function cargarAutorizaciones() {
+    const container = document.getElementById('module-autorizaciones');
+    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
+        return;
+    }
+
+    fetch('modules/autorizaciones.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/autorizaciones.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/autorizaciones.js';
+                document.body.appendChild(script);
+            }
+        })
+        .catch(error => console.error('Error cargando módulo autorizaciones:', error));
+}
+
+function cargarConfiguracion() {
+    const container = document.getElementById('module-configuracion');
+    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
+        return;
+    }
+
+    fetch('modules/configuracion.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/configuracion.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/configuracion.js';
+                document.body.appendChild(script);
+            }
+        })
+        .catch(error => console.error('Error cargando módulo configuración:', error));
 }

@@ -1,0 +1,75 @@
+<div class="card">
+    <h3>⚙️ Configuración del Sistema</h3>
+
+    <div class="row g-4 mt-2">
+        <div class="col-md-6">
+            <div class="card">
+                <h5 class="card-header">🏢 Información de la Empresa</h5>
+                <div class="card-body">
+                    <form id="form-config-empresa">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre de la Empresa</label>
+                            <input type="text" class="form-control" name="nombre_empresa" id="nombre_empresa" placeholder="Ej: SECM Autos">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Dirección</label>
+                            <input type="text" class="form-control" name="direccion_empresa" id="direccion_empresa" placeholder="Ej: Av. Corrientes 1234">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" name="telefono_empresa" id="telefono_empresa" placeholder="Ej: +54 11 1234-5678">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email_empresa" id="email_empresa" placeholder="Ej: contacto@secmautos.com">
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="guardarConfigEmpresa()">Guardar Empresa</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <h5 class="card-header">📍 Gestión de Sucursales</h5>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="nueva-sucursal" placeholder="Nombre de la sucursal">
+                            <button class="btn btn-success" type="button" onclick="agregarSucursal()">Agregar</button>
+                        </div>
+                    </div>
+                    <div id="lista-sucursales">
+                        <ul class="list-group" id="sucursales-list">
+                            <!-- Sucursales se cargarán aquí -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <h5 class="card-header">🔒 Seguridad</h5>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Aquí puedes configurar parámetros de seguridad del sistema.
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cambiar tu contraseña</label>
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <input type="password" class="form-control" id="nueva-password-actual" placeholder="Contraseña actual">
+                            </div>
+                            <div class="col-12">
+                                <input type="password" class="form-control" id="nueva-password-nueva" placeholder="Nueva contraseña">
+                            </div>
+                            <div class="col-12">
+                                <input type="password" class="form-control" id="nueva-password-confirmar" placeholder="Confirmar nueva contraseña">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-warning" onclick="cambiarPassword()">Cambiar Contraseña</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

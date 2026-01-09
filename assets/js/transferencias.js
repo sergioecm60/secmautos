@@ -158,3 +158,5 @@ document.addEventListener('DOMContentLoaded', () => {
         new TransferenciasView();
     }
 });
+
+new TransferenciasView();

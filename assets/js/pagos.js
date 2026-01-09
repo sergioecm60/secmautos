@@ -1,5 +1,5 @@
 let pagosData = [];
-let vehiculosData = [];
+let vehiculosDataPagos = [];
 
 async function cargarPagos() {
     try {
@@ -21,7 +21,7 @@ async function cargarVehiculos() {
         const data = await res.json();
 
         if (data.success) {
-            vehiculosData = data.data;
+            vehiculosDataPagos = data.data;
             actualizarSelectVehiculos();
         }
     } catch (error) {
@@ -35,7 +35,7 @@ function actualizarSelectVehiculos() {
 
     select.innerHTML = '<option value="">Seleccionar vehículo</option>';
 
-    vehiculosData.forEach(v => {
+    vehiculosDataPagos.forEach(v => {
         if (v.estado !== 'baja') {
             select.innerHTML += `<option value="${v.id}">${v.patente} - ${v.marca} ${v.modelo}</option>`;
         }
@@ -93,6 +93,7 @@ function getTipoPagoBadge(tipo) {
     const badges = {
         'patente': '<span class="badge bg-primary">Patente</span>',
         'seguro': '<span class="badge bg-info">Seguro</span>',
+        'servicios': '<span class="badge bg-warning">Servicios</span>',
         'otro': '<span class="badge bg-secondary">Otro</span>'
     };
     return badges[tipo] || tipo;

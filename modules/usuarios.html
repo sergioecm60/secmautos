@@ -1,0 +1,81 @@
+<div class="card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>👤 Gestión de Usuarios</h3>
+        <button class="btn btn-primary" id="btn-nuevo-usuario">
+            <i class="bi bi-plus-circle"></i> Nuevo Usuario
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover" id="tabla-usuarios">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Último Acceso</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Filas se insertarán dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Formulario Usuario -->
+<div class="modal fade" id="modalUsuario" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Gestión de Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-usuario">
+                    <input type="hidden" name="id" id="usuario-id">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre *</label>
+                            <input type="text" class="form-control" name="nombre" id="usuario-nombre" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellido *</label>
+                            <input type="text" class="form-control" name="apellido" id="usuario-apellido" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Email *</label>
+                            <input type="email" class="form-control" name="email" id="usuario-email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" name="password" id="usuario-password">
+                            <small class="text-muted">Dejar vacío para mantener la actual (solo al editar)</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Rol *</label>
+                            <select class="form-select" name="rol" id="usuario-rol" required>
+                                <option value="user">Usuario</option>
+                                <option value="admin">Administrador</option>
+                                <option value="superadmin">Superadministrador</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" name="activo" id="usuario-activo" checked>
+                                <label class="form-check-label" for="usuario-activo">Usuario Activo</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-guardar-usuario">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>

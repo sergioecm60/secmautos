@@ -35,6 +35,7 @@ requiereAutenticacion();
                 <a href="#" class="nav-btn active" data-module="dashboard">📊 Dashboard</a>
                 <a href="#" class="nav-btn" data-module="vehiculos">🚗 Vehículos</a>
                 <a href="#" class="nav-btn" data-module="empleados">👥 Empleados</a>
+                <a href="#" class="nav-btn" data-module="autorizaciones">🔐 Autorizaciones Manejo</a>
                 <a href="#" class="nav-btn" data-module="asignaciones">🔄 Asignaciones</a>
                 <a href="#" class="nav-btn" data-module="multas">⚠️ Multas</a>
                 <a href="#" class="nav-btn" data-module="mantenimientos">🔧 Mantenimiento</a>
@@ -43,6 +44,8 @@ requiereAutenticacion();
                 <a href="#" class="nav-btn" data-module="transferencias">📂 Transferencias</a>
                 <a href="#" class="nav-btn" data-module="pagos">💰 Pagos</a>
                 <a href="#" class="nav-btn" data-module="reportes">📈 Reportes</a>
+                <a href="#" class="nav-btn" data-module="usuarios">👤 Usuarios</a>
+                <a href="#" class="nav-btn" data-module="configuracion">⚙️ Configuración</a>
             </nav>
         </div>
     </div>
@@ -78,6 +81,9 @@ requiereAutenticacion();
         <div id="module-pagos" class="module"></div>
         <div id="module-ficha_vehiculo" class="module"></div>
         <div id="module-reportes" class="module"></div>
+        <div id="module-autorizaciones" class="module"></div>
+        <div id="module-usuarios" class="module"></div>
+        <div id="module-configuracion" class="module"></div>
     </div>
 
     <footer class="page-footer-fixed">
@@ -94,6 +100,9 @@ requiereAutenticacion();
         </p>
     </footer>
 
+    <script>
+        window.phpUsuarioId = '<?= $_SESSION['usuario_id'] ?? '' ?>';
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/dashboard.js"></script>
 </body>
