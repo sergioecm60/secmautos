@@ -88,7 +88,96 @@ switch ($method) {
             json_response(['success' => false, 'message' => 'Error al crear vehículo: ' . $e->getMessage()], 500);
         }
         break;
-    
+
+    case 'PUT':
+        parse_str(file_get_contents('php://input'), $_PUT);
+
+        if (!verificar_csrf($_PUT['csrf_token'] ?? '')) {
+            json_response(['success' => false, 'message' => 'Token CSRF inválido'], 403);
+        }
+
+        try {
+            $id = (int)($_PUT['id'] ?? 0);
+            $patente = strtoupper(trim($_PUT['patente'] ?? ''));
+            $marca = sanitizar_input($_PUT['marca'] ?? '');
+            $modelo = sanitizar_input($_PUT['modelo'] ?? '');
+            $anio = (int)($_PUT['anio'] ?? 0);
+            $motor = sanitizar_input($_PUT['motor'] ?? '');
+            $chasis = sanitizar_input($_PUT['chasis'] ?? '');
+            $titularidad = sanitizar_input($_PUT['titularidad'] ?? '');
+            $kilometraje_actual = (int)($_PUT['kilometraje_actual'] ?? 0);
+            $estado = sanitizar_input($_PUT['estado'] ?? 'disponible');
+            $fecha_vtv = !empty($_PUT['fecha_vtv']) ? $_PUT['fecha_vtv'] : null;
+            $fecha_seguro = !empty($_PUT['fecha_seguro']) ? $_PUT['fecha_seguro'] : null;
+            $fecha_patente = !empty($_PUT['fecha_patente']) ? $_PUT['fecha_patente'] : null;
+            $km_proximo_service = (int)($_PUT['km_proximo_service'] ?? 0);
+            $observaciones = sanitizar_input($_PUT['observaciones'] ?? '');
+
+            if (empty($id) || empty($patente) || empty($marca) || empty($modelo)) {
+                json_response(['success' => false, 'message' => 'ID, patente, marca y modelo son obligatorios'], 400);
+            }
+
+            $stmt = $pdo->prepare("
+                UPDATE vehiculos SET
+                    patente = ?, marca = ?, modelo = ?, anio = ?, motor = ?,
+                    chasis = ?, titularidad = ?, kilometraje_actual = ?, estado = ?,
+                    fecha_vtv = ?, fecha_seguro = ?, fecha_patente = ?,
+                    km_proximo_service = ?, observaciones = ?
+                WHERE id = ?
+            ");
+
+            $stmt->execute([
+                $patente, $marca, $modelo, $anio, $motor, $chasis, $titularidad,
+                $kilometraje_actual, $estado, $fecha_vtv, $fecha_seguro,
+                $fecha_patente, $km_proximo_service, $observaciones, $id
+            ]);
+
+            registrarLog($_SESSION['usuario_id'], 'ACTUALIZAR_VEHICULO', 'vehiculos', "Vehículo actualizado: $patente (ID: $id)", $pdo);
+
+            json_response(['success' => true, 'message' => 'Vehículo actualizado exitosamente']);
+        } catch (PDOException $e) {
+            if ($e->getCode() == 23000) {
+                json_response(['success' => false, 'message' => 'La patente ya existe en el sistema'], 409);
+            }
+            json_response(['success' => false, 'message' => 'Error al actualizar vehículo: ' . $e->getMessage()], 500);
+        }
+        break;
+
+    case 'DELETE':
+        parse_str(file_get_contents('php://input'), $_DELETE);
+
+        if (!verificar_csrf($_DELETE['csrf_token'] ?? '')) {
+            json_response(['success' => false, 'message' => 'Token CSRF inválido'], 403);
+        }
+
+        try {
+            $id = (int)($_DELETE['id'] ?? 0);
+
+            if (empty($id)) {
+                json_response(['success' => false, 'message' => 'ID es obligatorio'], 400);
+            }
+
+            // Obtener datos del vehículo antes de dar de baja
+            $stmt = $pdo->prepare("SELECT patente FROM vehiculos WHERE id = ?");
+            $stmt->execute([$id]);
+            $vehiculo = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$vehiculo) {
+                json_response(['success' => false, 'message' => 'Vehículo no encontrado'], 404);
+            }
+
+            // Soft delete: cambiar estado a 'baja' y registrar fecha
+            $stmt = $pdo->prepare("UPDATE vehiculos SET estado = 'baja', fecha_baja = CURDATE() WHERE id = ?");
+            $stmt->execute([$id]);
+
+            registrarLog($_SESSION['usuario_id'], 'DAR_BAJA_VEHICULO', 'vehiculos', "Vehículo dado de baja: {$vehiculo['patente']} (ID: $id)", $pdo);
+
+            json_response(['success' => true, 'message' => 'Vehículo dado de baja exitosamente']);
+        } catch (PDOException $e) {
+            json_response(['success' => false, 'message' => 'Error al dar de baja vehículo: ' . $e->getMessage()], 500);
+        }
+        break;
+
     default:
         json_response(['success' => false, 'message' => 'Método no permitido'], 405);
         break;

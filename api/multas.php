@@ -61,7 +61,34 @@ switch ($method) {
             json_response(['success' => false, 'message' => 'Error al registrar multa: ' . $e->getMessage()], 500);
         }
         break;
-    
+
+    case 'PUT':
+        parse_str(file_get_contents('php://input'), $_PUT);
+
+        if (!verificar_csrf($_PUT['csrf_token'] ?? '')) {
+            json_response(['success' => false, 'message' => 'Token CSRF inválido'], 403);
+        }
+
+        try {
+            $id = (int)($_PUT['id'] ?? 0);
+            $pagada = (bool)($_PUT['pagada'] ?? false);
+
+            if (empty($id)) {
+                json_response(['success' => false, 'message' => 'ID es obligatorio'], 400);
+            }
+
+            // Marcar como pagada con fecha de pago
+            $stmt = $pdo->prepare("UPDATE multas SET pagada = ?, fecha_pago = CURDATE() WHERE id = ?");
+            $stmt->execute([$pagada, $id]);
+
+            registrarLog($_SESSION['usuario_id'], 'ACTUALIZAR_MULTA', 'multas', "Multa marcada como pagada (ID: $id)", $pdo);
+
+            json_response(['success' => true, 'message' => 'Multa actualizada exitosamente']);
+        } catch (PDOException $e) {
+            json_response(['success' => false, 'message' => 'Error al actualizar multa: ' . $e->getMessage()], 500);
+        }
+        break;
+
     default:
         json_response(['success' => false, 'message' => 'Método no permitido'], 405);
         break;
