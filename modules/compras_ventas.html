@@ -1,0 +1,182 @@
+<div class="card">
+    <h3 class="mb-4">💸 Gestión de Compras y Ventas</h3>
+
+    <ul class="nav nav-tabs" id="comprasVentasTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="compras-tab" data-bs-toggle="tab" data-bs-target="#compras" type="button" role="tab" aria-controls="compras" aria-selected="true">
+                🛒 Compras
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="ventas-tab" data-bs-toggle="tab" data-bs-target="#ventas" type="button" role="tab" aria-controls="ventas" aria-selected="false">
+                💰 Ventas
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="comprasVentasTabContent">
+        <!-- Pestaña de Compras -->
+        <div class="tab-pane fade show active" id="compras" role="tabpanel" aria-labelledby="compras-tab">
+            <div class="d-flex justify-content-end my-3">
+                <button class="btn btn-primary" id="btn-nueva-compra">
+                    <i class="bi bi-plus-circle"></i> Nueva Compra
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover" id="tabla-compras">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Vehículo</th>
+                            <th>Proveedor</th>
+                            <th>Factura N°</th>
+                            <th>Total</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pestaña de Ventas -->
+        <div class="tab-pane fade" id="ventas" role="tabpanel" aria-labelledby="ventas-tab">
+            <div class="d-flex justify-content-end my-3">
+                <button class="btn btn-primary" id="btn-nueva-venta">
+                    <i class="bi bi-plus-circle"></i> Nueva Venta
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover" id="tabla-ventas">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Vehículo</th>
+                            <th>Comprador</th>
+                            <th>Factura N°</th>
+                            <th>Importe</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal Formulario Compra -->
+<div class="modal fade" id="modalCompra" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Registrar Compra</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-compra">
+                    <input type="hidden" name="id" id="compra-id">
+                     <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Vehículo *</label>
+                            <select class="form-select" name="vehiculo_id" required></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Fecha *</label>
+                            <input type="date" class="form-control" name="fecha" required>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Proveedor *</label>
+                            <input type="text" class="form-control" name="proveedor" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">CUIT Proveedor</label>
+                            <input type="text" class="form-control" name="cuit">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Factura N°</label>
+                            <input type="text" class="form-control" name="factura_numero">
+                        </div>
+                         <div class="col-md-6">
+                            <label class="form-label">Comprobante (link/path)</label>
+                            <input type="text" class="form-control" name="comprobante">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Importe Neto</label>
+                            <input type="number" step="0.01" class="form-control" name="importe_neto">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">IVA</label>
+                            <input type="number" step="0.01" class="form-control" name="iva">
+                        </div>
+                         <div class="col-md-4">
+                            <label class="form-label">Total</label>
+                            <input type="number" step="0.01" class="form-control" name="total">
+                        </div>
+                        <div class="col-12">
+                           <label class="form-label">Observaciones</label>
+                           <textarea class="form-control" name="observaciones" rows="2"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-guardar-compra">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Formulario Venta -->
+<div class="modal fade" id="modalVenta" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+             <div class="modal-header">
+                <h5 class="modal-title">Registrar Venta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-venta">
+                     <input type="hidden" name="id" id="venta-id">
+                     <div class="alert alert-warning">Al registrar una venta, el vehículo será dado de baja automáticamente.</div>
+                     <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Vehículo a vender *</label>
+                            <select class="form-select" name="vehiculo_id" required></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Fecha *</label>
+                            <input type="date" class="form-control" name="fecha" required>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Comprador *</label>
+                            <input type="text" class="form-control" name="comprador" required>
+                        </div>
+                         <div class="col-md-4">
+                            <label class="form-label">CUIT Comprador</label>
+                            <input type="text" class="form-control" name="cuit">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Factura N°</label>
+                            <input type="text" class="form-control" name="factura_numero">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Importe Total</label>
+                            <input type="number" step="0.01" class="form-control" name="importe">
+                        </div>
+                         <div class="col-12">
+                           <label class="form-label">Observaciones</label>
+                           <textarea class="form-control" name="observaciones" rows="2"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-guardar-venta">Guardar Venta</button>
+            </div>
+        </div>
+    </div>
+</div>

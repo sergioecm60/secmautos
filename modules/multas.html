@@ -1,0 +1,106 @@
+<div class="card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>⚠️ Gestión de Multas</h3>
+        <button class="btn btn-primary" id="btn-nueva-multa">
+            <i class="bi bi-plus-circle"></i> Nueva Multa
+        </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row g-2 mb-3">
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="filtro-multa-patente" placeholder="Buscar por patente">
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="filtro-multa-estado">
+                <option value="">Todos los estados</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="pagada">Pagada</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-secondary" id="btn-filtrar-multas">Filtrar</button>
+        </div>
+    </div>
+
+    <!-- Tabla de Multas -->
+    <div class="table-responsive">
+        <table class="table table-hover" id="tabla-multas">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Vehículo (Patente)</th>
+                    <th>Empleado Responsable</th>
+                    <th>Motivo</th>
+                    <th>Monto</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Filas se insertarán dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Formulario Multa -->
+<div class="modal fade" id="modalMulta" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Registrar Nueva Multa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-multa">
+                    <input type="hidden" name="id" id="multa-id">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="multa-vehiculo" class="form-label">Vehículo *</label>
+                            <select class="form-select" id="multa-vehiculo" name="vehiculo_id" required>
+                                <!-- Opciones de vehículos -->
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="multa-fecha" class="form-label">Fecha y Hora de la Infracción *</label>
+                            <input type="datetime-local" class="form-control" id="multa-fecha" name="fecha_multa" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Empleado Asignado en ese momento</label>
+                            <p id="multa-empleado-info" class="form-control-plaintext">Seleccione vehículo y fecha para ver al responsable.</p>
+                            <input type="hidden" id="multa-empleado-id" name="empleado_id">
+                        </div>
+                        <div class="col-12">
+                            <label for="multa-motivo" class="form-label">Motivo / Descripción de la Multa *</label>
+                            <textarea class="form-control" id="multa-motivo" name="motivo" rows="2" required></textarea>
+                        </div>
+                         <div class="col-md-6">
+                            <label for="multa-acta" class="form-label">Número de Acta/Boleta</label>
+                            <input type="text" class="form-control" id="multa-acta" name="numero_acta">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="multa-monto" class="form-label">Monto (AR$) *</label>
+                            <input type="number" step="0.01" class="form-control" id="multa-monto" name="monto" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="multa-estado" class="form-label">Estado</label>
+                             <select class="form-select" id="multa-estado-form" name="pagada" disabled>
+                                <option value="0" selected>Pendiente</option>
+                                <option value="1">Pagada</option>
+                            </select>
+                        </div>
+                         <div class="col-md-6" id="fecha-pago-container" style="display: none;">
+                            <label for="multa-fecha-pago" class="form-label">Fecha de Pago</label>
+                            <input type="date" class="form-control" id="multa-fecha-pago" name="fecha_pago">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-guardar-multa">Guardar Multa</button>
+            </div>
+        </div>
+    </div>
+</div>

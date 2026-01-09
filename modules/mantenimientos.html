@@ -1,0 +1,88 @@
+<div class="card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>🔧 Gestión de Mantenimientos</h3>
+        <button class="btn btn-primary" id="btn-nuevo-mantenimiento">
+            <i class="bi bi-plus-circle"></i> Nuevo Mantenimiento
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover" id="tabla-mantenimientos">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Vehículo</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Costo</th>
+                    <th>Kilometraje</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Formulario Mantenimiento -->
+<div class="modal fade" id="modalMantenimiento" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Registro de Mantenimiento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-mantenimiento" enctype="multipart/form-data">
+                    <input type="hidden" name="id" id="mantenimiento-id">
+                    <div class="row g-3">
+                        <div class="col-md-7">
+                            <label class="form-label">Vehículo *</label>
+                            <select class="form-select" name="vehiculo_id" required></select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Fecha *</label>
+                            <input type="date" class="form-control" name="fecha" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tipo</label>
+                            <select class="form-select" name="tipo">
+                                <option value="preventivo">Preventivo</option>
+                                <option value="correctivo">Correctivo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Kilometraje</label>
+                            <input type="number" class="form-control" name="kilometraje">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Descripción *</label>
+                            <textarea class="form-control" name="descripcion" rows="2" required></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Proveedor</label>
+                            <input type="text" class="form-control" name="proveedor">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Costo</label>
+                            <input type="number" step="0.01" class="form-control" name="costo">
+                        </div>
+                        <div class="col-12">
+                           <label class="form-label">Observaciones</label>
+                           <textarea class="form-control" name="observaciones" rows="2"></textarea>
+                        </div>
+                        <div class="col-12">
+                           <label class="form-label">Comprobante (subir archivo)</label>
+                           <input type="file" class="form-control" name="comprobante_file">
+                           <input type="hidden" name="comprobante">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-guardar-mantenimiento">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>

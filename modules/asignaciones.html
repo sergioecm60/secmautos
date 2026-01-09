@@ -1,0 +1,134 @@
+<div class="card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>🔄 Gestión de Asignaciones</h3>
+        <button class="btn btn-primary" id="btn-nueva-asignacion">
+            <i class="bi bi-plus-circle"></i> Nueva Asignación
+        </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row g-2 mb-3">
+        <div class="col-md-4">
+            <input type="text" class="form-control" id="filtro-asignacion-patente" placeholder="Buscar por patente">
+        </div>
+        <div class="col-md-4">
+            <input type="text" class="form-control" id="filtro-asignacion-empleado" placeholder="Buscar por empleado">
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-secondary w-100" id="btn-filtrar-asignaciones">Filtrar</button>
+        </div>
+    </div>
+
+    <!-- Tabla de Asignaciones Activas -->
+    <div class="table-responsive">
+        <h4 class="mt-4 mb-3">Asignaciones Activas</h4>
+        <table class="table table-hover" id="tabla-asignaciones-activas">
+            <thead>
+                <tr>
+                    <th>Vehículo (Patente)</th>
+                    <th>Empleado</th>
+                    <th>Fecha Salida</th>
+                    <th>Km Salida</th>
+                    <th>Observaciones</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Filas se insertarán dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Tabla de Historial de Asignaciones -->
+    <div class="table-responsive mt-5">
+        <h4 class="mb-3">Historial de Asignaciones</h4>
+        <table class="table table-sm table-bordered" id="tabla-historial-asignaciones">
+            <thead>
+                <tr>
+                    <th>Vehículo</th>
+                    <th>Empleado</th>
+                    <th>Periodo</th>
+                    <th>Recorrido</th>
+                </tr>
+            </thead>
+            <tbody>
+                 <!-- Filas se insertarán dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Formulario Asignación -->
+<div class="modal fade" id="modalAsignacion" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-asignacion-title">Nueva Asignación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-asignacion">
+                    
+                    <div class="mb-3">
+                        <label for="asignacion-vehiculo" class="form-label">Vehículo (disponibles)</label>
+                        <select class="form-select" id="asignacion-vehiculo" name="vehiculo_id" required>
+                            <!-- Opciones se cargarán dinámicamente -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="asignacion-empleado" class="form-label">Empleado</label>
+                        <select class="form-select" id="asignacion-empleado" name="empleado_id" required>
+                            <!-- Opciones se cargarán dinámicamente -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="asignacion-km_salida" class="form-label">Kilometraje de Salida</label>
+                        <input type="number" class="form-control" id="asignacion-km_salida" name="km_salida" readonly>
+                         <small class="form-text text-muted">Se carga automáticamente del vehículo seleccionado.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="asignacion-observaciones" class="form-label">Observaciones</label>
+                        <textarea class="form-control" id="asignacion-observaciones" name="observaciones" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-guardar-asignacion">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal Devolución -->
+<div class="modal fade" id="modalDevolucion" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Devolver Vehículo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-devolucion">
+                     
+                    <input type="hidden" id="devolucion-asignacion-id" name="asignacion_id">
+                    <p>Vehículo: <strong id="devolucion-vehiculo"></strong></p>
+                    <p>Km Salida: <strong id="devolucion-km-salida"></strong></p>
+                    <div class="mb-3">
+                        <label for="devolucion-km_regreso" class="form-label">Kilometraje de Regreso *</label>
+                        <input type="number" class="form-control" id="devolucion-km_regreso" name="km_regreso" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="devolucion-observaciones" class="form-label">Observaciones de Devolución</label>
+                        <textarea class="form-control" id="devolucion-observaciones" name="observaciones" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-confirmar-devolucion">Confirmar Devolución</button>
+            </div>
+        </div>
+    </div>
+</div>

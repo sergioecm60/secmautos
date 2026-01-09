@@ -146,6 +146,15 @@ function cargarModulo(modulo) {
         case 'multas':
             cargarMultas();
             break;
+        case 'compras_ventas':
+            cargarComprasVentas();
+            break;
+        case 'ceta':
+            cargarCeta();
+            break;
+        case 'transferencias':
+            cargarTransferencias();
+            break;
         case 'mantenimientos':
             cargarMantenimientos();
             break;
@@ -229,22 +238,59 @@ function cargarEmpleados() {
 
 function cargarAsignaciones() {
     const container = document.getElementById('module-asignaciones');
-    container.innerHTML = `
-        <div class="card">
-            <h3>🔄 Gestión de Asignaciones</h3>
-            <p>Módulo en construcción...</p>
-        </div>
-    `;
+
+    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
+        if (window.asignacionesView) {
+            window.asignacionesView.cargarDatos();
+        }
+        return;
+    }
+
+    fetch('modules/asignaciones.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/asignaciones.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/asignaciones.js';
+                script.onload = () => {
+                    window.asignacionesView = new AsignacionesView();
+                };
+                document.body.appendChild(script);
+            } else {
+                window.asignacionesView = new AsignacionesView();
+            }
+        })
+        .catch(error => console.error('Error cargando módulo asignaciones:', error));
 }
 
 function cargarMultas() {
     const container = document.getElementById('module-multas');
-    container.innerHTML = `
-        <div class="card">
-            <h3>⚠️ Registro de Multas</h3>
-            <p>Módulo en construcción...</p>
-        </div>
-    `;
+
+    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
+        // Module already loaded, maybe just refresh data if needed
+        return;
+    }
+
+    fetch('modules/multas.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/multas.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/multas.js';
+                // No need for onload if the script itself initializes
+                document.body.appendChild(script);
+            } else {
+                // If script is already there, maybe re-init
+                if (window.MultasView && typeof window.MultasView.init === 'function') {
+                    new MultasView();
+                }
+            }
+        })
+        .catch(error => console.error('Error cargando módulo multas:', error));
 }
 
 function cargarMantenimientos() {
@@ -291,4 +337,76 @@ function editarVehiculo(id) {
 
 function nuevoEmpleado() {
     alert('Formulario de nuevo empleado en construcción...');
+}
+
+function cargarComprasVentas() {
+    const container = document.getElementById('module-compras_ventas');
+    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
+        return;
+    }
+
+    fetch('modules/compras_ventas.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/compras_ventas.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/compras_ventas.js';
+                document.body.appendChild(script);
+            } else {
+                if (window.ComprasVentasView && typeof window.ComprasVentasView.init === 'function') {
+                    new ComprasVentasView();
+                }
+            }
+        })
+        .catch(error => console.error('Error cargando módulo compras/ventas:', error));
+}
+
+function cargarCeta() {
+    const container = document.getElementById('module-ceta');
+    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
+        return;
+    }
+
+    fetch('modules/ceta.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/ceta.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/ceta.js';
+                document.body.appendChild(script);
+            } else {
+                if (window.CetaView && typeof window.CetaView.init === 'function') {
+                    new CetaView();
+                }
+            }
+        })
+        .catch(error => console.error('Error cargando módulo ceta:', error));
+}
+
+function cargarTransferencias() {
+    const container = document.getElementById('module-transferencias');
+    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
+        return;
+    }
+
+    fetch('modules/transferencias.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/transferencias.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/transferencias.js';
+                document.body.appendChild(script);
+            } else {
+                if (window.TransferenciasView && typeof window.TransferenciasView.init === 'function') {
+                    new TransferenciasView();
+                }
+            }
+        })
+        .catch(error => console.error('Error cargando módulo transferencias:', error));
 }

@@ -1,0 +1,81 @@
+<div class="card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>📂 Gestión de Transferencias</h3>
+        <button class="btn btn-primary" id="btn-nueva-transferencia">
+            <i class="bi bi-plus-circle"></i> Nuevo Trámite
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover" id="tabla-transferencias">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Vehículo</th>
+                    <th>Registro</th>
+                    <th>N° Trámite</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Filas se insertarán dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Formulario Transferencia -->
+<div class="modal fade" id="modalTransferencia" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Registro de Transferencia</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-transferencia">
+                    <input type="hidden" name="id" id="transferencia-id">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Vehículo *</label>
+                            <select class="form-select" name="vehiculo_id" required></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Fecha de Inicio *</label>
+                            <input type="date" class="form-control" name="fecha" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Registro Seccional</label>
+                            <input type="text" class="form-control" name="registro">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Dirección del Registro</label>
+                            <input type="text" class="form-control" name="direccion_registro">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">N° de Trámite</label>
+                            <input type="text" class="form-control" name="numero_tramite">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Estado</label>
+                            <select class="form-select" name="estado">
+                                <option value="en_proceso">En Proceso</option>
+                                <option value="completa">Completa</option>
+                                <option value="cancelada">Cancelada</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                           <label class="form-label">Observaciones</label>
+                           <textarea class="form-control" name="observaciones" rows="2"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-guardar-transferencia">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
