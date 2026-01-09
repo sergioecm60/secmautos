@@ -1,0 +1,6 @@
+.env
+config/config.php
+vendor/
+sessions/*
+logs/*
+assets/img/uploads/*

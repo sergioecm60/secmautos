@@ -1,0 +1,81 @@
+<?php
+require_once 'bootstrap.php';
+requiereAutenticacion();
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SECM Autos</title>
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/themes.css">
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="user-info">
+                <span>👤 <?= htmlspecialchars($_SESSION['nombre'] . ' ' . $_SESSION['apellido']) ?></span>
+                <span>|</span>
+                <span>🏷️ <?= htmlspecialchars($_SESSION['rol']) ?></span>
+                <span>|</span>
+                <a href="api/logout.php" class="logout-btn">Cerrar Sesión</a>
+            </div>
+            <h1>🚗 SECM Autos</h1>
+            <p>Sistema de Gestión de Vehículos</p>
+        </div>
+    </div>
+
+    <div class="main-nav">
+        <div class="container">
+            <nav class="nav-buttons">
+                <a href="#" class="nav-btn active" data-module="dashboard">📊 Dashboard</a>
+                <a href="#" class="nav-btn" data-module="vehiculos">🚗 Vehículos</a>
+                <a href="#" class="nav-btn" data-module="empleados">👥 Empleados</a>
+                <a href="#" class="nav-btn" data-module="asignaciones">🔄 Asignaciones</a>
+                <a href="#" class="nav-btn" data-module="multas">⚠️ Multas</a>
+                <a href="#" class="nav-btn" data-module="mantenimientos">🔧 Mantenimiento</a>
+                <a href="#" class="nav-btn" data-module="pagos">💰 Pagos</a>
+                <a href="#" class="nav-btn" data-module="reportes">📈 Reportes</a>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="alertas-container"></div>
+
+        <div id="module-dashboard" class="module active">
+            <div class="card">
+                <h3>📊 Resumen General</h3>
+                <div class="stats-grid" id="stats-grid"></div>
+            </div>
+
+            <div class="card">
+                <h3>⚠️ Alertas Activas</h3>
+                <div id="alertas-lista"></div>
+            </div>
+
+            <div class="card">
+                <h3>🚗 Vehículos Próximos a Vencer</h3>
+                <div id="vencimientos-lista"></div>
+            </div>
+        </div>
+
+        <div id="module-vehiculos" class="module"></div>
+        <div id="module-empleados" class="module"></div>
+        <div id="module-asignaciones" class="module"></div>
+        <div id="module-multas" class="module"></div>
+        <div id="module-mantenimientos" class="module"></div>
+        <div id="module-pagos" class="module"></div>
+        <div id="module-reportes" class="module"></div>
+    </div>
+
+    <footer class="app-footer">
+        <p>SECM Autos - Sistema de Gestión de Vehículos</p>
+        <p>&copy; <?= date('Y') ?> Todos los derechos reservados</p>
+    </footer>
+
+    <script src="assets/js/dashboard.js"></script>
+</body>
+</html>

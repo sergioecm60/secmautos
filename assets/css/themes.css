@@ -1,0 +1,238 @@
+/* themes.css - Sistema de Temas Avanzado */
+/* ---------------------------------------- */
+/* Este archivo define las paletas de colores para los diferentes temas. */
+/* Utiliza variables CSS (ej. --bg-primary) para que los colores se puedan cambiar fácilmente.
+/* Para crear un nuevo tema, solo necesitas copiar un bloque [data-theme="..."] y cambiar los valores de las variables. */
+/* ---------------------------------------- */
+*/
+
+/* ========== VARIABLES DE TEMA ========== */
+/* El bloque :root define las variables para el tema por defecto (Claro). */
+:root {
+  /* --- Colores de Fondo --- */
+  --bg-primary: #f8f9fa;      /* Fondo principal de la página */
+  --bg-secondary: #ffffff;    /* Fondo de las tarjetas y contenedores */
+  --bg-tertiary: #e9ecef;     /* Fondo para elementos secundarios como cabeceras de tablas o inputs */
+
+  /* --- Colores de Texto --- */
+  --text-primary: #212529;    /* Color de texto principal (oscuro) */
+  --text-secondary: #6c757d;  /* Color de texto secundario (gris) */
+  --text-muted: #adb5bd;      /* Color de texto más claro (apagado) */
+
+  /* --- Colores de Bordes y Sombras --- */
+  --border-color: #dee2e6;    /* Color de borde principal */
+  --border-light: #f1f3f4;    /* Color de borde más claro */
+  --shadow: 0 2px 10px rgba(0,0,0,0.08);       /* Sombra estándar */
+  --shadow-hover: 0 4px 20px rgba(0,0,0,0.12); /* Sombra al pasar el mouse */
+
+  /* --- Degradados (Gradients) --- */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-success: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  --gradient-warning: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+  --gradient-danger: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+  --gradient-info: linear-gradient(135deg, #17a2b8 0%, #007bff 100%);
+  
+  /* --- Colores de Acento (para botones, enlaces, etc.) --- */
+  --accent-primary: #667eea;  /* Azul/Púrpura principal */
+  --accent-success: #28a745;  /* Verde para éxito */
+  --accent-warning: #ffc107;  /* Amarillo para advertencia */
+  --accent-danger: #dc3545;   /* Rojo para peligro/error */
+  --accent-info: #17a2b8;     /* Azul para información */
+
+  /* --- Colores Específicos del Login --- */
+  --bg-login-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  --bg-login-container: rgba(255, 255, 255, 0.95);
+  --text-login-header-gradient: linear-gradient(135deg, #667eea, #764ba2);
+  --bg-login-footer: rgba(0, 0, 0, 0.2);
+  --text-login-footer: rgba(255, 255, 255, 0.8);
+  --text-login-footer-link: #ffffff;
+  
+  /* --- Animaciones y Bordes --- */
+  --transition-fast: 0.15s ease;    /* Transición rápida */
+  --transition-normal: 0.3s ease;   /* Transición estándar */
+  
+  --radius-sm: 6px;   /* Borde redondeado pequeño */
+  --radius-md: 10px;  /* Borde redondeado mediano */
+  --radius-lg: 15px;  /* Borde redondeado grande */
+}
+
+/* ========== TEMA OSCURO ========== */
+/* Se activa cuando el body tiene el atributo [data-theme="dark"] */
+[data-theme="dark"] {
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-tertiary: #21262d;
+  --text-primary: #f0f6fc;
+  --text-secondary: #8b949e;
+  --text-muted: #6e7681;
+  --border-color: #30363d;
+  --border-light: #21262d;
+  --shadow: 0 2px 10px rgba(0,0,0,0.4);
+  --shadow-hover: 0 4px 20px rgba(0,0,0,0.6);
+  --gradient-primary: linear-gradient(135deg, #4c6ef5 0%, #495057 100%);
+  --gradient-success: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
+  --gradient-warning: linear-gradient(135deg, #ffd43b 0%, #fab005 100%);
+  --gradient-danger: linear-gradient(135deg, #ff6b6b 0%, #f03e3e 100%);
+  --gradient-info: linear-gradient(135deg, #339af0 0%, #228be6 100%);
+  
+  --accent-primary: #4c6ef5;
+  --accent-success: #51cf66;
+  --accent-warning: #ffd43b;
+  --accent-danger: #ff6b6b;
+  --accent-info: #339af0;
+
+  --bg-login-gradient: linear-gradient(135deg, #1d2b64 0%, #2c3e50 100%);
+  --bg-login-container: rgba(22, 27, 34, 0.9);
+  --text-login-header-gradient: linear-gradient(135deg, #4c6ef5, #adb5bd);
+  --bg-login-footer: rgba(0, 0, 0, 0.4);
+  --text-login-footer: rgba(240, 246, 252, 0.8);
+  --text-login-footer-link: #c9d1d9;
+}
+
+/* ========== TEMA AZUL CORPORATIVO ========== */
+/* Se activa cuando el body tiene el atributo [data-theme="corporate"] */
+[data-theme="corporate"] {
+  --bg-primary: #f4f6f9;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #e8ecf0;
+  --text-primary: #1a2332;
+  --text-secondary: #5a6c7d;
+  --text-muted: #8fa3b3;
+  --border-color: #d4dce5;
+  --border-light: #eaf0f6;
+  --shadow: 0 2px 8px rgba(26, 35, 50, 0.1);
+  --shadow-hover: 0 4px 16px rgba(26, 35, 50, 0.15);
+  --gradient-primary: linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);
+  --gradient-success: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+  --gradient-warning: linear-gradient(135deg, #d69e2e 0%, #b7791f 100%);
+  --gradient-danger: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+  --gradient-info: linear-gradient(135deg, #3182ce 0%, #2c5aa0 100%);
+  
+  --accent-primary: #2c5aa0;
+  --accent-success: #38a169;
+  --accent-warning: #d69e2e;
+  --accent-danger: #e53e3e;
+  --accent-info: #3182ce;
+
+  --bg-login-gradient: linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);
+  --bg-login-container: rgba(255, 255, 255, 0.98);
+  --text-login-header-gradient: linear-gradient(135deg, #2c5aa0, #1a365d);
+  --bg-login-footer: rgba(26, 54, 93, 0.8);
+  --text-login-footer: rgba(255, 255, 255, 0.9);
+  --text-login-footer-link: #ffffff;
+}
+
+/* ========== TEMA NATURE (VERDE) ========== */
+/* Se activa cuando el body tiene el atributo [data-theme="nature"] */
+[data-theme="nature"] {
+  --bg-primary: #f0f9f0;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #e8f5e8;
+  --text-primary: #1b4332;
+  --text-secondary: #40916c;
+  --text-muted: #74c69d;
+  --border-color: #b7e4c7;
+  --border-light: #d8f3dc;
+  --shadow: 0 2px 8px rgba(27, 67, 50, 0.1);
+  --shadow-hover: 0 4px 16px rgba(27, 67, 50, 0.15);
+  --gradient-primary: linear-gradient(135deg, #2d6a4f 0%, #1b4332 100%);
+  --gradient-success: linear-gradient(135deg, #40916c 0%, #2d6a4f 100%);
+  --gradient-warning: linear-gradient(135deg, #f77f00 0%, #d62d20 100%);
+  --gradient-danger: linear-gradient(135deg, #d62d20 0%, #ae2012 100%);
+  --gradient-info: linear-gradient(135deg, #0077b6 0%, #023e8a 100%);
+  
+  --accent-primary: #2d6a4f;
+  --accent-success: #40916c;
+  --accent-warning: #f77f00;
+  --accent-danger: #d62d20;
+  --accent-info: #0077b6;
+
+  --bg-login-gradient: linear-gradient(135deg, #2d6a4f 0%, #1b4332 100%);
+  --bg-login-container: rgba(255, 255, 255, 0.96);
+  --text-login-header-gradient: linear-gradient(135deg, #2d6a4f, #1b4332);
+  --bg-login-footer: rgba(27, 67, 50, 0.8);
+  --text-login-footer: rgba(255, 255, 255, 0.9);
+  --text-login-footer-link: #ffffff;
+}
+/* ========== ACCESIBILIDAD ========== */
+/* Reduce las animaciones si el usuario lo tiene configurado en su sistema operativo */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ========== MODO IMPRESIÓN ========== */
+/* Estilos que se aplican solo al imprimir la página */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  /* Oculta elementos no necesarios para la impresión */
+  .theme-selector,
+  .btn,
+  .logout-btn,
+  .no-print {
+    display: none !important;
+  }
+  
+  /* Simplifica el estilo de las tarjetas para la impresión */
+  .card,
+  .stat-card {
+    background: white !important;
+    color: black !important;
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+  }
+}
+
+/* ========== SELECTOR DE TEMAS ========== */
+/* Estilos para los botones que permiten cambiar de tema */
+.theme-selector {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 8px;
+    z-index: 1000;
+}
+
+.theme-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    font-size: 20px;
+}
+
+.theme-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Estilos para cada botón de tema */
+.theme-btn.light {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 2px solid #dee2e6;
+}
+
+.theme-btn.dark {
+    background: linear-gradient(135deg, #212529 0%, #495057 100%);
+    border: 2px solid #6c757d;
+}
+
+.theme-btn.auto {
+    background: linear-gradient(45deg, #ffffff 50%, #212529 50%);
+    border: 2px solid #6c757d;
+}
+
+/* Estilo para el botón del tema activo */
+.theme-btn.active {
+    box-shadow: 0 0 0 3px var(--accent-primary, #007bff);
+}
