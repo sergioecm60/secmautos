@@ -368,11 +368,11 @@ tr:hover { background-color: var(--bg-tertiary); } /* Efecto al pasar el mouse s
 .login-container {
     background: var(--bg-login-container);
     backdrop-filter: blur(20px); /* Efecto de vidrio esmerilado */
-    border-radius: 16px; /* Bordes más suaves */
-    padding: 30px 20px; /* Reducimos el padding */
+    border-radius: 12px; /* Bordes más compactos */
+    padding: 20px 16px; /* Padding más compacto */
     width: 100%;
-    max-width: 320px; /* ¡Reducimos el ancho máximo! */
-    box-shadow: 
+    max-width: 280px; /* Ancho más pequeño */
+    box-shadow:
         0 15px 30px rgba(0, 0, 0, 0.12),
         0 5px 10px rgba(0, 0, 0, 0.08),
         inset 0 1px 0 rgba(255, 255, 255, 0.6);
@@ -385,13 +385,13 @@ tr:hover { background-color: var(--bg-tertiary); } /* Efecto al pasar el mouse s
 }
 
 /* Encabezado del login (logo y título) */
-.login-header { text-align: center; margin-bottom: 30px; }
+.login-header { text-align: center; margin-bottom: 20px; }
 .login-header .login-logo {
-    width: 60px; /* Reducido de 80px */
-    height: 60px; /* Reducido de 80px */
-    border-radius: 15px; /* Reducido de 20px */
-    margin-bottom: 12px; /* Reducido de 16px */
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15); /* Sombra más sutil */
+    width: 50px; /* Logo más pequeño */
+    height: 50px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
 .login-header p {
     font-size: 28px;
