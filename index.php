@@ -22,7 +22,7 @@ requiereAutenticacion();
                 <span>|</span>
                 <a href="api/logout.php" class="logout-btn">Cerrar Sesión</a>
             </div>
-            <h1>🚗 SECM Autos</h1>
+            <h1>🚗 SECM Flota de Autos</h1>
             <p>Sistema de Gestión de Vehículos</p>
         </div>
     </div>
@@ -71,9 +71,18 @@ requiereAutenticacion();
         <div id="module-reportes" class="module"></div>
     </div>
 
-    <footer class="app-footer">
-        <p>SECM Autos - Sistema de Gestión de Vehículos</p>
-        <p>&copy; <?= date('Y') ?> Todos los derechos reservados</p>
+    <footer class="page-footer-fixed">
+        <p>
+            <strong>SECM Flota de Autos</strong> |
+            By Sergio Cabrera |
+            Copyleft ©2025 |
+            <a href="licence.php">Licencia GNU GPL v3</a>
+        </p>
+        <p class="footer-contact">
+            ¿Necesitas ayuda?
+            <a href="mailto:sergiomiers@gmail.com">📧 sergiomiers@gmail.com</a> |
+            <a href="https://wa.me/541167598452" target="_blank">💬 WhatsApp +54 11 6759-8452</a>
+        </p>
     </footer>
 
     <script src="assets/js/dashboard.js"></script>
