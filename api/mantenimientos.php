@@ -71,6 +71,76 @@ switch ($method) {
             json_response(['success' => false, 'message' => 'Error al registrar mantenimiento: ' . $e->getMessage()], 500);
         }
         break;
+
+    case 'PUT':
+        parse_str(file_get_contents('php://input'), $_PUT);
+
+        if (!verificar_csrf($_PUT['csrf_token'] ?? '')) {
+            json_response(['success' => false, 'message' => 'Token CSRF inválido'], 403);
+        }
+
+        try {
+            $id = (int)($_PUT['id'] ?? 0);
+            $fecha = $_PUT['fecha'] ?? '';
+            $tipo = sanitizar_input($_PUT['tipo'] ?? 'preventivo');
+            $descripcion = sanitizar_input($_PUT['descripcion'] ?? '');
+            $costo = (float)($_PUT['costo'] ?? 0);
+            $kilometraje = (int)($_PUT['kilometraje'] ?? 0);
+            $proveedor = sanitizar_input($_PUT['proveedor'] ?? '');
+            $comprobante = sanitizar_input($_PUT['comprobante'] ?? '');
+            $observaciones = sanitizar_input($_PUT['observaciones'] ?? '');
+
+            if (empty($id) || empty($fecha) || empty($descripcion)) {
+                json_response(['success' => false, 'message' => 'ID, fecha y descripción son obligatorios'], 400);
+            }
+
+            $stmt = $pdo->prepare("
+                UPDATE mantenimientos SET
+                    fecha = ?, tipo = ?, descripcion = ?, costo = ?, kilometraje = ?, 
+                    proveedor = ?, comprobante = ?, observaciones = ?
+                WHERE id = ?
+            ");
+
+            $stmt->execute([
+                $fecha, $tipo, $descripcion, $costo, $kilometraje, 
+                $proveedor, $comprobante, $observaciones, $id
+            ]);
+
+            registrarLog($_SESSION['usuario_id'], 'ACTUALIZAR_MANTENIMIENTO', 'mantenimientos', "Mantenimiento actualizado (ID: $id)", $pdo);
+
+            json_response(['success' => true, 'message' => 'Mantenimiento actualizado exitosamente']);
+        } catch (PDOException $e) {
+            json_response(['success' => false, 'message' => 'Error al actualizar mantenimiento: ' . $e->getMessage()], 500);
+        }
+        break;
+
+    case 'DELETE':
+        parse_str(file_get_contents('php://input'), $_DELETE);
+
+        if (!verificar_csrf($_DELETE['csrf_token'] ?? '')) {
+            json_response(['success' => false, 'message' => 'Token CSRF inválido'], 403);
+        }
+
+        try {
+            $id = (int)($_DELETE['id'] ?? 0);
+
+            if (empty($id)) {
+                json_response(['success' => false, 'message' => 'ID es obligatorio'], 400);
+            }
+
+            $stmt = $pdo->prepare("DELETE FROM mantenimientos WHERE id = ?");
+            $stmt->execute([$id]);
+
+            if ($stmt->rowCount() > 0) {
+                registrarLog($_SESSION['usuario_id'], 'ELIMINAR_MANTENIMIENTO', 'mantenimientos', "Mantenimiento eliminado (ID: $id)", $pdo);
+                json_response(['success' => true, 'message' => 'Mantenimiento eliminado exitosamente']);
+            } else {
+                json_response(['success' => false, 'message' => 'No se encontró el mantenimiento a eliminar.'], 404);
+            }
+        } catch (PDOException $e) {
+            json_response(['success' => false, 'message' => 'Error al eliminar mantenimiento: ' . $e->getMessage()], 500);
+        }
+        break;
     
     default:
         json_response(['success' => false, 'message' => 'Método no permitido'], 405);
