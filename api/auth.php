@@ -86,22 +86,12 @@ function logout($pdo) {
     session_destroy();
 }
 
-function requiereAutenticacion($redirect = true) {
+function requiereRol($roles_permitidos, $redirect = true) {
     if (!isset($_SESSION['usuario_id'])) {
         if ($redirect) {
             header('Location: /login.php');
             exit;
         }
-        return false;
-    }
-    
-    global $pdo;
-    
-    return true;
-}
-
-function requiereRol($roles_permitidos, $redirect = true) {
-    if (!requiereAutenticacion($redirect)) {
         return false;
     }
     
