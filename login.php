@@ -11,11 +11,14 @@ if (isset($_SESSION['usuario_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Login - SECM Autos</title>
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/themes.css">
-    <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css?v=1.1">
+    <link rel="stylesheet" href="assets/css/style.css?v=1.1">
+    <link rel="stylesheet" href="assets/css/themes.css?v=1.1">
+    <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg?v=1.1">
 </head>
 <body class="modern-login-body" data-theme="light">
     <div class="theme-selector no-print">
@@ -89,7 +92,7 @@ if (isset($_SESSION['usuario_id'])) {
         </p>
     </footer>
     
-    <script src="assets/js/login.js"></script>
-    <script src="assets/js/theme-switcher.js"></script>
+    <script src="assets/js/login.js?v=1.1"></script>
+    <script src="assets/js/theme-switcher.js?v=1.1"></script>
 </body>
 </html>

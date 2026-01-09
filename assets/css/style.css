@@ -345,7 +345,7 @@ tr:hover { background-color: var(--bg-tertiary); } /* Efecto al pasar el mouse s
 
 /* Imagen del captcha */
 .captcha-image {
-    background: var(--gradient-primary);
+    background: var(--gradient-primary, #0d6efd);
     color: white;
     padding: 8px 12px;
     border-radius: 8px;
@@ -415,7 +415,7 @@ tr:hover { background-color: var(--bg-tertiary); } /* Efecto al pasar el mouse s
     margin-bottom: 16px; /* Reducido de 20px */
 }
 .captcha-image {
-    background: var(--gradient-primary);
+    background: var(--gradient-primary, #0d6efd);
     color: white;
     padding: 8px 12px; /* Reducido */
     border-radius: 8px; /* Reducido */

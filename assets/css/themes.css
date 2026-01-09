@@ -4,7 +4,6 @@
 /* Utiliza variables CSS (ej. --bg-primary) para que los colores se puedan cambiar fácilmente.
 /* Para crear un nuevo tema, solo necesitas copiar un bloque [data-theme="..."] y cambiar los valores de las variables. */
 /* ---------------------------------------- */
-*/
 
 /* ========== VARIABLES DE TEMA ========== */
 /* El bloque :root define las variables para el tema por defecto (Claro). */
