@@ -1,3 +1,6 @@
+// Variable global para CSRF token
+const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
 document.addEventListener('DOMContentLoaded', function() {
     const navBtns = document.querySelectorAll('.nav-btn');
     const modules = document.querySelectorAll('.module');
@@ -156,54 +159,39 @@ function cargarModulo(modulo) {
 }
 
 function cargarVehiculos() {
-    fetch('api/vehiculos.php')
-        .then(r => r.json())
-        .then(data => {
-            const container = document.getElementById('module-vehiculos');
-            if (!data.success) return;
-            
-            const rows = data.data.map(v => `
-                <tr>
-                    <td><strong>${v.patente}</strong></td>
-                    <td>${v.marca}</td>
-                    <td>${v.modelo}</td>
-                    <td>${v.anio}</td>
-                    <td>${v.kilometraje_actual} km</td>
-                    <td><span class="badge badge-${v.estado === 'disponible' ? 'success' : v.estado === 'asignado' ? 'info' : v.estado === 'mantenimiento' ? 'warning' : 'danger'}">${v.estado}</span></td>
-                    <td>${v.fecha_vtv || 'N/A'}</td>
-                    <td>
-                        <button class="btn btn-sm btn-info" onclick="verVehiculo(${v.id})">Ver</button>
-                        <button class="btn btn-sm btn-warning" onclick="editarVehiculo(${v.id})">Editar</button>
-                    </td>
-                </tr>
-            `).join('');
-            
-            container.innerHTML = `
-                <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h3>🚗 Listado de Vehículos</h3>
-                        <button class="btn btn-primary" onclick="nuevoVehiculo()">+ Nuevo Vehículo</button>
-                    </div>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Patente</th>
-                                    <th>Marca</th>
-                                    <th>Modelo</th>
-                                    <th>Año</th>
-                                    <th>Kilometraje</th>
-                                    <th>Estado</th>
-                                    <th>VTV</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>${rows}</tbody>
-                        </table>
-                    </div>
-                </div>
-            `;
-        });
+    const container = document.getElementById('module-vehiculos');
+
+    // Verificar si ya está cargado
+    if (container.innerHTML.trim() !== '') {
+        if (window.vehiculosView) {
+            window.vehiculosView.cargar();
+        }
+        return;
+    }
+
+    // Cargar el HTML del módulo
+    fetch('modules/vehiculos.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            // Cargar el script JS del módulo
+            if (!document.querySelector('script[src="assets/js/vehiculos.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/vehiculos.js';
+                script.onload = () => {
+                    if (window.vehiculosView) {
+                        window.vehiculosView.init();
+                    }
+                };
+                document.body.appendChild(script);
+            } else {
+                if (window.vehiculosView) {
+                    window.vehiculosView.init();
+                }
+            }
+        })
+        .catch(error => console.error('Error cargando módulo vehículos:', error));
 }
 
 function cargarEmpleados() {

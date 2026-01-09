@@ -1,0 +1,138 @@
+<div class="card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>🚗 Gestión de Vehículos</h3>
+        <button class="btn btn-primary" onclick="window.vehiculosView.nuevoVehiculo()">
+            + Nuevo Vehículo
+        </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row g-2 mb-3">
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="filtro-patente" placeholder="🔍 Buscar por patente">
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="filtro-estado">
+                <option value="">Todos los estados</option>
+                <option value="disponible">Disponible</option>
+                <option value="asignado">Asignado</option>
+                <option value="mantenimiento">Mantenimiento</option>
+                <option value="baja">Baja</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-secondary w-100" onclick="window.vehiculosView.filtrar()">Filtrar</button>
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Patente</th>
+                    <th>Marca</th>
+                    <th>Modelo</th>
+                    <th>Año</th>
+                    <th>Km</th>
+                    <th>Estado</th>
+                    <th>VTV</th>
+                    <th>Seguro</th>
+                    <th>Asignado a</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-vehiculos-body">
+                <tr>
+                    <td colspan="10" class="text-center">Cargando vehículos...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Formulario -->
+<div class="modal fade" id="modalVehiculo" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalVehiculoTitulo">Nuevo Vehículo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-vehiculo">
+                    <input type="hidden" name="id" id="vehiculo-id">
+                    <input type="hidden" name="csrf_token" id="vehiculo-csrf">
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Patente *</label>
+                            <input type="text" class="form-control" name="patente" id="vehiculo-patente" required placeholder="ABC123">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Marca *</label>
+                            <input type="text" class="form-control" name="marca" id="vehiculo-marca" required placeholder="Ej: Ford">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Modelo *</label>
+                            <input type="text" class="form-control" name="modelo" id="vehiculo-modelo" required placeholder="Ej: Focus">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Año</label>
+                            <input type="number" class="form-control" name="anio" id="vehiculo-anio" min="1990" max="2030" placeholder="2020">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Motor</label>
+                            <input type="text" class="form-control" name="motor" id="vehiculo-motor" placeholder="Número de motor">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Chasis</label>
+                            <input type="text" class="form-control" name="chasis" id="vehiculo-chasis" placeholder="Número de chasis">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Titularidad</label>
+                            <input type="text" class="form-control" name="titularidad" id="vehiculo-titularidad" placeholder="Nombre del titular">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Kilometraje Actual</label>
+                            <input type="number" class="form-control" name="kilometraje_actual" id="vehiculo-kilometraje" min="0" placeholder="0">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Fecha VTV</label>
+                            <input type="date" class="form-control" name="fecha_vtv" id="vehiculo-fecha-vtv">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Fecha Seguro</label>
+                            <input type="date" class="form-control" name="fecha_seguro" id="vehiculo-fecha-seguro">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Fecha Patente</label>
+                            <input type="date" class="form-control" name="fecha_patente" id="vehiculo-fecha-patente">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">KM Próximo Service</label>
+                            <input type="number" class="form-control" name="km_proximo_service" id="vehiculo-km-service" min="0" placeholder="10000">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Estado</label>
+                            <select class="form-select" name="estado" id="vehiculo-estado">
+                                <option value="disponible">Disponible</option>
+                                <option value="asignado">Asignado</option>
+                                <option value="mantenimiento">Mantenimiento</option>
+                                <option value="baja">Baja</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Observaciones</label>
+                            <textarea class="form-control" name="observaciones" id="vehiculo-observaciones" rows="3" placeholder="Observaciones adicionales..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="window.vehiculosView.guardar()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
