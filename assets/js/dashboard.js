@@ -195,20 +195,36 @@ function cargarVehiculos() {
 }
 
 function cargarEmpleados() {
-    fetch('api/empleados.php')
-        .then(r => r.json())
-        .then(data => {
-            const container = document.getElementById('module-empleados');
-            container.innerHTML = `
-                <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h3>👥 Listado de Empleados</h3>
-                        <button class="btn btn-primary" onclick="nuevoEmpleado()">+ Nuevo Empleado</button>
-                    </div>
-                    <p>Módulo en construcción...</p>
-                </div>
-            `;
-        });
+    const container = document.getElementById('module-empleados');
+
+    if (container.innerHTML.trim() !== '') {
+        if (window.empleadosView) {
+            window.empleadosView.cargar();
+        }
+        return;
+    }
+
+    fetch('modules/empleados.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/empleados.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/empleados.js';
+                script.onload = () => {
+                    if (window.empleadosView) {
+                        window.empleadosView.init();
+                    }
+                };
+                document.body.appendChild(script);
+            } else {
+                if (window.empleadosView) {
+                    window.empleadosView.init();
+                }
+            }
+        })
+        .catch(error => console.error('Error cargando módulo empleados:', error));
 }
 
 function cargarAsignaciones() {

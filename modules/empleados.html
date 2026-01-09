@@ -1,0 +1,89 @@
+<div class="card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>👥 Gestión de Empleados</h3>
+        <button class="btn btn-primary" onclick="window.empleadosView.nuevo()">
+            + Nuevo Empleado
+        </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row g-2 mb-3">
+        <div class="col-md-4">
+            <input type="text" class="form-control" id="filtro-empleado" placeholder="🔍 Buscar por nombre, apellido o DNI">
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-secondary w-100" onclick="window.empleadosView.filtrar()">Filtrar</button>
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Apellido y Nombre</th>
+                    <th>DNI</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Dirección</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-empleados-body">
+                <tr>
+                    <td colspan="7" class="text-center">Cargando empleados...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Formulario -->
+<div class="modal fade" id="modalEmpleado" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEmpleadoTitulo">Nuevo Empleado</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-empleado">
+                    <input type="hidden" name="id" id="empleado-id">
+                    <input type="hidden" name="csrf_token" id="empleado-csrf">
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre *</label>
+                            <input type="text" class="form-control" name="nombre" id="empleado-nombre" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellido *</label>
+                            <input type="text" class="form-control" name="apellido" id="empleado-apellido" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">DNI</label>
+                            <input type="text" class="form-control" name="dni" id="empleado-dni" placeholder="12345678">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" name="telefono" id="empleado-telefono" placeholder="+54 11 1234-5678">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" id="empleado-email" placeholder="empleado@empresa.com">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Dirección</label>
+                            <textarea class="form-control" name="direccion" id="empleado-direccion" rows="2"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="window.empleadosView.guardar()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
