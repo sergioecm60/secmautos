@@ -5,13 +5,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const refreshBtn = document.querySelector('.refresh-captcha');
     const loading = document.getElementById('loading');
     const btnSubmit = document.getElementById('btnSubmit');
+    
+    console.log('Elementos:', { loginForm, captchaBox, captchaInput, refreshBtn });
 
     function loadCaptcha() {
+        console.log('Cargando captcha...');
         fetch('api/refresh_captcha.php')
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
-                captchaBox.textContent = `${data.num1} ${data.operator} ${data.num2} = ?`;
-                captchaInput.value = '';
+                console.log('Captcha data:', data);
+                if (data && data.num1 !== undefined && data.num2 !== undefined && data.operator) {
+                    captchaBox.textContent = `${data.num1} ${data.operator} ${data.num2} = ?`;
+                    captchaInput.value = '';
+                } else {
+                    console.error('Datos de captcha inválidos:', data);
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar captcha:', error);
+                captchaBox.textContent = 'Error';
             });
     }
 

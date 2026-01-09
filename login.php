@@ -17,7 +17,7 @@ if (isset($_SESSION['usuario_id'])) {
     <link rel="stylesheet" href="assets/css/themes.css">
     <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
 </head>
-<body class="modern-login-body">
+<body class="modern-login-body" data-theme="light">
     <div class="theme-selector no-print">
         <button class="theme-btn light" title="Tema Claro">☀️</button>
         <button class="theme-btn dark" title="Tema Oscuro">🌙</button>
