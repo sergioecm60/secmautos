@@ -305,12 +305,22 @@ function cargarMantenimientos() {
 
 function cargarPagos() {
     const container = document.getElementById('module-pagos');
-    container.innerHTML = `
-        <div class="card">
-            <h3>💰 Control de Pagos</h3>
-            <p>Módulo en construcción...</p>
-        </div>
-    `;
+    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
+        return;
+    }
+
+    fetch('modules/pagos.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/pagos.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/pagos.js';
+                document.body.appendChild(script);
+            }
+        })
+        .catch(error => console.error('Error cargando módulo pagos:', error));
 }
 
 function cargarReportes() {

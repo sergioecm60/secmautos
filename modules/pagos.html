@@ -1,0 +1,107 @@
+<div class="card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>💰 Gestión de Pagos</h3>
+        <button class="btn btn-primary" onclick="abrirModalPago()">
+            <i class="bi bi-plus-circle"></i> Nuevo Pago
+        </button>
+    </div>
+
+    <div class="row g-2 mb-3">
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="filtro-patente" placeholder="Buscar por patente">
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="filtro-tipo">
+                <option value="">Todos los tipos</option>
+                <option value="patente">Patente</option>
+                <option value="seguro">Seguro</option>
+                <option value="otro">Otro</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="filtro-pagado">
+                <option value="">Todos los estados</option>
+                <option value="0">Pendientes</option>
+                <option value="1">Pagados</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-secondary" onclick="filtrarPagos()">Filtrar</button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover" id="tabla-pagos">
+            <thead>
+                <tr>
+                    <th>Patente</th>
+                    <th>Tipo</th>
+                    <th>Vencimiento</th>
+                    <th>Monto</th>
+                    <th>Estado</th>
+                    <th>Fecha Pago</th>
+                    <th>Comprobante</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="modalPago" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalPagoTitle">Nuevo Pago</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-pago">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+
+                    <div class="mb-3">
+                        <label class="form-label">Vehículo *</label>
+                        <select class="form-select" name="vehiculo_id" required>
+                            <option value="">Seleccionar vehículo</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Pago *</label>
+                        <select class="form-select" name="tipo" required>
+                            <option value="">Seleccionar tipo</option>
+                            <option value="patente">Patente</option>
+                            <option value="seguro">Seguro</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Fecha de Vencimiento *</label>
+                        <input type="date" class="form-control" name="fecha_vencimiento" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Monto</label>
+                        <input type="number" step="0.01" class="form-control" name="monto" placeholder="0.00">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nº Comprobante</label>
+                        <input type="text" class="form-control" name="comprobante">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Fecha de Pago</label>
+                        <input type="date" class="form-control" name="fecha_pago">
+                        <small class="text-muted">Dejar vacío para marcar como pendiente</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Observaciones</label>
+                        <textarea class="form-control" name="observaciones" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="guardarPago()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>

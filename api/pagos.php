@@ -32,7 +32,7 @@ switch ($method) {
         if (!verificar_csrf($_POST['csrf_token'] ?? '')) {
             json_response(['success' => false, 'message' => 'Token CSRF inválido'], 403);
         }
-        
+
         try {
             $vehiculo_id = (int)($_POST['vehiculo_id'] ?? 0);
             $tipo = sanitizar_input($_POST['tipo'] ?? '');
@@ -42,22 +42,85 @@ switch ($method) {
             $comprobante = sanitizar_input($_POST['comprobante'] ?? '');
             $observaciones = sanitizar_input($_POST['observaciones'] ?? '');
             $pagado = isset($_POST['pagado']) ? 1 : 0;
-            
+
             if (empty($vehiculo_id) || empty($tipo) || empty($fecha_vencimiento)) {
                 json_response(['success' => false, 'message' => 'Vehículo, tipo y fecha de vencimiento son obligatorios'], 400);
             }
-            
+
             $stmt = $pdo->prepare("
                 INSERT INTO pagos (vehiculo_id, tipo, fecha_vencimiento, fecha_pago, monto, comprobante, observaciones, pagado)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmt->execute([$vehiculo_id, $tipo, $fecha_vencimiento, $fecha_pago, $monto, $comprobante, $observaciones, $pagado]);
-            
+
             registrarLog($_SESSION['usuario_id'], 'REGISTRAR_PAGO', 'pagos', "Pago registrado para vehículo $vehiculo_id", $pdo);
-            
+
             json_response(['success' => true, 'message' => 'Pago registrado exitosamente']);
         } catch (Exception $e) {
             json_response(['success' => false, 'message' => 'Error al registrar pago: ' . $e->getMessage()], 500);
+        }
+        break;
+
+    case 'PUT':
+        parse_str(file_get_contents('php://input'), $_PUT);
+
+        if (!verificar_csrf($_PUT['csrf_token'] ?? '')) {
+            json_response(['success' => false, 'message' => 'Token CSRF inválido'], 403);
+        }
+
+        try {
+            $id = (int)($_PUT['id'] ?? 0);
+
+            if (empty($id)) {
+                json_response(['success' => false, 'message' => 'ID de pago requerido'], 400);
+            }
+
+            $stmt = $pdo->prepare("
+                UPDATE pagos
+                SET pagado = 1,
+                    fecha_pago = COALESCE(?, fecha_pago)
+                WHERE id = ?
+            ");
+            $stmt->execute([$_PUT['fecha_pago'] ?? date('Y-m-d'), $id]);
+
+            if ($stmt->rowCount() === 0) {
+                json_response(['success' => false, 'message' => 'Pago no encontrado'], 404);
+            }
+
+            registrarLog($_SESSION['usuario_id'], 'MARCAR_PAGO_PAGADO', 'pagos', "Pago $id marcado como pagado", $pdo);
+
+            json_response(['success' => true, 'message' => 'Pago marcado como pagado']);
+        } catch (Exception $e) {
+            json_response(['success' => false, 'message' => 'Error al actualizar pago: ' . $e->getMessage()], 500);
+        }
+        break;
+
+    case 'DELETE':
+        parse_str(file_get_contents('php://input'), $_DELETE);
+
+        if (!verificar_csrf($_DELETE['csrf_token'] ?? '')) {
+            json_response(['success' => false, 'message' => 'Token CSRF inválido'], 403);
+        }
+
+        try {
+            $id = (int)($_DELETE['id'] ?? 0);
+
+            if (empty($id)) {
+                json_response(['success' => false, 'message' => 'ID de pago requerido'], 400);
+            }
+
+            $stmt = $pdo->prepare("DELETE FROM pagos WHERE id = ?");
+            $stmt->execute([$id]);
+
+            if ($stmt->rowCount() === 0) {
+                json_response(['success' => false, 'message' => 'Pago no encontrado'], 404);
+            }
+
+            registrarLog($_SESSION['usuario_id'], 'ELIMINAR_PAGO', 'pagos', "Pago $id eliminado", $pdo);
+
+            json_response(['success' => true, 'message' => 'Pago eliminado exitosamente']);
+        } catch (Exception $e) {
+            json_response(['success' => false, 'message' => 'Error al eliminar pago: ' . $e->getMessage()], 500);
         }
         break;
     
