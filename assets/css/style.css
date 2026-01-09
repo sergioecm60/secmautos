@@ -793,16 +793,20 @@ body.modern-login-body .app-footer:hover p {
     color: var(--text-secondary);
     font-weight: 500;
 }
-"/* Footer fijo para login y dashboard */"  
-".page-footer-fixed {"  
-"    position: fixed;"  
-"    bottom: 0;"  
-"    left: 0;"  
-"    z-index: 1000;"  
-"    text-align: center;"  
-"    padding: 10px 20px;"  
-"    font-size: 12px;"  
-"}"  
-".page-footer-fixed .footer-contact {"  
-"    margin-top: 5px;"  
-"}" 
+
+/* Footer fijo para login y dashboard */
+.page-footer-fixed {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    text-align: center !important;
+    padding: 10px 20px;
+    font-size: 12px;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+}
+.page-footer-fixed .footer-contact {
+    margin-top: 5px;
+}

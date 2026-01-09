@@ -1,12 +1,10 @@
 <?php
-session_start();
+require_once 'bootstrap.php';
 
 if (isset($_SESSION['usuario_id'])) {
     header('Location: index.php');
     exit();
 }
-
-require_once 'bootstrap.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -17,6 +15,7 @@ require_once 'bootstrap.php';
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/themes.css">
+    <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
 </head>
 <body class="modern-login-body">
     <div class="theme-selector no-print">

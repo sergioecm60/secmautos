@@ -11,6 +11,7 @@ requiereAutenticacion();
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/themes.css">
+    <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
 </head>
 <body>
     <div class="header">

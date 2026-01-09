@@ -1,19 +1,17 @@
 <?php
 date_default_timezone_set('America/Argentina/Buenos_Aires');
-ini_set('session.gc_maxlifetime', 1800);
-ini_set('session.cookie_lifetime', 0);
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 0);
-ini_set('session.use_strict_mode', 1);
-ini_set('session.cookie_samesite', 'Strict');
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_save_path(__DIR__ . '/sessions');
+    if (!file_exists(__DIR__ . '/sessions')) {
+        mkdir(__DIR__ . '/sessions', 0755, true);
+    }
+    session_start();
+}
 
 session_save_path(__DIR__ . '/sessions');
 if (!file_exists(__DIR__ . '/sessions')) {
     mkdir(__DIR__ . '/sessions', 0755, true);
-}
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
 }
 
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
@@ -82,4 +80,15 @@ function verificar_rol($roles_permitidos) {
 
 function verificar_csrf($token) {
     return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+}
+
+function requiereAutenticacion($redirect = true) {
+    if (!verificar_autenticacion()) {
+        if ($redirect) {
+            header('Location: /login.php');
+            exit;
+        }
+        return false;
+    }
+    return true;
 }
