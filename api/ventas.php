@@ -12,14 +12,25 @@ $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
     case 'GET':
         try {
-            $stmt = $pdo->query("
+            $sql = "
                 SELECT
                     vt.*,
                     v.patente, v.marca, v.modelo
                 FROM ventas vt
                 JOIN vehiculos v ON vt.vehiculo_id = v.id
-                ORDER BY vt.fecha DESC
-            ");
+            ";
+
+            $params = [];
+
+            if (isset($_GET['vehiculo_id'])) {
+                $sql .= " WHERE vt.vehiculo_id = ?";
+                $params[] = (int)$_GET['vehiculo_id'];
+            }
+
+            $sql .= " ORDER BY vt.fecha DESC";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
             $ventas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             json_response(['success' => true, 'data' => $ventas]);

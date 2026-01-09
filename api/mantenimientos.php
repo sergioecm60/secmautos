@@ -12,16 +12,27 @@ $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
     case 'GET':
         try {
-            $stmt = $pdo->query("
-                SELECT 
+            $sql = "
+                SELECT
                     m.*,
                     v.patente, v.marca, v.modelo
                 FROM mantenimientos m
                 JOIN vehiculos v ON m.vehiculo_id = v.id
-                ORDER BY m.fecha DESC, m.created_at DESC
-            ");
+            ";
+
+            $params = [];
+
+            if (isset($_GET['vehiculo_id'])) {
+                $sql .= " WHERE m.vehiculo_id = ?";
+                $params[] = (int)$_GET['vehiculo_id'];
+            }
+
+            $sql .= " ORDER BY m.fecha DESC, m.created_at DESC";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
             $mantenimientos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
+
             json_response(['success' => true, 'data' => $mantenimientos]);
         } catch (Exception $e) {
             json_response(['success' => false, 'message' => 'Error al obtener mantenimientos: ' . $e->getMessage()], 500);

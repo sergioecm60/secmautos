@@ -161,6 +161,9 @@ function cargarModulo(modulo) {
         case 'pagos':
             cargarPagos();
             break;
+        case 'ficha_vehiculo':
+            cargarFichaVehiculo();
+            break;
         case 'reportes':
             cargarReportes();
             break;
@@ -321,6 +324,33 @@ function cargarPagos() {
             }
         })
         .catch(error => console.error('Error cargando módulo pagos:', error));
+}
+
+function cargarFichaVehiculo(id) {
+    const container = document.getElementById('module-ficha_vehiculo');
+    container.innerHTML = '';
+
+    fetch('modules/ficha_vehiculo.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/ficha_vehiculo.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/ficha_vehiculo.js';
+                script.onload = () => {
+                    if (id) {
+                        cargarFichaVehiculo(id);
+                    }
+                };
+                document.body.appendChild(script);
+            } else {
+                if (id) {
+                    cargarFichaVehiculo(id);
+                }
+            }
+        })
+        .catch(error => console.error('Error cargando ficha vehículo:', error));
 }
 
 function cargarReportes() {

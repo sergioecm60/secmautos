@@ -12,27 +12,38 @@ $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
     case 'GET':
         try {
-            $stmt = $pdo->query("
-                SELECT 
+            $sql = "
+                SELECT
                     v.*,
-                    CASE 
-                        WHEN a.empleado_id IS NOT NULL THEN e.nombre 
-                        ELSE 'N/A' 
+                    CASE
+                        WHEN a.empleado_id IS NOT NULL THEN e.nombre
+                        ELSE 'N/A'
                     END as empleado_actual
                 FROM vehiculos v
                 LEFT JOIN (
-                    SELECT vehiculo_id, empleado_id 
-                    FROM asignaciones 
-                    WHERE fecha_devolucion IS NULL 
-                    ORDER BY fecha_asignacion DESC 
+                    SELECT vehiculo_id, empleado_id
+                    FROM asignaciones
+                    WHERE fecha_devolucion IS NULL
+                    ORDER BY fecha_asignacion DESC
                     LIMIT 1
                 ) a ON v.id = a.vehiculo_id
                 LEFT JOIN empleados e ON a.empleado_id = e.id
-                WHERE v.estado != 'baja'
-                ORDER BY v.patente ASC
-            ");
+            ";
+
+            $params = [];
+
+            if (isset($_GET['id'])) {
+                $sql .= " WHERE v.id = ?";
+                $params[] = (int)$_GET['id'];
+            } else {
+                $sql .= " WHERE v.estado != 'baja'";
+                $sql .= " ORDER BY v.patente ASC";
+            }
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
             $vehiculos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
+
             json_response(['success' => true, 'data' => $vehiculos]);
         } catch (Exception $e) {
             json_response(['success' => false, 'message' => 'Error al obtener vehículos: ' . $e->getMessage()], 500);

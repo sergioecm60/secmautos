@@ -3,7 +3,7 @@
 **Proyecto:** Sistema de Gestión de Flota Automotor
 **Fecha inicio:** 2026-01-09
 **Última actualización:** 2026-01-09 (Sesión actual)
-**Estado:** Base de datos completa ✅ | Backend API completo ✅ | Frontend 90% ⚠️
+**Estado:** Base de datos completa ✅ | Backend API completo ✅ | Frontend 95% ⚠️
 
 ## 🎉 PROGRESO ACTUAL
 
@@ -64,6 +64,18 @@
 - dashboard.js modificado - Carga de módulo pagos
 - api/pagos.php modificado - Agregado método PUT para marcar pagado
 - **Funcional:** Registrar pagos, marcar como pagados, filtrar por tipo/estado ✅
+
+### ✅ FASE 11 COMPLETADA - Ficha Completa de Vehículo (100%)
+- modules/ficha_vehiculo.html - Vista completa del vehículo con tabs
+- assets/js/ficha_vehiculo.js - Carga historial y documentos
+- api endpoints modificados - Soporte para filtro vehiculo_id en GET:
+  * vehiculos.php (obtener por ID)
+  * asignaciones.php, multas.php, mantenimientos.php, pagos.php
+  * compras.php, ventas.php, ceta.php, transferencias.php
+- assets/js/vehiculos.js - Agregado botón "Ver ficha"
+- index.php modificado - Agregado div module-ficha_vehiculo
+- dashboard.js modificado - Función cargarFichaVehiculo
+- **Funcional:** Ver historial completo del vehículo (asignaciones, multas, mantenimientos, pagos, patrimonio) ✅
 
 ---
 
@@ -130,9 +142,8 @@
 ✅ Diseño responsive     - Mobile-first
 ```
 
-**FALTA EN FRONTEND (10%):**
+**FALTA EN FRONTEND (5%):**
 - ❌ Módulo de reportes (exportar Excel, PDF)
-- ❌ Ficha completa de vehículo (historial, documentos)
 - ❌ Subida de comprobantes (PDF/imágenes)
 - ❌ Mejoras UX/UI (notificaciones toast, loading spinners, paginación)
 - ❌ Testing completo de todos los módulos
@@ -349,7 +360,7 @@ secmautos/
 │   │   ├── transferencias.js ✅
 │   │   ├── mantenimientos.js ✅
 │   │   ├── pagos.js ✅
-│   │   ├── ficha_vehiculo.js ❌
+│   │   ├── ficha_vehiculo.js ✅
 │   │   └── reportes.js ❌
 │   └── img/
 │       ├── logo.png ✅
@@ -376,7 +387,7 @@ secmautos/
 │   ├── transferencias.html ✅
 │   ├── mantenimientos.html ✅
 │   ├── pagos.html ✅
-│   ├── ficha_vehiculo.html ❌
+│   ├── ficha_vehiculo.html ✅
 │   └── reportes.html ❌
 ├── scripts/
 │   └── generar_alertas.php ✅
@@ -415,7 +426,7 @@ secmautos/
 | 8 | Frontend - Transferencias | 2h | ✅ Completado | 🟢 Baja |
 | 9 | Frontend - Mantenimientos | 2h | ✅ Completado | 🟠 Media |
 | 10 | Frontend - Pagos | 2h | ✅ Completado | 🟠 Media |
-| 11 | Ficha Completa Vehículo | 3h | ⚠️ Pendiente | 🟠 Media |
+| 11 | Ficha Completa Vehículo | 3h | ✅ Completado | 🟠 Media |
 | 12 | Reportes y Exportación | 3h | ⚠️ Pendiente | 🟢 Baja |
 | 13 | Subida de Archivos | 2h | ⚠️ Pendiente | 🟢 Baja |
 | 14 | Mejoras UX/UI | 2h | ⚠️ Pendiente | 🟢 Baja |
@@ -423,7 +434,7 @@ secmautos/
 | 16 | Documentación y Deployment | 2h | ⚠️ Pendiente | 🟢 Baja |
 | **TOTAL** | | **40h** | **40h completadas** | |
 
-**⚡ Progreso actual: 27h / 40h (67.5% completado)**
+**⚡ Progreso actual: 30h / 40h (75% completado)**
 
 ---
 
@@ -598,4 +609,4 @@ Crear script `db/datos_prueba.sql` con:
 
 **Última actualización:** 2026-01-09
 **Autor:** Sergio Cabrera
-**Estado actual:** 67.5% completado (27h / 40h)
+**Estado actual:** 75% completado (30h / 40h)

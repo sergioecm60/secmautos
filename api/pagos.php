@@ -12,16 +12,27 @@ $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
     case 'GET':
         try {
-            $stmt = $pdo->query("
-                SELECT 
+            $sql = "
+                SELECT
                     p.*,
                     v.patente, v.marca, v.modelo
                 FROM pagos p
                 JOIN vehiculos v ON p.vehiculo_id = v.id
-                ORDER BY p.fecha_vencimiento ASC, p.created_at DESC
-            ");
+            ";
+
+            $params = [];
+
+            if (isset($_GET['vehiculo_id'])) {
+                $sql .= " WHERE p.vehiculo_id = ?";
+                $params[] = (int)$_GET['vehiculo_id'];
+            }
+
+            $sql .= " ORDER BY p.fecha_vencimiento ASC, p.created_at DESC";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
             $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
+
             json_response(['success' => true, 'data' => $pagos]);
         } catch (Exception $e) {
             json_response(['success' => false, 'message' => 'Error al obtener pagos: ' . $e->getMessage()], 500);

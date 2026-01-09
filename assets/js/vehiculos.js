@@ -48,6 +48,9 @@ class VehiculosView {
                 <td>${this.formatFecha(v.fecha_seguro)}</td>
                 <td>${v.empleado_actual || '-'}</td>
                 <td>
+                    <button class="btn btn-sm btn-info" onclick="window.vehiculosView.verFicha(${v.id})" title="Ver ficha completa">
+                        👁️
+                    </button>
                     <button class="btn btn-sm btn-warning" onclick="window.vehiculosView.editar(${v.id})" title="Editar">
                         📝
                     </button>
@@ -109,6 +112,34 @@ class VehiculosView {
         document.getElementById('vehiculo-csrf').value = csrfToken;
 
         this.modal.show();
+    }
+
+    verFicha(id) {
+        const container = document.getElementById('module-ficha_vehiculo');
+        container.innerHTML = '';
+
+        Promise.all([
+            fetch('modules/ficha_vehiculo.html').then(r => r.text()),
+            fetch('assets/js/ficha_vehiculo.js').then(() => {})
+        ])
+        .then(([html]) => {
+            container.innerHTML = html;
+
+            const script = document.createElement('script');
+            script.src = 'assets/js/ficha_vehiculo.js';
+            script.onload = () => {
+                cargarFichaVehiculo(id);
+            };
+            document.body.appendChild(script);
+
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+            container.classList.add('active');
+        })
+        .catch(error => {
+            console.error('Error cargando ficha:', error);
+            alert('Error al cargar la ficha del vehículo');
+        });
     }
 
     async guardar() {

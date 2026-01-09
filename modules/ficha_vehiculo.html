@@ -1,0 +1,206 @@
+<div class="card">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3>🚗 Ficha Completa del Vehículo</h3>
+            <button class="btn btn-secondary" onclick="cerrarFicha()">
+                <i class="bi bi-arrow-left"></i> Volver
+            </button>
+        </div>
+
+        <div id="ficha-content" class="d-none">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">📋 Datos Generales</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>Patente:</strong></td>
+                                    <td id="ficha-patente"></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Marca/Modelo:</strong></td>
+                                    <td id="ficha-marca-modelo"></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Año:</strong></td>
+                                    <td id="ficha-anio"></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Motor:</strong></td>
+                                    <td id="ficha-motor"></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Chasis:</strong></td>
+                                    <td id="ficha-chasis"></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Titularidad:</strong></td>
+                                    <td id="ficha-titularidad"></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Kilometraje:</strong></td>
+                                    <td id="ficha-km"></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Estado:</strong></td>
+                                    <td id="ficha-estado"></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">📅 Vencimientos</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>VTV:</strong></td>
+                                    <td id="ficha-vtv"></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Seguro:</strong></td>
+                                    <td id="ficha-seguro"></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Patente:</strong></td>
+                                    <td id="ficha-patente-vencimiento"></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>CETA:</strong></td>
+                                    <td id="ficha-ceta"></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card mt-3">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">💰 Patrimonio</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>Compra:</strong></td>
+                                    <td id="ficha-compra"></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Venta:</strong></td>
+                                    <td id="ficha-venta"></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Transferencia:</strong></td>
+                                    <td id="ficha-transferencia"></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <ul class="nav nav-tabs mb-3" id="ficha-tabs">
+                <li class="nav-item">
+                    <button class="nav-link active" data-tab="asignaciones">🔄 Asignaciones</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-tab="multas">💸 Multas</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-tab="mantenimientos">🔧 Mantenimientos</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-tab="pagos">💳 Pagos</button>
+                </li>
+            </ul>
+
+            <div id="tab-asignaciones" class="tab-content active">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tabla-asignaciones">
+                        <thead>
+                            <tr>
+                                <th>Empleado</th>
+                                <th>Fecha Salida</th>
+                                <th>Km Salida</th>
+                                <th>Fecha Regreso</th>
+                                <th>Km Regreso</th>
+                                <th>Km Recorridos</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-multas" class="tab-content d-none">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tabla-multas">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Responsable</th>
+                                <th>Motivo</th>
+                                <th>Acta Nº</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-mantenimientos" class="tab-content d-none">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tabla-mantenimientos">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Descripción</th>
+                                <th>Km</th>
+                                <th>Costo</th>
+                                <th>Proveedor</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-pagos" class="tab-content d-none">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tabla-pagos">
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Vencimiento</th>
+                                <th>Monto</th>
+                                <th>Fecha Pago</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="ficha-loading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-3">Cargando ficha del vehículo...</p>
+        </div>
+
+        <div id="ficha-error" class="text-center py-5 d-none">
+            <div class="alert alert-danger">
+                <h5>❌ Error al cargar la ficha</h5>
+                <p id="error-message"></p>
+                <button class="btn btn-primary" onclick="cerrarFicha()">Volver</button>
+            </div>
+        </div>
+    </div>
+</div>

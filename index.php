@@ -76,6 +76,7 @@ requiereAutenticacion();
         <div id="module-ceta" class="module"></div>
         <div id="module-transferencias" class="module"></div>
         <div id="module-pagos" class="module"></div>
+        <div id="module-ficha_vehiculo" class="module"></div>
         <div id="module-reportes" class="module"></div>
     </div>
 
