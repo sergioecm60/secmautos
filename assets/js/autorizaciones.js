@@ -1,252 +1,220 @@
-let autorizacionesData = [];
-let empleadosAutorizaciones = [];
-let vehiculosAutorizaciones = [];
+class AutorizacionesView {
+    constructor() {
+        this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        this.api = 'api/autorizaciones_manejo.php';
+        this.apiEmpleados = 'api/empleados.php';
+        this.apiVehiculos = 'api/vehiculos.php';
+        this.data = {
+            autorizaciones: [],
+            empleados: [],
+            vehiculos: []
+        };
+        this.init();
+    }
 
-async function cargarAutorizaciones() {
-    try {
-        const res = await fetch('api/autorizaciones_manejo.php');
-        const data = await res.json();
+    init() {
+        this.loadInitialData();
+        this.initEventListeners();
+    }
 
-        if (data.success) {
-            autorizacionesData = data.data;
-            renderTablaAutorizaciones(autorizacionesData);
+    async loadInitialData() {
+        try {
+            const [autorizacionesRes, empleadosRes, vehiculosRes] = await Promise.all([
+                this.fetchData(this.api),
+                this.fetchData(this.apiEmpleados),
+                this.fetchData(this.apiVehiculos)
+            ]);
+
+            if (autorizacionesRes.success) this.data.autorizaciones = autorizacionesRes.data;
+            if (empleadosRes.success) this.data.empleados = empleadosRes.data;
+            if (vehiculosRes.success) this.data.vehiculos = vehiculosRes.data.filter(v => v.estado !== 'baja');
+
+            this.render();
+        } catch (error) {
+            alert('❌ Error cargando datos iniciales.');
+            console.error('Error en loadInitialData:', error);
         }
-    } catch (error) {
-        console.error('Error cargando autorizaciones:', error);
     }
-}
 
-async function cargarEmpleadosAutorizaciones() {
-    try {
-        const res = await fetch('api/empleados.php');
-        const data = await res.json();
+    initEventListeners() {
+        const btnNueva = document.getElementById('btn-nueva-autorizacion');
+        const btnGuardar = document.getElementById('btn-guardar-autorizacion');
+        const tabla = document.getElementById('tabla-autorizaciones');
 
-        if (data.success) {
-            empleadosAutorizaciones = data.data;
-            actualizarSelectEmpleadosAutorizaciones();
+        if (btnNueva) btnNueva.addEventListener('click', () => this.openModal());
+        if (btnGuardar) btnGuardar.addEventListener('click', () => this.save());
+
+        if (tabla) {
+            tabla.addEventListener('click', e => {
+                if (e.target.closest('.btn-edit-autorizacion')) {
+                    const id = e.target.closest('.btn-edit-autorizacion').dataset.id;
+                    this.edit(id);
+                } else if (e.target.closest('.btn-delete-autorizacion')) {
+                    const id = e.target.closest('.btn-delete-autorizacion').dataset.id;
+                    this.delete(id);
+                }
+            });
         }
-    } catch (error) {
-        console.error('Error cargando empleados:', error);
     }
-}
 
-async function cargarVehiculosAutorizaciones() {
-    try {
-        const res = await fetch('api/vehiculos.php');
-        const data = await res.json();
+    render() {
+        this.renderTable();
+        this.populateSelects();
+    }
 
-        if (data.success) {
-            vehiculosAutorizaciones = data.data.filter(v => v.estado !== 'baja');
-            actualizarSelectVehiculosAutorizaciones();
+    renderTable() {
+        const tbody = document.querySelector('#tabla-autorizaciones tbody');
+        tbody.innerHTML = '';
+
+        if (this.data.autorizaciones.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay autorizaciones registradas</td></tr>';
+            return;
         }
-    } catch (error) {
-        console.error('Error cargando vehículos:', error);
-    }
-}
 
-function actualizarSelectEmpleadosAutorizaciones() {
-    const select = document.getElementById('autorizacion-empleado');
-    if (!select) return;
-
-    select.innerHTML = '<option value="">Seleccionar empleado</option>';
-    empleadosAutorizaciones.forEach(e => {
-        select.innerHTML += `<option value="${e.id}">${e.apellido}, ${e.nombre} (DNI: ${e.dni || 'N/A'})</option>`;
-    });
-}
-
-function actualizarSelectVehiculosAutorizaciones() {
-    const select = document.getElementById('autorizacion-vehiculo');
-    if (!select) return;
-
-    select.innerHTML = '<option value="">Seleccionar vehículo</option>';
-    vehiculosAutorizaciones.forEach(v => {
-        select.innerHTML += `<option value="${v.id}">${v.patente} - ${v.marca} ${v.modelo}</option>`;
-    });
-}
-
-function renderTablaAutorizaciones(autorizaciones) {
-    const tbody = document.querySelector('#tabla-autorizaciones tbody');
-    tbody.innerHTML = '';
-
-    if (autorizaciones.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay autorizaciones registradas</td></tr>';
-        return;
-    }
-
-    autorizaciones.forEach(a => {
-        tbody.innerHTML += `
-            <tr>
-                <td><strong>${a.nombre} ${a.apellido}</strong></td>
-                <td>${a.marca} ${a.modelo}</td>
-                <td><span class="badge bg-primary">${a.patente}</span></td>
-                <td>${formatDate(a.fecha_otorgamiento)}</td>
-                <td>${getBadgeEstadoAutorizacion(a.activa)}</td>
-                <td>
-                    <button class="btn btn-sm btn-warning btn-edit-autorizacion" data-id="${a.id}" title="Editar">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button class="btn btn-sm btn-danger btn-delete-autorizacion" data-id="${a.id}" title="Eliminar">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `;
-    });
-}
-
-function getBadgeEstadoAutorizacion(activa) {
-    return activa == 1
-        ? '<span class="badge bg-success">Activa</span>'
-        : '<span class="badge bg-danger">Revocada</span>';
-}
-
-function filtrarAutorizaciones() {
-    const empleado = document.getElementById('filtro-autorizacion-empleado').value.toLowerCase();
-    const patente = document.getElementById('filtro-autorizacion-patente').value.toLowerCase();
-    const estado = document.getElementById('filtro-autorizacion-estado').value;
-
-    let filtradas = autorizacionesData;
-
-    if (empleado) {
-        filtradas = filtradas.filter(a =>
-            (a.nombre + ' ' + a.apellido).toLowerCase().includes(empleado) ||
-            (a.apellido + ' ' + a.nombre).toLowerCase().includes(empleado)
-        );
-    }
-
-    if (patente) {
-        filtradas = filtradas.filter(a => a.patente.toLowerCase().includes(patente));
-    }
-
-    if (estado !== '') {
-        filtradas = filtradas.filter(a => a.activa == estado);
-    }
-
-    renderTablaAutorizaciones(filtradas);
-}
-
-function abrirModalAutorizacion() {
-    document.getElementById('form-autorizacion').reset();
-    document.getElementById('autorizacion-id').value = '';
-    document.getElementById('autorizacion-fecha').value = new Date().toISOString().split('T')[0];
-    document.getElementById('autorizacion-activa').checked = true;
-    actualizarSelectEmpleadosAutorizaciones();
-    actualizarSelectVehiculosAutorizaciones();
-    new bootstrap.Modal(document.getElementById('modalAutorizacion')).show();
-}
-
-async function guardarAutorizacion() {
-    const form = document.getElementById('form-autorizacion');
-
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-    }
-
-    const formData = new FormData(form);
-    const id = formData.get('id');
-    const method = id ? 'PUT' : 'POST';
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-    formData.set('csrf_token', csrfToken);
-
-    try {
-        const res = await fetch('api/autorizaciones_manejo.php', {
-            method: method,
-            body: formData
+        this.data.autorizaciones.forEach(a => {
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>${a.nombre} ${a.apellido}</strong></td>
+                    <td>${a.marca} ${a.modelo}</td>
+                    <td><span class="badge bg-primary">${a.patente}</span></td>
+                    <td>${this.formatDate(a.fecha_otorgamiento)}</td>
+                    <td>${this.getBadgeEstado(a.activa)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning btn-edit-autorizacion" data-id="${a.id}" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger btn-delete-autorizacion" data-id="${a.id}" title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
         });
-        const data = await res.json();
+    }
 
-        if (data.success) {
-            alert(data.message);
-            bootstrap.Modal.getInstance(document.getElementById('modalAutorizacion')).hide();
-            cargarAutorizaciones();
-        } else {
-            alert('Error: ' + data.message);
+    getBadgeEstado(activa) {
+        return activa == 1
+            ? '<span class="badge bg-success">Activa</span>'
+            : '<span class="badge bg-danger">Revocada</span>';
+    }
+
+    populateSelects() {
+        const selectEmpleado = document.getElementById('autorizacion-empleado');
+        const selectVehiculo = document.getElementById('autorizacion-vehiculo');
+
+        if (selectEmpleado) {
+            selectEmpleado.innerHTML = '<option value="">Seleccionar empleado</option>' +
+                this.data.empleados.map(e =>
+                    `<option value="${e.id}">${e.apellido}, ${e.nombre} (DNI: ${e.dni || 'N/A'})</option>`
+                ).join('');
         }
-    } catch (error) {
-        console.error('Error guardando autorización:', error);
-        alert('Error al guardar la autorización');
+
+        if (selectVehiculo) {
+            selectVehiculo.innerHTML = '<option value="">Seleccionar vehículo</option>' +
+                this.data.vehiculos.map(v =>
+                    `<option value="${v.id}">${v.patente} - ${v.marca} ${v.modelo}</option>`
+                ).join('');
+        }
+    }
+
+    openModal() {
+        const form = document.getElementById('form-autorizacion');
+        form.reset();
+        document.getElementById('autorizacion-id').value = '';
+        document.getElementById('autorizacion-fecha').value = new Date().toISOString().split('T')[0];
+        document.getElementById('autorizacion-activa').checked = true;
+
+        this.populateSelects();
+
+        new bootstrap.Modal(document.getElementById('modalAutorizacion')).show();
+    }
+
+    async save() {
+        const form = document.getElementById('form-autorizacion');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const formData = new FormData(form);
+        const id = formData.get('id');
+        const method = id ? 'PUT' : 'POST';
+        formData.set('csrf_token', this.csrfToken);
+
+        try {
+            const res = await this.fetchData(this.api, method, formData);
+            if (res.success) {
+                alert(res.message);
+                bootstrap.Modal.getInstance(document.getElementById('modalAutorizacion')).hide();
+                this.loadInitialData();
+            } else {
+                alert('Error: ' + res.message);
+            }
+        } catch (error) {
+            alert('❌ Error al guardar la autorización');
+            console.error('Error guardando autorización:', error);
+        }
+    }
+
+    async edit(id) {
+        try {
+            const res = await this.fetchData(`${this.api}?id=${id}`);
+            if (res.success) {
+                const autorizacion = res.data;
+                const form = document.getElementById('form-autorizacion');
+                document.getElementById('autorizacion-id').value = autorizacion.id;
+                document.getElementById('autorizacion-empleado').value = autorizacion.empleado_id;
+                document.getElementById('autorizacion-vehiculo').value = autorizacion.vehiculo_id;
+                document.getElementById('autorizacion-fecha').value = autorizacion.fecha_otorgamiento ? autorizacion.fecha_otorgamiento.split(' ')[0] : '';
+                document.getElementById('autorizacion-activa').checked = autorizacion.activa == 1;
+                document.getElementById('autorizacion-observaciones').value = autorizacion.observaciones || '';
+
+                new bootstrap.Modal(document.getElementById('modalAutorizacion')).show();
+            } else {
+                alert('Error: ' + res.message);
+            }
+        } catch (error) {
+            alert('❌ Error al cargar la autorización');
+            console.error('Error cargando autorización:', error);
+        }
+    }
+
+    async delete(id) {
+        if (!confirm('¿Está seguro de eliminar esta autorización de manejo?')) return;
+
+        try {
+            const res = await this.fetchData(this.api, 'DELETE', new URLSearchParams({id, csrf_token: this.csrfToken}));
+            if (res.success) {
+                alert(res.message);
+                this.loadInitialData();
+            } else {
+                alert('Error: ' + res.message);
+            }
+        } catch (error) {
+            alert('❌ Error al eliminar la autorización');
+            console.error('Error eliminando autorización:', error);
+        }
+    }
+
+    async fetchData(url, method = 'GET', body = null) {
+        const options = { method };
+        if (body) {
+            const effectiveBody = (method === 'PUT' || method === 'DELETE') ? new URLSearchParams(body) : body;
+            effectiveBody.set('csrf_token', this.csrfToken);
+            options.body = effectiveBody;
+        }
+        const res = await fetch(url, options);
+        return res.json();
+    }
+
+    formatDate(dateStr) {
+        if (!dateStr) return 'N/A';
+        return new Date(dateStr + 'T00:00:00').toLocaleDateString('es-AR');
     }
 }
 
-async function editarAutorizacion(id) {
-    try {
-        const res = await fetch(`api/autorizaciones_manejo.php?id=${id}`);
-        const data = await res.json();
-
-        if (data.success) {
-            const autorizacion = data.data;
-            document.getElementById('autorizacion-id').value = autorizacion.id;
-            document.getElementById('autorizacion-empleado').value = autorizacion.empleado_id;
-            document.getElementById('autorizacion-vehiculo').value = autorizacion.vehiculo_id;
-            document.getElementById('autorizacion-fecha').value = autorizacion.fecha_otorgamiento ? autorizacion.fecha_otorgamiento.split(' ')[0] : '';
-            document.getElementById('autorizacion-activa').checked = autorizacion.activa == 1;
-            document.getElementById('autorizacion-observaciones').value = autorizacion.observaciones || '';
-
-            new bootstrap.Modal(document.getElementById('modalAutorizacion')).show();
-        } else {
-            alert('Error: ' + data.message);
-        }
-    } catch (error) {
-        console.error('Error cargando autorización:', error);
-        alert('Error al cargar la autorización');
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('tabla-autorizaciones')) {
+        new AutorizacionesView();
     }
-}
-
-async function eliminarAutorizacion(id) {
-    if (!confirm('¿Está seguro de eliminar esta autorización de manejo?')) {
-        return;
-    }
-
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-    try {
-        const res = await fetch('api/autorizaciones_manejo.php', {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
-                id: id,
-                csrf_token: csrfToken
-            })
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            alert(data.message);
-            cargarAutorizaciones();
-        } else {
-            alert('Error: ' + data.message);
-        }
-    } catch (error) {
-        console.error('Error eliminando autorización:', error);
-        alert('Error al eliminar la autorización');
-    }
-}
-
-function formatDate(dateString) {
-    const date = new Date(dateString + 'T00:00:00');
-    return date.toLocaleDateString('es-AR');
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    cargarAutorizaciones();
-    cargarEmpleadosAutorizaciones();
-    cargarVehiculosAutorizaciones();
-
-    document.getElementById('btn-nueva-autorizacion').addEventListener('click', abrirModalAutorizacion);
-    document.getElementById('btn-guardar-autorizacion').addEventListener('click', guardarAutorizacion);
-
-    document.getElementById('tabla-autorizaciones').addEventListener('click', function(e) {
-        const btnEdit = e.target.closest('.btn-edit-autorizacion');
-        const btnDelete = e.target.closest('.btn-delete-autorizacion');
-
-        if (btnEdit) {
-            editarAutorizacion(btnEdit.dataset.id);
-        } else if (btnDelete) {
-            eliminarAutorizacion(btnDelete.dataset.id);
-        }
-    });
 });

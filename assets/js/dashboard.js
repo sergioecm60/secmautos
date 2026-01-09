@@ -432,30 +432,6 @@ function cargarComprasVentas() {
         .catch(error => console.error('Error cargando módulo compras/ventas:', error));
 }
 
-function cargarCeta() {
-    const container = document.getElementById('module-ceta');
-    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
-        return;
-    }
-
-    fetch('modules/ceta.html')
-        .then(r => r.text())
-        .then(html => {
-            container.innerHTML = html;
-
-            if (!document.querySelector('script[src="assets/js/ceta.js"]')) {
-                const script = document.createElement('script');
-                script.src = 'assets/js/ceta.js';
-                document.body.appendChild(script);
-            } else {
-                if (window.CetaView && typeof window.CetaView.init === 'function') {
-                    new CetaView();
-                }
-            }
-        })
-        .catch(error => console.error('Error cargando módulo ceta:', error));
-}
-
 function cargarTransferencias() {
     const container = document.getElementById('module-transferencias');
     if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {

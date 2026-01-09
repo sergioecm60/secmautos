@@ -40,7 +40,6 @@ requiereAutenticacion();
                 <a href="#" class="nav-btn" data-module="multas">⚠️ Multas</a>
                 <a href="#" class="nav-btn" data-module="mantenimientos">🔧 Mantenimiento</a>
                 <a href="#" class="nav-btn" data-module="compras_ventas">💸 Compras/Ventas</a>
-                <a href="#" class="nav-btn" data-module="ceta">📄 CETA</a>
                 <a href="#" class="nav-btn" data-module="transferencias">📂 Transferencias</a>
                 <a href="#" class="nav-btn" data-module="pagos">💰 Pagos</a>
                 <a href="#" class="nav-btn" data-module="reportes">📈 Reportes</a>
@@ -76,7 +75,6 @@ requiereAutenticacion();
         <div id="module-multas" class="module"></div>
         <div id="module-mantenimientos" class="module"></div>
         <div id="module-compras_ventas" class="module"></div>
-        <div id="module-ceta" class="module"></div>
         <div id="module-transferencias" class="module"></div>
         <div id="module-pagos" class="module"></div>
         <div id="module-ficha_vehiculo" class="module"></div>
