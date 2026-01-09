@@ -22,7 +22,7 @@ requiereAutenticacion();
                 <span>|</span>
                 <span>🏷️ <?= htmlspecialchars($_SESSION['rol']) ?></span>
                 <span>|</span>
-                <a href="api/logout.php" class="logout-btn">Cerrar Sesión</a>
+                <a href="logout.php" class="logout-btn">Cerrar Sesión</a>
             </div>
             <h1>🚗 SECM Flota de Autos</h1>
             <p>Sistema de Gestión de Vehículos</p>
