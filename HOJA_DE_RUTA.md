@@ -2,7 +2,24 @@
 
 **Proyecto:** Sistema de Gestión de Flota Automotor
 **Fecha inicio:** 2026-01-09
-**Estado:** Base de datos completa ✅ | Backend parcial ✅ | Frontend 10% ⚠️
+**Última actualización:** 2026-01-09 (Sesión 2)
+**Estado:** Base de datos completa ✅ | Backend API completo ✅ | Frontend 30% ⚠️
+
+## 🎉 PROGRESO ACTUAL
+
+### ✅ FASE 1 COMPLETADA - Backend API (100%)
+- PUT/DELETE agregados a: vehiculos.php, empleados.php, multas.php, asignaciones.php
+- Nuevos endpoints creados: compras.php, ventas.php, ceta.php, transferencias.php
+- Script de alertas automáticas: scripts/generar_alertas.php
+- **Commit:** `278793a` - 897 líneas agregadas
+
+### ✅ FASE 2 COMPLETADA - Frontend Módulo Vehículos (100%)
+- modules/vehiculos.html - Tabla + Modal formulario Bootstrap 5
+- assets/js/vehiculos.js - Clase VehiculosView con CRUD completo
+- dashboard.js modificado - Carga dinámica de módulos
+- index.php actualizado - Meta CSRF + Bootstrap 5 CDN
+- **Commit:** `6b1fd1e` - 388 líneas agregadas
+- **Funcional:** Crear, editar, eliminar, listar, filtrar vehículos ✅
 
 ---
 
@@ -32,31 +49,30 @@
 - Email: `admin@secmautos.com`
 - Password: `password` (cambiar en producción)
 
-#### 2. **API Backend - PHP 8.x** (13 endpoints funcionales)
+#### 2. **API Backend - PHP 8.x** (17 endpoints COMPLETOS ✅)
 
 | Endpoint | Métodos | Estado | Funcionalidad |
 |----------|---------|--------|---------------|
 | `api/auth.php` | - | ✅ | Login, logout, roles, logs |
 | `api/login_handler.php` | POST | ✅ | Procesa login con CAPTCHA |
 | `api/logout.php` | POST | ✅ | Cierra sesión |
-| `api/vehiculos.php` | GET, POST | ✅ | Listar + crear vehículos |
-| `api/empleados.php` | GET, POST | ✅ | Listar + crear empleados |
-| `api/asignaciones.php` | GET, POST | ✅ | Listar + crear asignaciones |
-| `api/multas.php` | GET, POST | ✅ | Listar + crear multas |
+| `api/vehiculos.php` | GET, POST, PUT, DELETE | ✅ | CRUD completo de vehículos |
+| `api/empleados.php` | GET, POST, PUT, DELETE | ✅ | CRUD completo de empleados |
+| `api/asignaciones.php` | GET, POST, PUT | ✅ | Asignar + devolver vehículos |
+| `api/multas.php` | GET, POST, PUT | ✅ | Registrar + marcar pagada |
 | `api/mantenimientos.php` | GET, POST | ✅ | Listar + crear mantenimientos |
 | `api/pagos.php` | GET, POST | ✅ | Listar + crear pagos |
+| `api/compras.php` | GET, POST, PUT | ✅ | Gestión de compras |
+| `api/ventas.php` | GET, POST, PUT | ✅ | Gestión de ventas (auto-baja vehículo) |
+| `api/ceta.php` | GET, POST, PUT | ✅ | Gestión de CETA |
+| `api/transferencias.php` | GET, POST, PUT | ✅ | Gestión de transferencias |
 | `api/stats.php` | GET | ✅ | Estadísticas dashboard |
 | `api/alertas.php` | GET | ✅ | Alertas activas |
 | `api/vencimientos.php` | GET | ✅ | Vencimientos próximos |
 | `api/refresh_captcha.php` | GET | ✅ | Regenerar CAPTCHA |
 
-**FALTA EN BACKEND:**
-- ❌ PUT/DELETE en todos los endpoints (editar, eliminar)
-- ❌ Endpoint para CETA (crear/editar)
-- ❌ Endpoint para compras/ventas (crear/editar)
-- ❌ Endpoint para transferencias (crear/editar)
-- ❌ Endpoint para devolución de asignación
-- ❌ Cron job para generar alertas automáticas
+**Scripts auxiliares:**
+- ✅ `scripts/generar_alertas.php` - Cron job para alertas automáticas (VTV, seguro, patente, CETA, KM, multas)
 
 #### 3. **Frontend - HTML/CSS/JS**
 
