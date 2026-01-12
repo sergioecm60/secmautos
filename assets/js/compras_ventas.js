@@ -56,6 +56,9 @@ class ComprasVentasView {
         if (event.target.closest('.btn-edit')) {
             const id = event.target.closest('.btn-edit').dataset.id;
             this.openModal(type, id);
+        } else if (event.target.closest('.btn-delete')) {
+            const id = event.target.closest('.btn-delete').dataset.id;
+            this.delete(type, id);
         }
     }
 
@@ -77,6 +80,9 @@ class ComprasVentasView {
                 <td>
                     <button class="btn btn-sm btn-warning btn-edit" data-id="${item.id}" data-type="${type}">
                         <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger btn-delete" data-id="${item.id}" data-type="${type}">
+                        <i class="bi bi-trash"></i>
                     </button>
                 </td>
             </tr>
@@ -114,6 +120,23 @@ class ComprasVentasView {
         }
         
         this.modals[type].show();
+    }
+
+    async delete(type, id) {
+        if (!confirm(`¿Está seguro de eliminar este registro de ${type}?`)) return;
+
+        try {
+            const res = await this.fetchData(this.api[type], 'DELETE', new URLSearchParams({id}));
+            if (res.success) {
+                this.showSuccess(res.message);
+                this.loadInitialData();
+            } else {
+                this.showError(res.message);
+            }
+        } catch (error) {
+            this.showError(`Error al eliminar ${type}`);
+            console.error(`Error eliminando ${type}:`, error);
+        }
     }
 
     async save(type) {
@@ -162,10 +185,4 @@ class ComprasVentasView {
     showSuccess(message) { alert(`✅ ${message}`); }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('comprasVentasTab')) {
-        new ComprasVentasView();
-    }
-});
-
-new ComprasVentasView();
+window.ComprasVentasView = ComprasVentasView;

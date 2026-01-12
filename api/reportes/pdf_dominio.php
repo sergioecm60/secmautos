@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../bootstrap.php';
+require_once __DIR__ . '/../../bootstrap.php';
 
 if (!verificar_autenticacion()) {
     header('HTTP/1.0 401 Unauthorized');
@@ -57,11 +57,11 @@ try {
     $stmt->execute([$vehiculo_id]);
     $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $stmt = $pdo->prepare("SELECT * FROM compras WHERE vehiculo_id = ? ORDER BY fecha DESC LIMIT 1");
+    $stmt = $pdo->prepare("SELECT * FROM compras WHERE vehiculo_id = ? ORDER BY fecha DESC LIMIT1");
     $stmt->execute([$vehiculo_id]);
     $compra = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $stmt = $pdo->prepare("SELECT * FROM ventas WHERE vehiculo_id = ? ORDER BY fecha DESC LIMIT 1");
+    $stmt = $pdo->prepare("SELECT * FROM ventas WHERE vehiculo_id = ? ORDER BY fecha DESC LIMIT1");
     $stmt->execute([$vehiculo_id]);
     $venta = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -86,88 +86,16 @@ function formatMoney($amount) {
 <head>
     <meta charset="UTF-8">
     <title>Informe de Dominio - <?= $vehiculo['patente'] ?></title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            font-size: 12px;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #333;
-            padding-bottom: 10px;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .info-item {
-            padding: 5px;
-            background: #f5f5f5;
-        }
-        .info-item strong {
-            display: block;
-            color: #666;
-        }
-        section {
-            margin-bottom: 20px;
-        }
-        h2 {
-            background: #333;
-            color: white;
-            padding: 5px 10px;
-            margin: 0 0 10px 0;
-            font-size: 14px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 10px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 5px;
-            text-align: left;
-        }
-        th {
-            background: #f5f5f5;
-            font-weight: bold;
-        }
-        .total {
-            text-align: right;
-            font-weight: bold;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-        .print-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            background: #333;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        @media print {
-            .print-btn { display: none; }
-            body { margin: 0; }
-        }
-    </style>
+    <link rel="stylesheet" href="../../assets/css/reportes.css">
 </head>
 <body>
-    <button class="print-btn" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+    <div class="btn-group">
+        <button class="print-btn" onclick="window.print()">🖨️ Imprimir</button>
+        <button class="print-btn" onclick="window.print()">💾 Guardar como PDF</button>
+    </div>
 
     <div class="header">
-        <h1>📋 INFORME DE DOMINIO COMPLETO</h1>
+        <h1>📋 Informe de Dominio</h1>
         <p>Fecha de emisión: <?= date('d/m/Y H:i') ?></p>
     </div>
 
@@ -183,9 +111,9 @@ function formatMoney($amount) {
     </div>
 
     <section>
-        <h2>📅 Vencimientos</h2>
+        <div class="report-title">📅 Vencimientos</div>
         <table>
-            <tr><th>VTV</th><td><?= formatDate($vehiculo['fecha_vtv']) ?></td></tr>
+            <tr><th>TVT</th><td><?= formatDate($vehiculo['fecha_tvt']) ?></td></tr>
             <tr><th>Seguro</th><td><?= formatDate($vehiculo['fecha_seguro']) ?></td></tr>
             <tr><th>Patente</th><td><?= formatDate($vehiculo['fecha_patente']) ?></td></tr>
         </table>
@@ -193,13 +121,13 @@ function formatMoney($amount) {
 
     <?php if ($compra): ?>
     <section>
-        <h2>🛒 Compra</h2>
+        <div class="report-title">🛒 Compra</div>
         <table>
             <tr><th>Fecha:</th><td><?= formatDate($compra['fecha']) ?></td></tr>
             <tr><th>Proveedor:</th><td><?= $compra['proveedor'] ?></td></tr>
-            <tr><th>CUIT:</th><td><?= $compra['proveedor_cuit'] ?></td></tr>
+            <tr><th>CUIT:</th><td><?= $compra['cuit'] ?></td></tr>
             <tr><th>Factura Nº:</th><td><?= $compra['factura_numero'] ?></td></tr>
-            <tr><th>Neto:</th><td><?= formatMoney($compra['neto']) ?></td></tr>
+            <tr><th>Neto:</th><td><?= formatMoney($compra['importe_neto']) ?></td></tr>
             <tr><th>IVA:</th><td><?= formatMoney($compra['iva']) ?></td></tr>
             <tr><th><strong>Total:</strong></th><td><strong><?= formatMoney($compra['total']) ?></strong></td></tr>
         </table>
@@ -208,11 +136,11 @@ function formatMoney($amount) {
 
     <?php if ($venta): ?>
     <section>
-        <h2>💵 Venta</h2>
+        <div class="report-title">💰 Venta</div>
         <table>
             <tr><th>Fecha:</th><td><?= formatDate($venta['fecha']) ?></td></tr>
             <tr><th>Comprador:</th><td><?= $venta['comprador'] ?></td></tr>
-            <tr><th>CUIT:</th><td><?= $venta['comprador_cuit'] ?></td></tr>
+            <tr><th>CUIT:</th><td><?= $venta['cuit'] ?></td></tr>
             <tr><th>Factura Nº:</th><td><?= $venta['factura_numero'] ?></td></tr>
             <tr><th><strong>Importe:</strong></th><td><strong><?= formatMoney($venta['importe']) ?></strong></td></tr>
         </table>
@@ -220,7 +148,7 @@ function formatMoney($amount) {
     <?php endif; ?>
 
     <section>
-        <h2>🔄 Historial de Asignaciones</h2>
+        <div class="report-title">🔄 Historial de Asignaciones</div>
         <?php if (count($asignaciones) > 0): ?>
         <table>
             <tr><th>Empleado</th><th>Fecha Salida</th><th>Km Salida</th><th>Fecha Regreso</th><th>Km Regreso</th></tr>
@@ -235,12 +163,12 @@ function formatMoney($amount) {
             <?php endforeach; ?>
         </table>
         <?php else: ?>
-        <p>Sin asignaciones registradas</p>
+        <div class="no-data">Sin asignaciones registradas</div>
         <?php endif; ?>
     </section>
 
     <section>
-        <h2>⚠️ Multas</h2>
+        <div class="report-title">⚠️ Multas</div>
         <?php if (count($multas) > 0): ?>
         <table>
             <tr><th>Fecha</th><th>Motivo</th><th>Acta Nº</th><th>Responsable</th><th>Monto</th><th>Estado</th></tr>
@@ -248,7 +176,7 @@ function formatMoney($amount) {
             <tr>
                 <td><?= formatDate($m['fecha_multa']) ?></td>
                 <td><?= $m['motivo'] ?></td>
-                <td><?= $m['acta_numero'] ?></td>
+                <td><?= $m['numero_acta'] ?></td>
                 <td><?= $m['empleado_nombre'] ?></td>
                 <td><?= formatMoney($m['monto']) ?></td>
                 <td><?= $m['pagada'] ? 'Pagada' : 'Pendiente' ?></td>
@@ -257,12 +185,12 @@ function formatMoney($amount) {
         </table>
         <div class="total">Total Multas: <?= formatMoney($totalMultas) ?></div>
         <?php else: ?>
-        <p>Sin multas registradas</p>
+        <div class="no-data">Sin multas registradas</div>
         <?php endif; ?>
     </section>
 
     <section>
-        <h2>🔧 Mantenimientos</h2>
+        <div class="report-title">🔧 Mantenimientos</div>
         <?php if (count($mantenimientos) > 0): ?>
         <table>
             <tr><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Km</th><th>Costo</th></tr>
@@ -278,12 +206,12 @@ function formatMoney($amount) {
         </table>
         <div class="total">Total Mantenimientos: <?= formatMoney($totalMantenimientos) ?></div>
         <?php else: ?>
-        <p>Sin mantenimientos registrados</p>
+        <div class="no-data">Sin mantenimientos registrados</div>
         <?php endif; ?>
     </section>
 
     <section>
-        <h2>💳 Pagos</h2>
+        <div class="report-title">💳 Pagos</div>
         <?php if (count($pagos) > 0): ?>
         <table>
             <tr><th>Tipo</th><th>Vencimiento</th><th>Monto</th><th>Fecha Pago</th><th>Estado</th></tr>
@@ -298,13 +226,15 @@ function formatMoney($amount) {
             <?php endforeach; ?>
         </table>
         <?php else: ?>
-        <p>Sin pagos registrados</p>
+        <div class="no-data">Sin pagos registrados</div>
         <?php endif; ?>
     </section>
 
-    <div class="total" style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #333;">
-        RESUMEN ECONÓMICO<br>
-        Total Invertido (Mantenimientos + Multas): <?= formatMoney($totalMantenimientos + $totalMultas) ?>
+    <div class="summary-section">
+        <div class="total">RESUMEN ECONÓMICO</div>
+        <div class="total" style="font-size: 18px; background: rgba(255,255,255,0.2);">
+            Total Invertido (Mantenimientos + Multas): <?= formatMoney($totalMantenimientos + $totalMultas) ?>
+        </div>
     </div>
 </body>
 </html>

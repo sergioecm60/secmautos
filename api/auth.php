@@ -1,13 +1,13 @@
 <?php
 require_once __DIR__ . '/../bootstrap.php';
 
-function loginUsuario($email, $password, $captcha, $pdo) {
+function loginUsuario($username, $password, $captcha, $pdo) {
     if (!isset($_SESSION['captcha']) || strval($_SESSION['captcha']) !== strval($captcha)) {
         unset($_SESSION['captcha']);
         return ['success' => false, 'message' => 'Captcha incorrecto'];
     }
     unset($_SESSION['captcha']);
-    
+
     $ip_address = $_SERVER['REMOTE_ADDR'] ?? 'NA';
     $stmt_ip = $pdo->prepare("SELECT intentos, bloqueado_hasta FROM intentos_login_ip WHERE ip_address = ?");
     $stmt_ip->execute([$ip_address]);
@@ -20,20 +20,20 @@ function loginUsuario($email, $password, $captcha, $pdo) {
     $stmt = $pdo->prepare("DELETE FROM intentos_login_ip WHERE ultimo_intento < DATE_SUB(NOW(), INTERVAL 1 DAY)");
     $stmt->execute();
 
-    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ? AND activo = 1");
-    $stmt->execute([$email]);
+    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE username = ? AND activo = 1");
+    $stmt->execute([$username]);
     $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
     if (!$usuario) {
-        registrarLog(null, 'LOGIN_FALLIDO', 'AUTH', "Intento de login con email inexistente: $email", $pdo);
+        registrarLog(null, 'LOGIN_FALLIDO', 'AUTH', "Intento de login con usuario inexistente: $username", $pdo);
         return ['success' => false, 'message' => 'Usuario o contraseña incorrectos'];
     }
-    
+
     if ($usuario['bloqueado_hasta'] && new DateTime() < new DateTime($usuario['bloqueado_hasta'])) {
         $tiempo_restante = (new DateTime($usuario['bloqueado_hasta']))->diff(new DateTime())->format('%i minutos');
         return ['success' => false, 'message' => "Usuario bloqueado. Tiempo restante: $tiempo_restante"];
     }
-    
+
     if (!password_verify($password, $usuario['password_hash'])) {
         $intentos = $usuario['intentos_fallidos'] ?? 0 + 1;
         $bloqueado_hasta = null;
@@ -41,10 +41,10 @@ function loginUsuario($email, $password, $captcha, $pdo) {
         if ($intentos >= MAX_INTENTOS_USUARIO) {
             $bloqueado_hasta = date('Y-m-d H:i:s', strtotime('+' . BLOQUEO_USUARIO_MINUTOS . ' minute'));
         }
-        
+
         $stmt = $pdo->prepare("UPDATE usuarios SET intentos_fallidos = ?, bloqueado_hasta = ? WHERE id = ?");
         $stmt->execute([$intentos, $bloqueado_hasta, $usuario['id']]);
-        
+
         registrarLog($usuario['id'], 'LOGIN_FALLIDO', 'AUTH', "Contraseña incorrecta", $pdo);
 
         if ($ip_data) {
@@ -55,26 +55,27 @@ function loginUsuario($email, $password, $captcha, $pdo) {
         } else {
             $pdo->prepare("INSERT INTO intentos_login_ip (ip_address, intentos, ultimo_intento) VALUES (?, 1, NOW())")->execute([$ip_address]);
         }
-        
+
         if ($intentos >= MAX_INTENTOS_USUARIO) {
             return ['success' => false, 'message' => 'Usuario bloqueado por ' . BLOQUEO_USUARIO_MINUTOS . ' minuto(s)'];
         }
-        
+
         return ['success' => false, 'message' => "Usuario o contraseña incorrectos. Intentos restantes: " . (MAX_INTENTOS_USUARIO - $intentos)];
     }
-    
+
     session_regenerate_id(true);
     $_SESSION['usuario_id'] = $usuario['id'];
+    $_SESSION['username'] = $usuario['username'];
     $_SESSION['email'] = $usuario['email'];
     $_SESSION['nombre'] = $usuario['nombre'];
     $_SESSION['apellido'] = $usuario['apellido'];
     $_SESSION['rol'] = $usuario['rol'];
-    
+
     $stmt = $pdo->prepare("UPDATE usuarios SET intentos_fallidos = 0, bloqueado_hasta = NULL, ultimo_acceso = NOW() WHERE id = ?");
     $stmt->execute([$usuario['id']]);
-    
+
     registrarLog($usuario['id'], 'LOGIN_EXITOSO', 'AUTH', "Login exitoso", $pdo);
-    
+
     return ['success' => true, 'message' => 'Login exitoso'];
 }
 
@@ -103,21 +104,6 @@ function requiereRol($roles_permitidos, $redirect = true) {
         }
         return false;
     }
-    
-    return true;
-}
 
-function registrarLog($usuario_id, $accion, $modulo, $descripcion, $pdo, $datos_anteriores = null, $datos_nuevos = null) {
-    try {
-        $stmt = $pdo->prepare("INSERT INTO logs (usuario_id, accion, entidad, detalles, ip) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([
-            $usuario_id,
-            $accion,
-            $modulo,
-            $descripcion,
-            $_SERVER['REMOTE_ADDR'] ?? 'NA'
-        ]);
-    } catch (Exception $e) {
-        error_log("Error al registrar log: " . $e->getMessage());
-    }
+    return true;
 }

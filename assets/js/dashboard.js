@@ -152,9 +152,6 @@ function cargarModulo(modulo) {
         case 'compras_ventas':
             cargarComprasVentas();
             break;
-        case 'ceta':
-            cargarCeta();
-            break;
         case 'transferencias':
             cargarTransferencias();
             break;
@@ -293,12 +290,15 @@ function cargarMultas() {
             if (!document.querySelector('script[src="assets/js/multas.js"]')) {
                 const script = document.createElement('script');
                 script.src = 'assets/js/multas.js';
-                // No need for onload if the script itself initializes
+                script.onload = () => {
+                    if (window.MultasView) {
+                        window.multasView = new MultasView();
+                    }
+                };
                 document.body.appendChild(script);
             } else {
-                // If script is already there, maybe re-init
-                if (window.MultasView && typeof window.MultasView.init === 'function') {
-                    new MultasView();
+                if (window.MultasView) {
+                    window.multasView = new MultasView();
                 }
             }
         })
@@ -319,7 +319,16 @@ function cargarMantenimientos() {
             if (!document.querySelector('script[src="assets/js/mantenimientos.js"]')) {
                 const script = document.createElement('script');
                 script.src = 'assets/js/mantenimientos.js';
+                script.onload = () => {
+                    if (window.MantenimientosView) {
+                        window.mantenimientosView = new MantenimientosView();
+                    }
+                };
                 document.body.appendChild(script);
+            } else {
+                if (window.MantenimientosView) {
+                    window.mantenimientosView = new MantenimientosView();
+                }
             }
         })
         .catch(error => console.error('Error cargando módulo mantenimientos:', error));
@@ -422,10 +431,15 @@ function cargarComprasVentas() {
             if (!document.querySelector('script[src="assets/js/compras_ventas.js"]')) {
                 const script = document.createElement('script');
                 script.src = 'assets/js/compras_ventas.js';
+                script.onload = () => {
+                    if (window.ComprasVentasView) {
+                        window.comprasVentasView = new ComprasVentasView();
+                    }
+                };
                 document.body.appendChild(script);
             } else {
-                if (window.ComprasVentasView && typeof window.ComprasVentasView.init === 'function') {
-                    new ComprasVentasView();
+                if (window.ComprasVentasView) {
+                    window.comprasVentasView = new ComprasVentasView();
                 }
             }
         })
@@ -446,10 +460,15 @@ function cargarTransferencias() {
             if (!document.querySelector('script[src="assets/js/transferencias.js"]')) {
                 const script = document.createElement('script');
                 script.src = 'assets/js/transferencias.js';
+                script.onload = () => {
+                    if (window.TransferenciasView) {
+                        window.transferenciasView = new TransferenciasView();
+                    }
+                };
                 document.body.appendChild(script);
             } else {
-                if (window.TransferenciasView && typeof window.TransferenciasView.init === 'function') {
-                    new TransferenciasView();
+                if (window.TransferenciasView) {
+                    window.transferenciasView = new TransferenciasView();
                 }
             }
         })
@@ -465,23 +484,32 @@ function cargarUsuarios() {
         return;
     }
 
+    console.log('Cargando módulo usuarios...');
     fetch('modules/usuarios.html')
         .then(r => r.text())
         .then(html => {
             container.innerHTML = html;
+            console.log('HTML de usuarios cargado');
 
             if (!document.querySelector('script[src="assets/js/usuarios.js"]')) {
+                console.log('Creando script de usuarios...');
                 const script = document.createElement('script');
                 script.src = 'assets/js/usuarios.js';
                 script.onload = () => {
+                    console.log('Script de usuarios cargado');
+                    console.log('window.UsuariosView:', window.UsuariosView);
                     if (window.UsuariosView) {
                         window.usuariosView = new UsuariosView();
+                        console.log('Instancia de usuariosView creada:', window.usuariosView);
                     }
                 };
+                script.onerror = (e) => console.error('Error cargando script:', e);
                 document.body.appendChild(script);
             } else {
+                console.log('Script de usuarios ya existe, creando instancia...');
                 if (window.UsuariosView) {
                     window.usuariosView = new UsuariosView();
+                    console.log('Instancia de usuariosView creada:', window.usuariosView);
                 }
             }
         })
@@ -502,7 +530,16 @@ function cargarAutorizaciones() {
             if (!document.querySelector('script[src="assets/js/autorizaciones.js"]')) {
                 const script = document.createElement('script');
                 script.src = 'assets/js/autorizaciones.js';
+                script.onload = () => {
+                    if (window.AutorizacionesView) {
+                        window.autorizacionesView = new AutorizacionesView();
+                    }
+                };
                 document.body.appendChild(script);
+            } else {
+                if (window.AutorizacionesView) {
+                    window.autorizacionesView = new AutorizacionesView();
+                }
             }
         })
         .catch(error => console.error('Error cargando módulo autorizaciones:', error));

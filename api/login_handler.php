@@ -13,15 +13,15 @@ if (!isset($_POST['csrf_token']) || !verificar_csrf($_POST['csrf_token'])) {
     json_response(['success' => false, 'message' => 'Token CSRF inválido'], 403);
 }
 
-$email = sanitizar_input($_POST['email'] ?? '');
+$username = sanitizar_input($_POST['username'] ?? '');
 $password = $_POST['password'] ?? '';
 $captcha = $_POST['captcha'] ?? '';
 
-if (empty($email) || empty($password) || empty($captcha)) {
+if (empty($username) || empty($password) || empty($captcha)) {
     json_response(['success' => false, 'message' => 'Todos los campos son obligatorios']);
 }
 
-$resultado = loginUsuario($email, $password, $captcha, $pdo);
+$resultado = loginUsuario($username, $password, $captcha, $pdo);
 
 if ($resultado['success']) {
     json_response($resultado);

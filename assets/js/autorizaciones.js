@@ -236,8 +236,4 @@ class AutorizacionesView {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('tabla-autorizaciones')) {
-        new AutorizacionesView();
-    }
-});
+window.AutorizacionesView = AutorizacionesView;

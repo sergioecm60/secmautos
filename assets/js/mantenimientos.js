@@ -179,10 +179,4 @@ class MantenimientosView {
     showSuccess(message) { alert(`✅ ${message}`); }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('tabla-mantenimientos')) {
-        new MantenimientosView();
-    }
-});
-
-new MantenimientosView();
+window.MantenimientosView = MantenimientosView;

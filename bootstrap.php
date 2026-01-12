@@ -14,11 +14,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-session_save_path(__DIR__ . '/sessions');
-if (!file_exists(__DIR__ . '/sessions')) {
-    mkdir(__DIR__ . '/sessions', 0755, true);
-}
-
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
     session_unset();
     session_destroy();
@@ -96,6 +91,21 @@ function requiereAutenticacion($redirect = true) {
         return false;
     }
     return true;
+}
+
+function registrarLog($usuario_id, $accion, $modulo, $descripcion, $pdo, $datos_anteriores = null, $datos_nuevos = null) {
+    try {
+        $stmt = $pdo->prepare("INSERT INTO logs (usuario_id, accion, entidad, detalles, ip) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([
+            $usuario_id,
+            $accion,
+            $modulo,
+            $descripcion,
+            $_SERVER['REMOTE_ADDR'] ?? 'NA'
+        ]);
+    } catch (Exception $e) {
+        error_log("Error al registrar log: " . $e->getMessage());
+    }
 }
 
 // Funciones de seguridad mejoradas

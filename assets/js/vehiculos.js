@@ -238,5 +238,5 @@ class VehiculosView {
     }
 }
 
-// Instancia global
-window.vehiculosView = new VehiculosView();
+window.VehiculosView = VehiculosView;
+

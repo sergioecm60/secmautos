@@ -2,12 +2,73 @@ class EmpleadosView {
     constructor() {
         this.empleados = [];
         this.modal = null;
+        this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     }
 
     async init() {
         this.modal = new bootstrap.Modal(document.getElementById('modalEmpleado'));
-        document.getElementById('empleado-csrf').value = csrfToken;
+        const csrfInput = document.getElementById('empleado-csrf');
+        if (csrfInput) {
+            csrfInput.value = this.csrfToken;
+        }
         await this.cargar();
+    }
+
+    async nuevo() {
+        document.getElementById('form-empleado').reset();
+        document.getElementById('empleado-id').value = '';
+        document.getElementById('modalEmpleadoTitulo').textContent = 'Nuevo Empleado';
+        const csrfInput = document.getElementById('empleado-csrf');
+        if (csrfInput) {
+            csrfInput.value = this.csrfToken;
+        }
+        this.modal.show();
+    }
+
+    async editar(id) {
+        const empleado = this.empleados.find(e => e.id === id);
+        if (!empleado) return;
+
+        document.getElementById('empleado-id').value = empleado.id;
+        document.getElementById('empleado-nombre').value = empleado.nombre || '';
+        document.getElementById('empleado-apellido').value = empleado.apellido || '';
+        document.getElementById('empleado-dni').value = empleado.dni || '';
+        document.getElementById('empleado-telefono').value = empleado.telefono || '';
+        document.getElementById('empleado-email').value = empleado.email || '';
+        document.getElementById('empleado-direccion').value = empleado.direccion || '';
+
+        document.getElementById('modalEmpleadoTitulo').textContent = 'Editar Empleado';
+        const csrfInput = document.getElementById('empleado-csrf');
+        if (csrfInput) {
+            csrfInput.value = this.csrfToken;
+        }
+        this.modal.show();
+    }
+
+    async eliminar(id) {
+        if (!confirm('¿Está seguro de eliminar este empleado?')) return;
+
+        try {
+            const res = await fetch('api/empleados.php', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    id: id,
+                    csrf_token: this.csrfToken
+                })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                alert(data.message);
+                await this.cargar();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Error eliminando empleado:', error);
+            alert('Error al eliminar empleado');
+        }
     }
 
     async cargar() {
@@ -45,47 +106,24 @@ class EmpleadosView {
                 <td>${e.direccion || '-'}</td>
                 <td>${this.getBadgeEstado(e.activo)}</td>
                 <td>
-                    <button class="btn btn-sm btn-warning" onclick="window.empleadosView.editar(${e.id})" title="Editar">
-                        📝
+                    <button class="btn btn-sm btn-warning" onclick="window.empleadosView.editar(${e.id})" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar">
+                        <i class="bi bi-pencil"></i>
                     </button>
-                    <button class="btn btn-sm btn-danger" onclick="window.empleadosView.eliminar(${e.id})" title="Dar de baja">
-                        🗑️
+                    <button class="btn btn-sm btn-danger" onclick="window.empleadosView.eliminar(${e.id})" data-bs-toggle="tooltip" data-bs-placement="top" title="Borrar">
+                        <i class="bi bi-trash"></i>
                     </button>
                 </td>
             </tr>
         `).join('');
+
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
     }
 
     getBadgeEstado(activo) {
         return activo ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>';
-    }
-
-    nuevo() {
-        document.getElementById('modalEmpleadoTitulo').textContent = 'Nuevo Empleado';
-        document.getElementById('form-empleado').reset();
-        document.getElementById('empleado-id').value = '';
-        document.getElementById('empleado-csrf').value = csrfToken;
-        this.modal.show();
-    }
-
-    editar(id) {
-        const empleado = this.empleados.find(e => e.id == id);
-        if (!empleado) {
-            this.mostrarError('Empleado no encontrado');
-            return;
-        }
-
-        document.getElementById('modalEmpleadoTitulo').textContent = 'Editar Empleado';
-        document.getElementById('empleado-id').value = empleado.id;
-        document.getElementById('empleado-nombre').value = empleado.nombre || '';
-        document.getElementById('empleado-apellido').value = empleado.apellido || '';
-        document.getElementById('empleado-dni').value = empleado.dni || '';
-        document.getElementById('empleado-telefono').value = empleado.telefono || '';
-        document.getElementById('empleado-email').value = empleado.email || '';
-        document.getElementById('empleado-direccion').value = empleado.direccion || '';
-        document.getElementById('empleado-csrf').value = csrfToken;
-
-        this.modal.show();
     }
 
     async guardar() {
@@ -96,11 +134,11 @@ class EmpleadosView {
         }
 
         const formData = new FormData(form);
-        const id = document.getElementById('empleado-id').value;
+        const id = formData.get('id');
         const method = id ? 'PUT' : 'POST';
 
         try {
-            let body = method === 'PUT' ? new URLSearchParams(formData).toString() : formData;
+            let body = method === 'PUT' ? new URLSearchParams(formData) : formData;
 
             const res = await fetch('api/empleados.php', {
                 method: method,
@@ -120,34 +158,6 @@ class EmpleadosView {
         } catch (error) {
             console.error('Error guardando empleado:', error);
             this.mostrarError('Error de conexión al guardar empleado');
-        }
-    }
-
-    async eliminar(id) {
-        if (!confirm('¿Está seguro de dar de baja este empleado?')) {
-            return;
-        }
-
-        try {
-            const params = new URLSearchParams({ id: id, csrf_token: csrfToken }).toString();
-
-            const res = await fetch('api/empleados.php', {
-                method: 'DELETE',
-                body: params,
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-            });
-
-            const data = await res.json();
-
-            if (data.success) {
-                this.mostrarExito(data.message);
-                await this.cargar();
-            } else {
-                this.mostrarError(data.message);
-            }
-        } catch (error) {
-            console.error('Error eliminando empleado:', error);
-            this.mostrarError('Error de conexión al eliminar empleado');
         }
     }
 
@@ -173,4 +183,4 @@ class EmpleadosView {
     }
 }
 
-window.empleadosView = new EmpleadosView();
+window.EmpleadosView = EmpleadosView;

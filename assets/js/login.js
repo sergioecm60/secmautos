@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    document.getElementById('email').addEventListener('keypress', function(e) {
+    document.getElementById('username').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
             document.getElementById('password').focus();

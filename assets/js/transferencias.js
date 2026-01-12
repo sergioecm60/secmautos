@@ -44,6 +44,9 @@ class TransferenciasView {
             if (e.target.closest('.btn-edit')) {
                 const id = e.target.closest('.btn-edit').dataset.id;
                 this.openModal(id);
+            } else if (e.target.closest('.btn-delete')) {
+                const id = e.target.closest('.btn-delete').dataset.id;
+                this.delete(id);
             }
         });
     }
@@ -65,6 +68,9 @@ class TransferenciasView {
                 <td>
                     <button class="btn btn-sm btn-warning btn-edit" data-id="${item.id}">
                         <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger btn-delete" data-id="${item.id}">
+                        <i class="bi bi-trash"></i>
                     </button>
                 </td>
             </tr>
@@ -105,6 +111,23 @@ class TransferenciasView {
             });
         }
         this.modal.show();
+    }
+
+    async delete(id) {
+        if (!confirm('¿Está seguro de eliminar esta transferencia?')) return;
+
+        try {
+            const res = await this.fetchData(this.api.transferencias, 'DELETE', new URLSearchParams({id}));
+            if (res.success) {
+                this.showSuccess(res.message);
+                this.loadInitialData();
+            } else {
+                this.showError(res.message);
+            }
+        } catch (error) {
+            this.showError('Error al eliminar la transferencia.');
+            console.error('Error eliminando transferencia:', error);
+        }
     }
 
     async save() {
@@ -153,10 +176,4 @@ class TransferenciasView {
     showSuccess(message) { alert(`✅ ${message}`); }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('tabla-transferencias')) {
-        new TransferenciasView();
-    }
-});
-
-new TransferenciasView();
+window.TransferenciasView = TransferenciasView;

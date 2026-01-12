@@ -68,7 +68,9 @@
             </div>
             <div class="modal-body">
                 <form id="form-asignacion">
-                    
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                    <input type="hidden" name="id" id="asignacion-id">
+
                     <div class="mb-3">
                         <label for="asignacion-vehiculo" class="form-label">Vehículo (disponibles)</label>
                         <select class="form-select" id="asignacion-vehiculo" name="vehiculo_id" required>

@@ -10,6 +10,7 @@ requiereAutenticacion();
     <meta name="csrf-token" content="<?= $_SESSION['csrf_token'] ?>">
     <title>Dashboard - SECM Autos</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/themes.css">
     <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">

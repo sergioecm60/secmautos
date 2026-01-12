@@ -110,12 +110,12 @@ function cambiarPassword() {
         return;
     }
 
-    fetch('api/usuarios.php', {
-        method: 'PUT',
+    fetch('api/cambiar_password.php', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
-            id: usuarioId,
-            password: nueva,
+            password_actual: actual,
+            password_nueva: nueva,
             csrf_token: csrfTokenConfig
         })
     })

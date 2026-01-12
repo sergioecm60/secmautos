@@ -43,8 +43,53 @@ class AsignacionesView {
             if (e.target.closest('.btn-devolver')) {
                 const asignacionId = e.target.closest('.btn-devolver').dataset.id;
                 this.abrirModalDevolucion(asignacionId);
+            } else if (e.target.closest('.btn-edit')) {
+                const asignacionId = e.target.closest('.btn-edit').dataset.id;
+                this.editarAsignacion(asignacionId);
+            } else if (e.target.closest('.btn-delete')) {
+                const asignacionId = e.target.closest('.btn-delete').dataset.id;
+                this.eliminarAsignacion(asignacionId);
             }
         });
+    }
+
+    editarAsignacion(asignacionId) {
+        const asignacion = this.asignaciones.find(a => a.id == asignacionId);
+        if (!asignacion) return;
+
+        document.getElementById('form-asignacion').reset();
+        document.getElementById('asignacion-id').value = asignacion.id;
+        document.getElementById('asignacion-vehiculo').value = asignacion.vehiculo_id;
+        document.getElementById('asignacion-empleado').value = asignacion.empleado_id;
+        document.getElementById('asignacion-km_salida').value = asignacion.km_salida;
+        document.getElementById('asignacion-observaciones').value = asignacion.observaciones || '';
+
+        document.getElementById('modal-asignacion-title').textContent = 'Editar Asignación';
+
+        const modal = document.getElementById('modalAsignacion');
+        const modalInstance = bootstrap.Modal.getInstance(modal) || new bootstrap.Modal(modal);
+        modalInstance.show();
+    }
+
+    async eliminarAsignacion(asignacionId) {
+        if (!confirm('¿Está seguro de eliminar esta asignación?')) return;
+
+        try {
+            const body = new URLSearchParams({
+                id: asignacionId,
+                csrf_token: this.csrfToken
+            });
+            const response = await this.fetchData(this.apiAsignaciones, 'DELETE', body);
+            if (response.success) {
+                this.mostrarExito('Asignación eliminada correctamente.');
+                this.cargarDatos();
+            } else {
+                this.mostrarError(response.message || 'Error al eliminar la asignación.');
+            }
+        } catch (error) {
+            this.mostrarError('Error de red al eliminar la asignación.');
+            console.error('Error en eliminarAsignacion:', error);
+        }
     }
 
     renderAsignaciones(data) {
@@ -74,8 +119,14 @@ class AsignacionesView {
                 <td>${asig.km_salida.toLocaleString()} km</td>
                 <td>${asig.observaciones || '-'}</td>
                 <td>
-                    <button class="btn btn-sm btn-success btn-devolver" data-id="${asig.id}">
-                        <i class="bi bi-arrow-return-left"></i> Devolver
+                    <button class="btn btn-sm btn-warning btn-edit" data-id="${asig.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger btn-delete" data-id="${asig.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Borrar">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                    <button class="btn btn-sm btn-success btn-devolver" data-id="${asig.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Devolver">
+                        <i class="bi bi-arrow-return-left"></i>
                     </button>
                 </td>
             </tr>
@@ -96,6 +147,8 @@ class AsignacionesView {
 
     abrirModalAsignacion() {
         document.getElementById('form-asignacion').reset();
+        document.getElementById('asignacion-id').value = '';
+        document.getElementById('modal-asignacion-title').textContent = 'Nueva Asignación';
         new bootstrap.Modal(document.getElementById('modalAsignacion')).show();
     }
 
@@ -112,6 +165,7 @@ class AsignacionesView {
     async guardarAsignacion() {
         const form = document.getElementById('form-asignacion');
         const formData = new FormData(form);
+        const id = formData.get('id');
 
         if (!form.checkValidity()) {
             this.mostrarError('Por favor, complete todos los campos requeridos.');
@@ -119,9 +173,10 @@ class AsignacionesView {
         }
 
         try {
-            const response = await this.fetchData(this.apiAsignaciones, 'POST', formData);
+            const method = id ? 'PUT' : 'POST';
+            const response = await this.fetchData(this.apiAsignaciones, method, formData);
             if (response.success) {
-                this.mostrarExito('Asignación creada correctamente.');
+                this.mostrarExito(id ? 'Asignación actualizada correctamente.' : 'Asignación creada correctamente.');
                 bootstrap.Modal.getInstance(document.getElementById('modalAsignacion')).hide();
                 this.cargarDatos(); // Recargar todo
             } else {
@@ -177,13 +232,12 @@ class AsignacionesView {
     // --- Utilidades ---
     async fetchData(url, method = 'GET', body = null) {
         const options = { method };
-        if (method === 'POST' || method === 'PUT') {
+        if (method === 'POST' || method === 'PUT' || method === 'DELETE') {
             if (body) {
-                // FormData and URLSearchParams both have 'set' which overwrites.
-                // This is fine and ensures the token is correctly set.
-                body.set('csrf_token', this.csrfToken);
+                const effectiveBody = (body instanceof FormData) ? body : new URLSearchParams(body);
+                effectiveBody.set('csrf_token', this.csrfToken);
+                options.body = effectiveBody;
             }
-            options.body = body;
         }
         const res = await fetch(url, options);
         return res.json();
@@ -214,10 +268,4 @@ class AsignacionesView {
     }
 }
 
-// Inicializar la vista cuando el módulo se cargue
-document.addEventListener('DOMContentLoaded', () => {
-    // Esto se podría mejorar para que solo se ejecute cuando el módulo de asignaciones sea visible
-    if (document.getElementById('tabla-asignaciones-activas')) {
-        new AsignacionesView();
-    }
-});
+window.AsignacionesView = AsignacionesView;

@@ -10,10 +10,10 @@
         <table class="table table-hover" id="tabla-usuarios">
             <thead>
                 <tr>
+                    <th>Usuario</th>
                     <th>Nombre</th>
                     <th>Apellido</th>
                     <th>Email</th>
-                    <th>Rol</th>
                     <th>Estado</th>
                     <th>Último Acceso</th>
                     <th>Acciones</th>
@@ -39,29 +39,29 @@
                     <input type="hidden" name="id" id="usuario-id">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">Nombre *</label>
-                            <input type="text" class="form-control" name="nombre" id="usuario-nombre" required>
+                            <label class="form-label">Usuario *</label>
+                            <input type="text" class="form-control" name="username" id="usuario-username" required>
+                            <small class="text-muted">Nombre de usuario para iniciar sesión</small>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Apellido *</label>
-                            <input type="text" class="form-control" name="apellido" id="usuario-apellido" required>
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" id="usuario-email">
+                            <small class="text-muted">Opcional</small>
                         </div>
-                        <div class="col-md-12">
-                            <label class="form-label">Email *</label>
-                            <input type="email" class="form-control" name="email" id="usuario-email" required>
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" class="form-control" name="nombre" id="usuario-nombre">
+                            <small class="text-muted">Opcional</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellido</label>
+                            <input type="text" class="form-control" name="apellido" id="usuario-apellido">
+                            <small class="text-muted">Opcional</small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Contraseña</label>
                             <input type="password" class="form-control" name="password" id="usuario-password">
-                            <small class="text-muted">Dejar vacío para mantener la actual (solo al editar)</small>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Rol *</label>
-                            <select class="form-select" name="rol" id="usuario-rol" required>
-                                <option value="user">Usuario</option>
-                                <option value="admin">Administrador</option>
-                                <option value="superadmin">Superadministrador</option>
-                            </select>
+                            <small class="text-muted" id="password-hint">Obligatorio para nuevo usuario, dejar vacío para mantener la actual (solo al editar)</small>
                         </div>
                         <div class="col-md-12">
                             <div class="form-check form-switch">

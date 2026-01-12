@@ -45,10 +45,15 @@ class MultasView {
 
         // Delegación de eventos para botones de la tabla
         document.getElementById('tabla-multas').addEventListener('click', (e) => {
-            const target = e.target.closest('.btn-pagar');
-            if (target) {
-                const multaId = target.dataset.id;
+            if (e.target.closest('.btn-pagar')) {
+                const multaId = e.target.closest('.btn-pagar').dataset.id;
                 this.marcarComoPagada(multaId);
+            } else if (e.target.closest('.btn-edit-multa')) {
+                const multaId = e.target.closest('.btn-edit-multa').dataset.id;
+                this.editarMulta(multaId);
+            } else if (e.target.closest('.btn-delete-multa')) {
+                const multaId = e.target.closest('.btn-delete-multa').dataset.id;
+                this.eliminarMulta(multaId);
             }
         });
         
@@ -70,7 +75,9 @@ class MultasView {
                     <td>$${parseFloat(multa.monto).toLocaleString('es-AR')}</td>
                     <td>${this.getBadgeEstado(multa.pagada)}</td>
                     <td>
-                        ${multa.pagada == 0 ? `<button class="btn btn-sm btn-success btn-pagar" data-id="${multa.id}"><i class="bi bi-check-circle"></i> Marcar Pagada</button>` : ''}
+                        ${multa.pagada == 0 ? `<button class="btn btn-sm btn-success btn-pagar" data-id="${multa.id}"><i class="bi bi-check-circle"></i></button>` : ''}
+                        <button class="btn btn-sm btn-warning btn-edit-multa" data-id="${multa.id}"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-danger btn-delete-multa" data-id="${multa.id}"><i class="bi bi-trash"></i></button>
                     </td>
                 </tr>
             `;
@@ -147,6 +154,59 @@ class MultasView {
         }
     }
 
+    async editarMulta(multaId) {
+        try {
+            const res = await this.fetchData(`${this.apiMultas}?id=${multaId}`);
+            if (res.success) {
+                const multa = res.data;
+                const form = document.getElementById('form-multa');
+                document.getElementById('multa-id').value = multa.id;
+                document.getElementById('multa-vehiculo').value = multa.vehiculo_id;
+                document.getElementById('multa-fecha').value = multa.fecha_multa;
+                document.getElementById('multa-motivo').value = multa.motivo;
+                document.getElementById('multa-acta').value = multa.numero_acta || '';
+                document.getElementById('multa-monto').value = multa.monto;
+                document.getElementById('multa-estado-form').value = multa.pagada;
+                document.getElementById('multa-empleado-id').value = multa.empleado_id || '';
+
+                if (multa.empleado_id) {
+                    document.getElementById('multa-empleado-info').textContent = 'Empleado asignado en el registro original.';
+                }
+
+                if (multa.pagada == 1) {
+                    document.getElementById('multa-estado-form').disabled = false;
+                    document.getElementById('fecha-pago-container').style.display = 'block';
+                    document.getElementById('multa-fecha-pago').value = multa.fecha_pago ? multa.fecha_pago.split(' ')[0] : '';
+                }
+
+                this.modal.show();
+            } else {
+                this.mostrarError(res.message);
+            }
+        } catch (error) {
+            this.mostrarError('Error al cargar multa');
+            console.error('Error cargando multa:', error);
+        }
+    }
+
+    async eliminarMulta(multaId) {
+        if (!confirm('¿Está seguro de eliminar esta multa?')) return;
+
+        try {
+            const body = new URLSearchParams({ id: multaId });
+            const res = await this.fetchData(this.apiMultas, 'DELETE', body);
+            if (res.success) {
+                this.mostrarExito('Multa eliminada correctamente');
+                this.cargarDatosIniciales();
+            } else {
+                this.mostrarError(res.message);
+            }
+        } catch (error) {
+            this.mostrarError('Error al eliminar multa');
+            console.error('Error eliminando multa:', error);
+        }
+    }
+
     async marcarComoPagada(multaId) {
         const fechaPago = prompt("Ingrese la fecha de pago (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
         if (!fechaPago) return; // Si el usuario cancela
@@ -174,11 +234,11 @@ class MultasView {
     // --- Utilidades ---
     async fetchData(url, method = 'GET', body = null) {
         const options = { method };
-        if (method === 'POST' || method === 'PUT') {
+        if (method === 'POST' || method === 'PUT' || method === 'DELETE') {
              if (body) {
-                const effectiveBody = (body instanceof FormData) ? body : new URLSearchParams(body);
-                effectiveBody.set('csrf_token', this.csrfToken);
-                options.body = effectiveBody;
+                 const effectiveBody = (body instanceof FormData) ? body : new URLSearchParams(body);
+                 effectiveBody.set('csrf_token', this.csrfToken);
+                 options.body = effectiveBody;
              }
         }
         const res = await fetch(url, options);
@@ -203,10 +263,4 @@ class MultasView {
     mostrarExito(mensaje) { alert(mensaje); }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('tabla-multas')) {
-        new MultasView();
-    }
-});
-
-new MultasView();
+window.MultasView = MultasView;

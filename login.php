@@ -14,7 +14,7 @@ if (isset($_SESSION['usuario_id'])) {
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Login - SECM Autos</title>
+    <title>Login - SECM Flota</title>
     <link rel="stylesheet" href="assets/css/bootstrap.min.css?v=1.1">
     <link rel="stylesheet" href="assets/css/style.css?v=1.1">
     <link rel="stylesheet" href="assets/css/themes.css?v=1.1">
@@ -30,9 +30,8 @@ if (isset($_SESSION['usuario_id'])) {
     <main class="login-main-content">
         <div class="login-container">
             <div class="login-header">
-                <img src="assets/img/logo.png" alt="SECM Flota de Autos" class="login-logo">
-                <h1>SECM Flota de Autos</h1>
-                <p>Sistema de Gestión de Vehículos</p>
+                <img src="assets/img/logo.png" alt="SECM Flota" class="login-logo">
+                <h1>SECM Flota</h1>
             </div>
             
             <?php if (isset($_SESSION['mensaje_logout'])): ?>
@@ -53,8 +52,8 @@ if (isset($_SESSION['usuario_id'])) {
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
                 
                 <div class="form-group">
-                    <label for="email">📧 Email</label>
-                    <input type="email" id="email" name="email" required placeholder="Ingrese su email" autocomplete="username" autofocus>
+                    <label for="username">👤 Usuario</label>
+                    <input type="text" id="username" name="username" required placeholder="Ingrese su usuario" autocomplete="username" autofocus>
                 </div>
                 
                 <div class="form-group">
@@ -80,7 +79,7 @@ if (isset($_SESSION['usuario_id'])) {
     
     <footer class="page-footer-fixed">
         <p>
-            <strong>SECM Flota de Autos</strong> |
+            <strong>SECM Flota</strong> |
             By Sergio Cabrera |
             Copyleft ©2025 |
             <a href="licence.php">Licencia GNU GPL v3</a>

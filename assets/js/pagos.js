@@ -115,6 +115,7 @@ async function guardarPago() {
     }
 
     const formData = new FormData(form);
+    formData.append('csrf_token', document.querySelector('[name="csrf_token"]').value);
 
     try {
         const res = await fetch('api/pagos.php', {
@@ -132,7 +133,7 @@ async function guardarPago() {
         }
     } catch (error) {
         console.error('Error guardando pago:', error);
-        alert('Error al guardar el pago');
+        alert('Error al guardar pago');
     }
 }
 

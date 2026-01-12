@@ -18,14 +18,14 @@ switch ($method) {
                 $fecha = $_GET['fecha'];
 
                 $stmt = $pdo->prepare("
-                    SELECT 
+                    SELECT
                         a.empleado_id,
                         CONCAT(e.nombre, ' ', e.apellido) as nombre_empleado,
                         e.dni as dni_empleado
                     FROM asignaciones a
                     JOIN empleados e ON a.empleado_id = e.id
-                    WHERE a.vehiculo_id = ? 
-                    AND ? >= a.fecha_asignacion 
+                    WHERE a.vehiculo_id = ?
+                    AND ? >= a.fecha_asignacion
                     AND (a.fecha_devolucion IS NULL OR ? <= a.fecha_devolucion)
                     ORDER BY a.fecha_asignacion DESC
                     LIMIT 1
@@ -45,9 +45,9 @@ switch ($method) {
             // Comportamiento original: listar todas las asignaciones
             try {
                 $stmt = $pdo->query("
-                    SELECT 
+                    SELECT
                         a.*,
-                        v.patente, 
+                        v.patente,
                         CONCAT(v.marca, ' ', v.modelo) as marca_modelo,
                         CONCAT(e.nombre, ' ', e.apellido) as nombre_empleado
                     FROM asignaciones a
@@ -62,37 +62,58 @@ switch ($method) {
             }
         }
         break;
-    
+
     case 'POST':
         if (!verificar_csrf($_POST['csrf_token'] ?? '')) {
             json_response(['success' => false, 'message' => 'Token CSRF inválido'], 403);
         }
-        
+
         try {
             $vehiculo_id = (int)($_POST['vehiculo_id'] ?? 0);
             $empleado_id = (int)($_POST['empleado_id'] ?? 0);
             $km_salida = (int)($_POST['km_salida'] ?? 0);
             $observaciones = sanitizar_input($_POST['observaciones'] ?? '');
-            
+
             if (empty($vehiculo_id) || empty($empleado_id)) {
                 json_response(['success' => false, 'message' => 'Vehículo y empleado son obligatorios'], 400);
             }
-            
+
+            // Verificar que el vehículo no esté actualmente asignado
+            $stmt = $pdo->prepare("
+                SELECT id FROM asignaciones
+                WHERE vehiculo_id = ? AND fecha_devolucion IS NULL
+            ");
+            $stmt->execute([$vehiculo_id]);
+            if ($stmt->fetch()) {
+                json_response(['success' => false, 'message' => 'El vehículo ya está asignado actualmente. Devuélvalo primero.'], 400);
+            }
+
+            // Verificar que el vehículo exista y esté disponible
+            $stmt = $pdo->prepare("SELECT id, estado FROM vehiculos WHERE id = ?");
+            $stmt->execute([$vehiculo_id]);
+            $vehiculo = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$vehiculo) {
+                json_response(['success' => false, 'message' => 'Vehículo no encontrado'], 404);
+            }
+            if ($vehiculo['estado'] === 'baja') {
+                json_response(['success' => false, 'message' => 'No se puede asignar un vehículo dado de baja'], 400);
+            }
+
             $pdo->beginTransaction();
-            
+
             $stmt = $pdo->prepare("UPDATE vehiculos SET estado = 'asignado' WHERE id = ?");
             $stmt->execute([$vehiculo_id]);
-            
+
             $stmt = $pdo->prepare("
                 INSERT INTO asignaciones (vehiculo_id, empleado_id, km_salida, observaciones)
                 VALUES (?, ?, ?, ?)
             ");
             $stmt->execute([$vehiculo_id, $empleado_id, $km_salida, $observaciones]);
-            
+
             $pdo->commit();
-            
+
             registrarLog($_SESSION['usuario_id'], 'ASIGNAR_VEHICULO', 'asignaciones', "Vehículo $vehiculo_id asignado a empleado $empleado_id", $pdo);
-            
+
             json_response(['success' => true, 'message' => 'Vehículo asignado exitosamente']);
         } catch (Exception $e) {
             $pdo->rollBack();
@@ -107,56 +128,143 @@ switch ($method) {
             json_response(['success' => false, 'message' => 'Token CSRF inválido'], 403);
         }
 
-        try {
-            $asignacion_id = (int)($_PUT['asignacion_id'] ?? 0);
-            $km_regreso = (int)($_PUT['km_regreso'] ?? 0);
-            $observaciones_devolucion = sanitizar_input($_PUT['observaciones'] ?? '');
+        // Si es una edición de asignación (no devolución)
+        if (isset($_PUT['id']) && isset($_PUT['vehiculo_id']) && isset($_PUT['empleado_id'])) {
+            try {
+                $asignacion_id = (int)($_PUT['id'] ?? 0);
+                $vehiculo_id = (int)($_PUT['vehiculo_id'] ?? 0);
+                $empleado_id = (int)($_PUT['empleado_id'] ?? 0);
+                $km_salida = (int)($_PUT['km_salida'] ?? 0);
+                $observaciones = sanitizar_input($_PUT['observaciones'] ?? '');
 
-            if (empty($asignacion_id) || empty($km_regreso)) {
-                json_response(['success' => false, 'message' => 'ID de asignación y kilometraje de regreso son obligatorios'], 400);
+                if (empty($asignacion_id) || empty($vehiculo_id) || empty($empleado_id)) {
+                    json_response(['success' => false, 'message' => 'Vehículo y empleado son obligatorios'], 400);
+                }
+
+                $pdo->beginTransaction();
+
+                $stmt = $pdo->prepare("UPDATE asignaciones SET vehiculo_id = ?, empleado_id = ?, km_salida = ?, observaciones = ? WHERE id = ?");
+                $stmt->execute([$vehiculo_id, $empleado_id, $km_salida, $observaciones, $asignacion_id]);
+
+                $pdo->commit();
+
+                registrarLog($_SESSION['usuario_id'], 'EDITAR_ASIGNACION', 'asignaciones', "Asignación editada: ID $asignacion_id", $pdo);
+
+                json_response(['success' => true, 'message' => 'Asignación actualizada correctamente']);
+            } catch (Exception $e) {
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                json_response(['success' => false, 'message' => 'Error al actualizar asignación: ' . $e->getMessage()], 500);
+            }
+        } else if (isset($_PUT['asignacion_id']) && isset($_PUT['km_regreso'])) {
+            // Devolución de vehículo
+            try {
+                $asignacion_id = (int)($_PUT['asignacion_id'] ?? 0);
+                $km_regreso = (int)($_PUT['km_regreso'] ?? 0);
+                $observaciones_devolucion = sanitizar_input($_PUT['observaciones'] ?? '');
+
+                if (empty($asignacion_id) || empty($km_regreso)) {
+                    json_response(['success' => false, 'message' => 'ID de asignación y kilometraje de regreso son obligatorios'], 400);
+                }
+
+                $pdo->beginTransaction();
+
+                $stmt = $pdo->prepare("SELECT vehiculo_id, km_salida, observaciones FROM asignaciones WHERE id = ?");
+                $stmt->execute([$asignacion_id]);
+                $asignacion = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if (!$asignacion) {
+                    $pdo->rollBack();
+                    json_response(['success' => false, 'message' => 'Asignación no encontrada'], 404);
+                }
+
+                if ($km_regreso < $asignacion['km_salida']) {
+                     $pdo->rollBack();
+                    json_response(['success' => false, 'message' => 'El kilometraje de regreso no puede ser menor al de salida'], 400);
+                }
+
+                $nuevas_observaciones = $asignacion['observaciones'];
+                if (!empty($observaciones_devolucion)) {
+                    $nuevas_observaciones .= "\n[Devolución " . date('Y-m-d') . "]: " . $observaciones_devolucion;
+                }
+
+                $stmt = $pdo->prepare("
+                    UPDATE asignaciones
+                    SET fecha_devolucion = NOW(), km_regreso = ?, observaciones = ?
+                    WHERE id = ?
+                ");
+                $stmt->execute([$km_regreso, trim($nuevas_observaciones), $asignacion_id]);
+
+                $stmt = $pdo->prepare("UPDATE vehiculos SET estado = 'disponible', kilometraje_actual = ? WHERE id = ?");
+                $stmt->execute([$km_regreso, $asignacion['vehiculo_id']]);
+
+                $pdo->commit();
+
+                registrarLog($_SESSION['usuario_id'], 'DEVOLVER_VEHICULO', 'asignaciones', "Vehículo devuelto (Asignación ID: $asignacion_id, KM: $km_regreso)", $pdo);
+
+                json_response(['success' => true, 'message' => 'Vehículo devuelto exitosamente']);
+            } catch (Exception $e) {
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                json_response(['success' => false, 'message' => 'Error al devolver vehículo: ' . $e->getMessage()], 500);
+            }
+        }
+        break;
+
+    case 'DELETE':
+        parse_str(file_get_contents('php://input'), $_DELETE);
+
+        if (!verificar_csrf($_DELETE['csrf_token'] ?? '')) {
+            json_response(['success' => false, 'message' => 'Token CSRF inválido'], 403);
+        }
+
+        try {
+            $asignacion_id = (int)($_DELETE['id'] ?? 0);
+
+            if (empty($asignacion_id)) {
+                json_response(['success' => false, 'message' => 'ID de asignación requerido'], 400);
             }
 
             $pdo->beginTransaction();
 
-            $stmt = $pdo->prepare("SELECT vehiculo_id, km_salida, observaciones FROM asignaciones WHERE id = ?");
+            // Obtener asignación para liberar el vehículo
+            $stmt = $pdo->prepare("SELECT vehiculo_id FROM asignaciones WHERE id = ?");
             $stmt->execute([$asignacion_id]);
             $asignacion = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$asignacion) {
-                $pdo->rollBack();
                 json_response(['success' => false, 'message' => 'Asignación no encontrada'], 404);
             }
 
-            if ($km_regreso < $asignacion['km_salida']) {
-                 $pdo->rollBack();
-                json_response(['success' => false, 'message' => 'El kilometraje de regreso no puede ser menor al de salida'], 400);
-            }
-            
-            $nuevas_observaciones = $asignacion['observaciones'];
-            if (!empty($observaciones_devolucion)) {
-                $nuevas_observaciones .= "\n[Devolución " . date('Y-m-d') . "]: " . $observaciones_devolucion;
+            // Verificar que la asignación esté activa (no devuelta)
+            $stmt = $pdo->prepare("SELECT fecha_devolucion FROM asignaciones WHERE id = ?");
+            $stmt->execute([$asignacion_id]);
+            $asignacion_check = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($asignacion_check['fecha_devolucion'] !== null) {
+                json_response(['success' => false, 'message' => 'No se puede eliminar una asignación que ya fue devuelta'], 400);
             }
 
-            $stmt = $pdo->prepare("
-                UPDATE asignaciones
-                SET fecha_devolucion = NOW(), km_regreso = ?, observaciones = ?
-                WHERE id = ?
-            ");
-            $stmt->execute([$km_regreso, trim($nuevas_observaciones), $asignacion_id]);
+            // Eliminar asignación
+            $stmt = $pdo->prepare("DELETE FROM asignaciones WHERE id = ?");
+            $stmt->execute([$asignacion_id]);
 
-            $stmt = $pdo->prepare("UPDATE vehiculos SET estado = 'disponible', kilometraje_actual = ? WHERE id = ?");
-            $stmt->execute([$km_regreso, $asignacion['vehiculo_id']]);
+            // Liberar vehículo
+            $stmt = $pdo->prepare("UPDATE vehiculos SET estado = 'disponible' WHERE id = ?");
+            $stmt->execute([$asignacion['vehiculo_id']]);
 
             $pdo->commit();
 
-            registrarLog($_SESSION['usuario_id'], 'DEVOLVER_VEHICULO', 'asignaciones', "Vehículo devuelto (Asignación ID: $asignacion_id, KM: $km_regreso)", $pdo);
+            registrarLog($_SESSION['usuario_id'], 'ELIMINAR_ASIGNACION', 'asignaciones', "Asignación eliminada: ID $asignacion_id", $pdo);
 
-            json_response(['success' => true, 'message' => 'Vehículo devuelto exitosamente']);
+            json_response(['success' => true, 'message' => 'Asignación eliminada correctamente']);
         } catch (Exception $e) {
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
             }
-            json_response(['success' => false, 'message' => 'Error al devolver vehículo: ' . $e->getMessage()], 500);
+            json_response(['success' => false, 'message' => 'Error al eliminar asignación: ' . $e->getMessage()], 500);
         }
         break;
 

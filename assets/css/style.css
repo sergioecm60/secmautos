@@ -68,7 +68,7 @@ body.modern-login-body::before {
 }
 
 /* Contenedor principal que centra el contenido */
-.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; padding-bottom: 100px; }
 
 /* ========== ENCABEZADO ========== */
 /* Barra de encabezado superior */
@@ -371,7 +371,7 @@ tr:hover { background-color: var(--bg-tertiary); } /* Efecto al pasar el mouse s
     border-radius: 12px; /* Bordes más compactos */
     padding: 20px 16px; /* Padding más compacto */
     width: 100%;
-    max-width: 280px; /* Ancho más pequeño */
+    max-width: 240px; /* Ancho más pequeño */
     box-shadow:
         0 15px 30px rgba(0, 0, 0, 0.12),
         0 5px 10px rgba(0, 0, 0, 0.08),
@@ -385,7 +385,7 @@ tr:hover { background-color: var(--bg-tertiary); } /* Efecto al pasar el mouse s
 }
 
 /* Encabezado del login (logo y título) */
-.login-header { text-align: center; margin-bottom: 20px; }
+.login-header { text-align: center; margin-bottom: 15px; }
 .login-header .login-logo {
     width: 50px; /* Logo más pequeño */
     height: 50px;
@@ -393,8 +393,17 @@ tr:hover { background-color: var(--bg-tertiary); } /* Efecto al pasar el mouse s
     margin-bottom: 10px;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
-.login-header p {
+.login-header h1 {
     font-size: 28px;
+    font-weight: 700;
+    background: var(--text-login-header-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 5px;
+}
+.login-header p {
+    font-size: 24px;
     font-weight: 700;
     background: var(--text-login-header-gradient);
     -webkit-background-clip: text;

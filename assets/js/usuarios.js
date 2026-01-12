@@ -8,9 +8,20 @@ class UsuariosView {
     }
 
     init() {
-        this.modal = new bootstrap.Modal(document.getElementById('modalUsuario'));
+        const modalElement = document.getElementById('modalUsuario');
+        if (modalElement) {
+            this.modal = new bootstrap.Modal(modalElement);
+        }
         this.loadInitialData();
         this.initEventListeners();
+        this.initTooltips();
+    }
+
+    initTooltips() {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
     }
 
     async loadInitialData() {
@@ -27,67 +38,86 @@ class UsuariosView {
     }
 
     initEventListeners() {
-        document.getElementById('btn-nuevo-usuario').addEventListener('click', () => this.openModal());
-        document.getElementById('btn-guardar-usuario').addEventListener('click', () => this.save());
+        const btnNuevo = document.getElementById('btn-nuevo-usuario');
+        const btnGuardar = document.getElementById('btn-guardar-usuario');
+        const tablaUsuarios = document.getElementById('tabla-usuarios');
 
-        document.getElementById('tabla-usuarios').addEventListener('click', e => {
-            if (e.target.closest('.btn-edit')) {
-                const id = e.target.closest('.btn-edit').dataset.id;
-                this.openModal(id);
-            } else if (e.target.closest('.btn-delete')) {
-                const id = e.target.closest('.btn-delete').dataset.id;
-                this.delete(id);
-            }
-        });
+        if (btnNuevo) {
+            btnNuevo.addEventListener('click', () => this.openModal());
+        } else {
+            console.error('btn-nuevo-usuario no encontrado');
+        }
+
+        if (btnGuardar) {
+            btnGuardar.addEventListener('click', () => this.save());
+        } else {
+            console.error('btn-guardar-usuario no encontrado');
+        }
+
+        if (tablaUsuarios) {
+            tablaUsuarios.addEventListener('click', e => {
+                if (e.target.closest('.btn-edit')) {
+                    const id = e.target.closest('.btn-edit').dataset.id;
+                    this.openModal(id);
+                } else if (e.target.closest('.btn-delete')) {
+                    const id = e.target.closest('.btn-delete').dataset.id;
+                    this.delete(id);
+                }
+            });
+        } else {
+            console.error('tabla-usuarios no encontrada');
+        }
     }
 
     renderTable() {
         const tbody = document.querySelector('#tabla-usuarios tbody');
         tbody.innerHTML = this.data.map(item => `
             <tr>
-                <td>${item.nombre}</td>
-                <td>${item.apellido}</td>
-                <td>${item.email}</td>
-                <td>${this.getRolBadge(item.rol)}</td>
+                <td><strong>${item.username}</strong></td>
+                <td>${item.nombre || '-'}</td>
+                <td>${item.apellido || '-'}</td>
+                <td>${item.email || '-'}</td>
                 <td>${item.activo ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>'}</td>
                 <td>${item.ultimo_acceso ? this.formatDate(item.ultimo_acceso) : 'Nunca'}</td>
                 <td>
-                    <button class="btn btn-sm btn-warning btn-edit" data-id="${item.id}">
+                    <button class="btn btn-sm btn-warning btn-edit" data-id="${item.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar">
                         <i class="bi bi-pencil"></i>
                     </button>
-                    <button class="btn btn-sm btn-danger btn-delete" data-id="${item.id}">
+                    <button class="btn btn-sm btn-danger btn-delete" data-id="${item.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Borrar">
                         <i class="bi bi-trash"></i>
                     </button>
                 </td>
             </tr>
         `).join('');
-    }
-
-    getRolBadge(rol) {
-        const badges = {
-            'superadmin': '<span class="badge bg-danger">Superadmin</span>',
-            'admin': '<span class="badge bg-warning">Admin</span>',
-            'user': '<span class="badge bg-primary">Usuario</span>'
-        };
-        return badges[rol] || rol;
+        this.initTooltips();
     }
 
     openModal(id = null) {
         const form = document.getElementById('form-usuario');
+        if (!form) {
+            console.error('form-usuario no encontrado');
+            return;
+        }
         form.reset();
         document.getElementById('usuario-id').value = id || '';
 
+        const passwordHint = document.getElementById('password-hint');
+
         if (id) {
             const item = this.data.find(i => i.id == id);
+            document.getElementById('usuario-username').value = item.username || '';
             document.getElementById('usuario-nombre').value = item.nombre || '';
             document.getElementById('usuario-apellido').value = item.apellido || '';
             document.getElementById('usuario-email').value = item.email || '';
-            document.getElementById('usuario-rol').value = item.rol || 'user';
             document.getElementById('usuario-activo').checked = item.activo == 1;
             document.getElementById('usuario-password').value = '';
+            document.getElementById('usuario-password').removeAttribute('required');
+            passwordHint.textContent = 'Dejar vacío para mantener la actual';
             document.getElementById('modalUsuario').querySelector('.modal-title').textContent = 'Editar Usuario';
         } else {
             document.getElementById('usuario-activo').checked = true;
+            document.getElementById('usuario-password').setAttribute('required', 'required');
+            passwordHint.textContent = 'Obligatorio para nuevo usuario';
             document.getElementById('modalUsuario').querySelector('.modal-title').textContent = 'Nuevo Usuario';
         }
         this.modal.show();
@@ -156,8 +186,4 @@ class UsuariosView {
     showSuccess(message) { alert(`✅ ${message}`); }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('tabla-usuarios')) {
-        new UsuariosView();
-    }
-});
+window.UsuariosView = UsuariosView;
