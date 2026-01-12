@@ -172,12 +172,12 @@ function verDetalles(id) {
     if (!pago) return;
 
     const detalles = `
-        Patente: ${pago.patente}
-        Tipo: ${pago.tipo}
-        Vencimiento: ${formatDate(p.fecha_vencimiento)}
-        Monto: ${pago.monto ? '$' + parseFloat(pago.monto).toFixed(2) : 'No especificado'}
+        Patente: ${pago.patente || 'No especificado'}
+        Tipo: ${pago.tipo || 'No especificado'}
+        Vencimiento: ${pago.fecha_vencimiento ? formatDate(pago.fecha_vencimiento) : 'No especificado'}
+        Monto: ${pago.monto ? `$${parseFloat(pago.monto).toFixed(2)}` : 'No especificado'}
         Estado: ${pago.pagado ? 'Pagado' : 'Pendiente'}
-        Fecha de pago: ${pago.fecha_pago ? formatDate(p.fecha_pago) : 'No pagado'}
+        Fecha de pago: ${pago.fecha_pago ? formatDate(pago.fecha_pago) : 'No pagado'}
         Comprobante: ${pago.comprobante || 'No especificado'}
         Observaciones: ${pago.observaciones || 'Sin observaciones'}
     `;

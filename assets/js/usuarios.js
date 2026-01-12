@@ -187,3 +187,4 @@ class UsuariosView {
 }
 
 window.UsuariosView = UsuariosView;
+window.usuariosView = new UsuariosView();

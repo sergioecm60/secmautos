@@ -239,4 +239,5 @@ class VehiculosView {
 }
 
 window.VehiculosView = VehiculosView;
+window.vehiculosView = new VehiculosView();
 

@@ -104,5 +104,13 @@ requiereAutenticacion();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/dashboard.js"></script>
+    <script src="assets/js/theme-switcher.js"></script>
+
+    <!-- Theme Selector -->
+    <div class="theme-selector">
+        <button class="theme-btn light" data-theme="light" title="Tema Claro">☀️</button>
+        <button class="theme-btn dark" data-theme="dark" title="Tema Oscuro">🌙</button>
+        <button class="theme-btn auto" data-theme="auto" title="Automático">🔄</button>
+    </div>
 </body>
 </html>

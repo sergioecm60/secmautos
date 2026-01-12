@@ -269,3 +269,4 @@ class AsignacionesView {
 }
 
 window.AsignacionesView = AsignacionesView;
+window.asignacionesView = new AsignacionesView();

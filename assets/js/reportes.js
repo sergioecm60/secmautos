@@ -46,13 +46,7 @@ async function generarListadoGCBA() {
 
         const blob = await res.blob();
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `listado_gcba_${new Date().toISOString().slice(0,10)}.html`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
+        window.open(url, '_blank');
     } catch (error) {
         console.error('Error generando listado:', error);
         alert('Error al generar el listado: ' + error.message);
@@ -86,15 +80,11 @@ async function generarReporteMultas() {
 
         const blob = new Blob([html], { type: 'text/html' });
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `reporte_multas_${new Date().toISOString().slice(0,10)}.html`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
+        window.open(url, '_blank');
 
-        alert('Reporte de multas generado. Abre el archivo para imprimir o guardar como PDF.');
+        setTimeout(() => {
+            alert('Reporte de multas generado en la nueva pestaña. Usa el botón para imprimir o guardar como PDF.');
+        }, 500);
     } catch (error) {
         console.error('Error generando reporte multas:', error);
         alert('Error al generar el reporte: ' + error.message);
@@ -180,15 +170,11 @@ async function generarReporteVencimientos() {
 
         const blob = new Blob([html], { type: 'text/html' });
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `vencimientos_${new Date().toISOString().slice(0,10)}.html`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
+        window.open(url, '_blank');
 
-        alert('Reporte de vencimientos generado. Abre el archivo para imprimir o guardar como PDF.');
+        setTimeout(() => {
+            alert('Reporte de vencimientos generado en la nueva pestaña. Usa el botón para imprimir o guardar como PDF.');
+        }, 500);
     } catch (error) {
         console.error('Error generando reporte vencimientos:', error);
         alert('Error al generar el reporte: ' + error.message);
@@ -267,15 +253,11 @@ async function generarReporteAsignaciones() {
 
         const blob = new Blob([html], { type: 'text/html' });
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `asignaciones_${new Date().toISOString().slice(0,10)}.html`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
+        window.open(url, '_blank');
 
-        alert('Reporte de asignaciones generado. Abre el archivo para imprimir o guardar como PDF.');
+        setTimeout(() => {
+            alert('Reporte de asignaciones generado en la nueva pestaña. Usa el botón para imprimir o guardar como PDF.');
+        }, 500);
     } catch (error) {
         console.error('Error generando reporte asignaciones:', error);
         alert('Error al generar el reporte: ' + error.message);

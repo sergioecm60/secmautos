@@ -180,3 +180,4 @@ class MantenimientosView {
 }
 
 window.MantenimientosView = MantenimientosView;
+window.mantenimientosView = new MantenimientosView();

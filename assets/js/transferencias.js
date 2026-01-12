@@ -177,3 +177,4 @@ class TransferenciasView {
 }
 
 window.TransferenciasView = TransferenciasView;
+window.transferenciasView = new TransferenciasView();

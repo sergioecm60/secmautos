@@ -186,3 +186,4 @@ class ComprasVentasView {
 }
 
 window.ComprasVentasView = ComprasVentasView;
+window.comprasVentasView = new ComprasVentasView();

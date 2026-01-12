@@ -237,3 +237,4 @@ class AutorizacionesView {
 }
 
 window.AutorizacionesView = AutorizacionesView;
+window.autorizacionesView = new AutorizacionesView();

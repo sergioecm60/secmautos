@@ -184,3 +184,4 @@ class EmpleadosView {
 }
 
 window.EmpleadosView = EmpleadosView;
+window.empleadosView = new EmpleadosView();

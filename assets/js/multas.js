@@ -264,3 +264,4 @@ class MultasView {
 }
 
 window.MultasView = MultasView;
+window.multasView = new MultasView();
