@@ -1,30 +1,16 @@
 <?php
-$dotenv_path = __DIR__ . '/../.env';
-if (file_exists($dotenv_path)) {
-    $lines = file($dotenv_path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        if (strpos(trim($line), '#') === 0) continue;
-        list($name, $value) = explode('=', $line, 2);
-        $name = trim($name);
-        $value = trim($value);
-        if (substr($value, 0, 1) == '"' && substr($value, -1) == '"') {
-            $value = substr($value, 1, -1);
-        }
-        putenv(sprintf('%s=%s', $name, $value));
-        $_ENV[$name] = $value;
-    }
-}
+date_default_timezone_set('America/Argentina/Buenos_Aires');
+
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/logs/php_errors.log');
 
 $host = getenv('DB_HOST') ?: 'localhost';
 $dbname = getenv('DB_NAME') ?: 'secmautos';
 $user = getenv('DB_USER') ?: 'root';
 $pass = getenv('DB_PASS') ?: '';
 $charset = getenv('DB_CHARSET') ?: 'utf8mb4';
-
-define('MAX_INTENTOS_USUARIO', 5);
-define('BLOQUEO_USUARIO_MINUTOS', 15);
-define('MAX_INTENTOS_IP', 10);
-define('BLOQUEO_IP_MINUTOS', 30);
 
 $dsn = "mysql:host={$host};dbname={$dbname};charset={$charset}";
 $options = [
@@ -36,8 +22,30 @@ $options = [
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
     $pdo->exec("SET time_zone = '-03:00'");
-} catch (\PDOException $e) {
+} catch (PDOException $e) {
     error_log("Error de conexión a la base de datos: " . $e->getMessage());
     http_response_code(503);
     die("Error de conexión con la base de datos. Por favor, intente más tarde.");
+}
+
+function json_response($data, $status = 200) {
+    http_response_code($status);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
+}
+
+function sanitizar_input($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+    return $data;
+}
+
+function sanitizeId($id) {
+    $id = (int)$id;
+    if ($id <= 0) {
+        return null;
+    }
+    return $id;
 }
