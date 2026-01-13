@@ -10,36 +10,61 @@ if (!verificar_autenticacion()) {
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
-    case 'GET':
-        try {
-            $sql = "
-                SELECT
-                    m.*,
-                    v.patente, v.marca, v.modelo,
-                    COALESCE(CONCAT(e.nombre, ' ', e.apellido), 'Sin asignar') as empleado_nombre
-                FROM multas m
-                JOIN vehiculos v ON m.vehiculo_id = v.id
-                LEFT JOIN empleados e ON m.empleado_id = e.id
-            ";
-
-            $params = [];
-
-            if (isset($_GET['vehiculo_id'])) {
-                $sql .= " WHERE m.vehiculo_id = ?";
-                $params[] = (int)$_GET['vehiculo_id'];
-            }
-
-            $sql .= " ORDER BY m.pagada ASC, m.fecha_multa DESC";
-
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute($params);
-            $multas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            json_response(['success' => true, 'data' => $multas]);
-        } catch (Exception $e) {
-            json_response(['success' => false, 'message' => 'Error al obtener multas: ' . $e->getMessage()], 500);
-        }
-        break;
+     case 'GET':
+         try {
+             // Si se pasa id, devolver una sola multa
+             if (isset($_GET['id'])) {
+                 $sql = "
+                     SELECT
+                         m.*,
+                         v.patente, v.marca, v.modelo,
+                         COALESCE(CONCAT(e.nombre, ' ', e.apellido), 'Sin asignar') as empleado_nombre
+                     FROM multas m
+                     JOIN vehiculos v ON m.vehiculo_id = v.id
+                     LEFT JOIN empleados e ON m.empleado_id = e.id
+                     WHERE m.id = ?
+                 ";
+                 $stmt = $pdo->prepare($sql);
+                 $stmt->execute([(int)$_GET['id']]);
+                 $multa = $stmt->fetch(PDO::FETCH_ASSOC);
+                 
+                 if ($multa) {
+                     json_response(['success' => true, 'data' => $multa]);
+                 } else {
+                     json_response(['success' => false, 'message' => 'Multa no encontrada'], 404);
+                 }
+                 break;
+             }
+             
+             // Si no, devolver todas las multas
+             $sql = "
+                 SELECT
+                     m.*,
+                     v.patente, v.marca, v.modelo,
+                     COALESCE(CONCAT(e.nombre, ' ', e.apellido), 'Sin asignar') as empleado_nombre
+                 FROM multas m
+                 JOIN vehiculos v ON m.vehiculo_id = v.id
+                 LEFT JOIN empleados e ON m.empleado_id = e.id
+             ";
+             
+             $params = [];
+             
+             if (isset($_GET['vehiculo_id'])) {
+                 $sql .= " WHERE m.vehiculo_id = ?";
+                 $params[] = (int)$_GET['vehiculo_id'];
+             }
+             
+             $sql .= " ORDER BY m.pagada ASC, m.fecha_multa DESC";
+             
+             $stmt = $pdo->prepare($sql);
+             $stmt->execute($params);
+             $multas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+             
+             json_response(['success' => true, 'data' => $multas]);
+         } catch (Exception $e) {
+             json_response(['success' => false, 'message' => 'Error al obtener multas: ' . $e->getMessage()], 500);
+         }
+         break;
 
     case 'POST':
         if (!verificar_csrf($_POST['csrf_token'] ?? '')) {
@@ -94,14 +119,48 @@ switch ($method) {
                 json_response(['success' => false, 'message' => 'La fecha de pago es obligatoria al marcar una multa como pagada'], 400);
             }
 
-            $stmt = $pdo->prepare("UPDATE multas SET pagada = ?, fecha_pago = ? WHERE id = ?");
-            $stmt->execute([$pagada, $pagada === 1 ? $fecha_pago : null, $id]);
+            $pdo->beginTransaction();
 
-            if ($stmt->rowCount() > 0) {
-                registrarLog($_SESSION['usuario_id'], 'ACTUALIZAR_MULTA', 'multas', "Multa ID: $id actualizada. Pagada: $pagada", $pdo);
-                json_response(['success' => true, 'message' => 'Multa actualizada exitosamente']);
-            } else {
-                json_response(['success' => false, 'message' => 'No se encontró la multa o no hubo cambios'], 404);
+            try {
+                $stmt = $pdo->prepare("UPDATE multas SET pagada = ?, fecha_pago = ? WHERE id = ?");
+                $stmt->execute([$pagada, $pagada === 1 ? $fecha_pago : null, $id]);
+
+                if ($pagada === 1) {
+                    // Obtener datos de la multa para crear registro en pagos
+                    $stmt = $pdo->prepare("SELECT m.*, v.patente FROM multas m JOIN vehiculos v ON m.vehiculo_id = v.id WHERE m.id = ?");
+                    $stmt->execute([$id]);
+                    $multa = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    if ($multa) {
+                        // Crear registro en pagos
+                        $stmt = $pdo->prepare("
+                            INSERT INTO pagos (
+                                vehiculo_id, empleado_id, tipo, multa_id,
+                                fecha_vencimiento, fecha_pago, monto, observaciones, pagado
+                            ) VALUES (?, ?, 'multa', ?, ?, ?, ?, 'Multa registrada en sistema', 1)
+                        ");
+                        $stmt->execute([
+                            $multa['vehiculo_id'],
+                            $multa['empleado_id'],
+                            $id,
+                            $multa['fecha_multa'],
+                            $fecha_pago,
+                            $multa['monto']
+                        ]);
+                    }
+                }
+
+                $pdo->commit();
+
+                if ($pdo->query("SELECT ROW_COUNT()")->fetchColumn() > 0) {
+                    registrarLog($_SESSION['usuario_id'], 'ACTUALIZAR_MULTA', 'multas', "Multa ID: $id actualizada. Pagada: $pagada", $pdo);
+                    json_response(['success' => true, 'message' => 'Multa actualizada exitosamente']);
+                } else {
+                    json_response(['success' => false, 'message' => 'No se encontró la multa o no hubo cambios'], 404);
+                }
+            } catch (Exception $e) {
+                $pdo->rollBack();
+                throw $e;
             }
         } catch (Exception $e) {
             json_response(['success' => false, 'message' => 'Error al actualizar multa: ' . $e->getMessage()], 500);

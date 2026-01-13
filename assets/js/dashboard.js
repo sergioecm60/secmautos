@@ -8,15 +8,15 @@ document.addEventListener('DOMContentLoaded', function() {
     navBtns.forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
-            
+
             navBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
-            
+
             const module = this.dataset.module;
-            
+
             modules.forEach(m => m.classList.remove('active'));
-            document.getElementById(`module-${module}`).classList.add('active');
-            
+            document.getElementById('module-' + module).classList.add('active');
+
             cargarModulo(module);
         });
     });
@@ -35,13 +35,19 @@ function cargarDashboard() {
         renderAlertas(alertas);
         renderVencimientos(vencimientos);
     })
-    .catch(error => console.error('Error cargando dashboard:', error));
+    .catch(error => {
+        console.error('Error cargando dashboard:', error);
+        // Intentar parsear el error para mostrar mensaje más claro
+        if (error.message && error.message.includes('JSON')) {
+            alert('❌ Error al cargar los datos del dashboard. Por favor recarga la página.');
+        }
+    });
 }
 
 function renderStats(data) {
     const container = document.getElementById('stats-grid');
     if (!data.success) return;
-    
+
     const stats = [
         { label: 'Total Vehículos', value: data.data.total_vehiculos, icon: '🚗' },
         { label: 'Disponibles', value: data.data.disponibles, icon: '✅' },
@@ -52,7 +58,7 @@ function renderStats(data) {
         { label: 'Multas Pendientes', value: data.data.multas_pendientes, icon: '💰' },
         { label: 'Mantenimientos Programados', value: data.data.mantenimientos_programados, icon: '📅' }
     ];
-    
+
     container.innerHTML = stats.map(stat => `
         <div class="stat-card">
             <div style="font-size: 2em;">${stat.icon}</div>
@@ -68,17 +74,17 @@ function renderAlertas(data) {
         container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No hay alertas activas</p>';
         return;
     }
-    
+
     const rows = data.data.map(alerta => `
         <tr>
             <td>${alerta.patente || 'N/A'}</td>
             <td>${alerta.tipo_alerta}</td>
             <td>${alerta.mensaje}</td>
             <td>${alerta.fecha_alerta}</td>
-            <td><span class="badge badge-warning">Pendiente</span></td>
+            <td>${alerta.estado}</td>
         </tr>
     `).join('');
-    
+
     container.innerHTML = `
         <div class="table-container">
             <table>
@@ -103,17 +109,29 @@ function renderVencimientos(data) {
         container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No hay vencimientos próximos</p>';
         return;
     }
-    
-    const rows = data.data.map(venc => `
+
+    const rows = data.data.map(venc => {
+        const dangerClass = venc.dias_restantes <= 7 ? 'text-danger fw-bold' : '';
+        return `
         <tr class="fila-pendiente">
-            <td>${venc.patente}</td>
+            <td><strong>${venc.patente}</strong></td>
             <td>${venc.marca} ${venc.modelo}</td>
             <td>${venc.tipo_vencimiento}</td>
             <td>${venc.fecha_vencimiento}</td>
-            <td>${venc.dias_restantes} días</td>
+            <td>
+                <span class="${dangerClass}">
+                    ${venc.dias_restantes} días
+                </span>
+            </td>
+            <td>
+                <button class="btn btn-sm btn-success" onclick="pagarDesdeDashboard(${venc.pago_id}, '${venc.patente}', '${venc.tipo_vencimiento}', '${venc.fecha_vencimiento}')" title="Pagar ahora">
+                    <i class="bi bi-cash"></i> Pagar
+                </button>
+            </td>
         </tr>
-    `).join('');
-    
+        `;
+    }).join('');
+
     container.innerHTML = `
         <div class="table-container">
             <table>
@@ -124,6 +142,7 @@ function renderVencimientos(data) {
                         <th>Tipo</th>
                         <th>Vence</th>
                         <th>Restantes</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>${rows}</tbody>
@@ -161,6 +180,15 @@ function cargarModulo(modulo) {
         case 'pagos':
             cargarPagos();
             break;
+        case 'combustible':
+            cargarCombustible();
+            break;
+        case 'talleres':
+            cargarTalleres();
+            break;
+        case 'telepases':
+            cargarTelepases();
+            break;
         case 'ficha_vehiculo':
             cargarFichaVehiculo();
             break;
@@ -179,7 +207,6 @@ function cargarModulo(modulo) {
 function cargarVehiculos() {
     const container = document.getElementById('module-vehiculos');
 
-    // Verificar si ya está cargado
     if (container.innerHTML.trim() !== '') {
         if (window.vehiculosView) {
             window.vehiculosView.cargar();
@@ -187,13 +214,11 @@ function cargarVehiculos() {
         return;
     }
 
-    // Cargar el HTML del módulo
     fetch('modules/vehiculos.html')
         .then(r => r.text())
         .then(html => {
             container.innerHTML = html;
 
-            // Cargar el script JS del módulo
             if (!document.querySelector('script[src="assets/js/vehiculos.js"]')) {
                 const script = document.createElement('script');
                 script.src = 'assets/js/vehiculos.js';
@@ -203,10 +228,6 @@ function cargarVehiculos() {
                     }
                 };
                 document.body.appendChild(script);
-            } else {
-                if (window.vehiculosView) {
-                    window.vehiculosView.init();
-                }
             }
         })
         .catch(error => console.error('Error cargando módulo vehículos:', error));
@@ -215,9 +236,9 @@ function cargarVehiculos() {
 function cargarEmpleados() {
     const container = document.getElementById('module-empleados');
 
-    if (container.innerHTML.trim() !== '') {
+    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
         if (window.empleadosView) {
-            window.empleadosView.cargar();
+            window.empleadosView.init();
         }
         return;
     }
@@ -236,13 +257,38 @@ function cargarEmpleados() {
                     }
                 };
                 document.body.appendChild(script);
-            } else {
-                if (window.empleadosView) {
-                    window.empleadosView.init();
-                }
             }
         })
         .catch(error => console.error('Error cargando módulo empleados:', error));
+}
+
+function cargarAutorizaciones() {
+    const container = document.getElementById('module-autorizaciones');
+
+    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
+        if (window.AutorizacionesView && !window.autorizacionesView) {
+            window.autorizacionesView = new AutorizacionesView();
+        }
+        return;
+    }
+
+    fetch('modules/autorizaciones.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/autorizaciones.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/autorizaciones.js';
+                script.onload = () => {
+                    if (window.AutorizacionesView && !window.autorizacionesView) {
+                        window.autorizacionesView = new AutorizacionesView();
+                    }
+                };
+                document.body.appendChild(script);
+            }
+        })
+        .catch(error => console.error('Error cargando módulo autorizaciones:', error));
 }
 
 function cargarAsignaciones() {
@@ -250,7 +296,7 @@ function cargarAsignaciones() {
 
     if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
         if (window.asignacionesView) {
-            window.asignacionesView.cargarDatos();
+            window.asignacionesView.init();
         }
         return;
     }
@@ -264,11 +310,11 @@ function cargarAsignaciones() {
                 const script = document.createElement('script');
                 script.src = 'assets/js/asignaciones.js';
                 script.onload = () => {
-                    window.asignacionesView = new AsignacionesView();
+                    if (window.asignacionesView) {
+                        window.asignacionesView.init();
+                    }
                 };
                 document.body.appendChild(script);
-            } else {
-                window.asignacionesView = new AsignacionesView();
             }
         })
         .catch(error => console.error('Error cargando módulo asignaciones:', error));
@@ -278,7 +324,6 @@ function cargarMultas() {
     const container = document.getElementById('module-multas');
 
     if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
-        // Module already loaded, maybe just refresh data if needed
         return;
     }
 
@@ -290,23 +335,73 @@ function cargarMultas() {
             if (!document.querySelector('script[src="assets/js/multas.js"]')) {
                 const script = document.createElement('script');
                 script.src = 'assets/js/multas.js';
-                script.onload = () => {
-                    if (window.MultasView) {
-                        window.multasView = new MultasView();
-                    }
-                };
                 document.body.appendChild(script);
-            } else {
-                if (window.MultasView) {
-                    window.multasView = new MultasView();
-                }
             }
         })
         .catch(error => console.error('Error cargando módulo multas:', error));
 }
 
+function cargarComprasVentas() {
+    const container = document.getElementById('module-compras_ventas');
+
+    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
+        if (window.ComprasVentasView && !window.comprasVentasView) {
+            window.comprasVentasView = new ComprasVentasView();
+        }
+        return;
+    }
+
+    fetch('modules/compras_ventas.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/compras_ventas.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/compras_ventas.js';
+                script.onload = () => {
+                    if (window.ComprasVentasView && !window.comprasVentasView) {
+                        window.comprasVentasView = new ComprasVentasView();
+                    }
+                };
+                document.body.appendChild(script);
+            }
+        })
+        .catch(error => console.error('Error cargando módulo compras/ventas:', error));
+}
+
+function cargarTransferencias() {
+    const container = document.getElementById('module-transferencias');
+
+    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
+        if (window.TransferenciasView && !window.transferenciasView) {
+            window.transferenciasView = new TransferenciasView();
+        }
+        return;
+    }
+
+    fetch('modules/transferencias.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/transferencias.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/transferencias.js';
+                script.onload = () => {
+                    if (window.TransferenciasView && !window.transferenciasView) {
+                        window.transferenciasView = new TransferenciasView();
+                    }
+                };
+                document.body.appendChild(script);
+            }
+        })
+        .catch(error => console.error('Error cargando módulo transferencias:', error));
+}
+
 function cargarMantenimientos() {
     const container = document.getElementById('module-mantenimientos');
+
     if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
         return;
     }
@@ -320,15 +415,11 @@ function cargarMantenimientos() {
                 const script = document.createElement('script');
                 script.src = 'assets/js/mantenimientos.js';
                 script.onload = () => {
-                    if (window.MantenimientosView) {
-                        window.mantenimientosView = new MantenimientosView();
+                    if (window.mantenimientosView) {
+                        window.mantenimientosView.init();
                     }
                 };
                 document.body.appendChild(script);
-            } else {
-                if (window.MantenimientosView) {
-                    window.mantenimientosView = new MantenimientosView();
-                }
             }
         })
         .catch(error => console.error('Error cargando módulo mantenimientos:', error));
@@ -336,6 +427,7 @@ function cargarMantenimientos() {
 
 function cargarPagos() {
     const container = document.getElementById('module-pagos');
+
     if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
         return;
     }
@@ -348,15 +440,49 @@ function cargarPagos() {
             if (!document.querySelector('script[src="assets/js/pagos.js"]')) {
                 const script = document.createElement('script');
                 script.src = 'assets/js/pagos.js';
+                document.onload = () => {
+                    if (window.pagosView) {
+                        window.pagosView = new PagosView();
+                    }
+                };
                 document.body.appendChild(script);
             }
         })
         .catch(error => console.error('Error cargando módulo pagos:', error));
 }
 
-function cargarFichaVehiculo(id) {
+function cargarTelepases() {
+    const container = document.getElementById('module-telepases');
+
+    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
+        return;
+    }
+
+    fetch('modules/telepases.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/telepases.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/telepases.js';
+                script.onload = () => {
+                    if (window.telepasesView) {
+                        window.telepasesView.init();
+                    }
+                };
+                document.body.appendChild(script);
+            }
+        })
+        .catch(error => console.error('Error cargando módulo telepases:', error));
+}
+
+function cargarFichaVehiculo() {
     const container = document.getElementById('module-ficha_vehiculo');
-    container.innerHTML = '';
+
+    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
+        return;
+    }
 
     fetch('modules/ficha_vehiculo.html')
         .then(r => r.text())
@@ -366,16 +492,10 @@ function cargarFichaVehiculo(id) {
             if (!document.querySelector('script[src="assets/js/ficha_vehiculo.js"]')) {
                 const script = document.createElement('script');
                 script.src = 'assets/js/ficha_vehiculo.js';
-                script.onload = () => {
-                    if (id) {
-                        cargarFichaVehiculo(id);
-                    }
+                document.onload = () => {
+                    cargarFichaVehiculo(id);
                 };
                 document.body.appendChild(script);
-            } else {
-                if (id) {
-                    cargarFichaVehiculo(id);
-                }
             }
         })
         .catch(error => console.error('Error cargando ficha vehículo:', error));
@@ -401,148 +521,33 @@ function cargarReportes() {
         .catch(error => console.error('Error cargando módulo reportes:', error));
 }
 
-function nuevoVehiculo() {
-    alert('Formulario de nuevo vehículo en construcción...');
-}
-
-function verVehiculo(id) {
-    alert('Ver detalle del vehículo ' + id);
-}
-
-function editarVehiculo(id) {
-    alert('Editar vehículo ' + id);
-}
-
-function nuevoEmpleado() {
-    alert('Formulario de nuevo empleado en construcción...');
-}
-
-function cargarComprasVentas() {
-    const container = document.getElementById('module-compras_ventas');
-    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
-        return;
-    }
-
-    fetch('modules/compras_ventas.html')
-        .then(r => r.text())
-        .then(html => {
-            container.innerHTML = html;
-
-            if (!document.querySelector('script[src="assets/js/compras_ventas.js"]')) {
-                const script = document.createElement('script');
-                script.src = 'assets/js/compras_ventas.js';
-                script.onload = () => {
-                    if (window.ComprasVentasView) {
-                        window.comprasVentasView = new ComprasVentasView();
-                    }
-                };
-                document.body.appendChild(script);
-            } else {
-                if (window.ComprasVentasView) {
-                    window.comprasVentasView = new ComprasVentasView();
-                }
-            }
-        })
-        .catch(error => console.error('Error cargando módulo compras/ventas:', error));
-}
-
-function cargarTransferencias() {
-    const container = document.getElementById('module-transferencias');
-    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
-        return;
-    }
-
-    fetch('modules/transferencias.html')
-        .then(r => r.text())
-        .then(html => {
-            container.innerHTML = html;
-
-            if (!document.querySelector('script[src="assets/js/transferencias.js"]')) {
-                const script = document.createElement('script');
-                script.src = 'assets/js/transferencias.js';
-                script.onload = () => {
-                    if (window.TransferenciasView) {
-                        window.transferenciasView = new TransferenciasView();
-                    }
-                };
-                document.body.appendChild(script);
-            } else {
-                if (window.TransferenciasView) {
-                    window.transferenciasView = new TransferenciasView();
-                }
-            }
-        })
-        .catch(error => console.error('Error cargando módulo transferencias:', error));
-}
-
 function cargarUsuarios() {
     const container = document.getElementById('module-usuarios');
+
     if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
-        if (window.usuariosView) {
-            window.usuariosView.loadInitialData();
+        if (window.UsuariosView && !window.usuariosView) {
+            window.usuariosView = new UsuariosView();
         }
         return;
     }
 
-    console.log('Cargando módulo usuarios...');
     fetch('modules/usuarios.html')
         .then(r => r.text())
         .then(html => {
             container.innerHTML = html;
-            console.log('HTML de usuarios cargado');
 
             if (!document.querySelector('script[src="assets/js/usuarios.js"]')) {
-                console.log('Creando script de usuarios...');
                 const script = document.createElement('script');
                 script.src = 'assets/js/usuarios.js';
                 script.onload = () => {
-                    console.log('Script de usuarios cargado');
-                    console.log('window.UsuariosView:', window.UsuariosView);
-                    if (window.UsuariosView) {
+                    if (window.UsuariosView && !window.usuariosView) {
                         window.usuariosView = new UsuariosView();
-                        console.log('Instancia de usuariosView creada:', window.usuariosView);
                     }
                 };
-                script.onerror = (e) => console.error('Error cargando script:', e);
                 document.body.appendChild(script);
-            } else {
-                console.log('Script de usuarios ya existe, creando instancia...');
-                if (window.UsuariosView) {
-                    window.usuariosView = new UsuariosView();
-                    console.log('Instancia de usuariosView creada:', window.usuariosView);
-                }
             }
         })
         .catch(error => console.error('Error cargando módulo usuarios:', error));
-}
-
-function cargarAutorizaciones() {
-    const container = document.getElementById('module-autorizaciones');
-    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
-        return;
-    }
-
-    fetch('modules/autorizaciones.html')
-        .then(r => r.text())
-        .then(html => {
-            container.innerHTML = html;
-
-            if (!document.querySelector('script[src="assets/js/autorizaciones.js"]')) {
-                const script = document.createElement('script');
-                script.src = 'assets/js/autorizaciones.js';
-                script.onload = () => {
-                    if (window.AutorizacionesView) {
-                        window.autorizacionesView = new AutorizacionesView();
-                    }
-                };
-                document.body.appendChild(script);
-            } else {
-                if (window.AutorizacionesView) {
-                    window.autorizacionesView = new AutorizacionesView();
-                }
-            }
-        })
-        .catch(error => console.error('Error cargando módulo autorizaciones:', error));
 }
 
 function cargarConfiguracion() {
@@ -563,4 +568,161 @@ function cargarConfiguracion() {
             }
         })
         .catch(error => console.error('Error cargando módulo configuración:', error));
+}
+
+// Función para pagar un vencimiento directamente desde el dashboard
+function pagarDesdeDashboard(pagoId, patente, tipo, fechaVencimiento) {
+    const container = document.getElementById('module-pagos');
+
+    // Si el módulo de pagos no está cargado, cargarlo primero
+    if (container.innerHTML.trim() === '') {
+        fetch('modules/pagos.html')
+            .then(r => r.text())
+            .then(html => {
+                container.innerHTML = html;
+
+                if (!document.querySelector('script[src="assets/js/pagos.js"]')) {
+                    const script = document.createElement('script');
+                    script.src = 'assets/js/pagos.js';
+                    script.onload = () => {
+                        prellenarPago(pagoId, patente, tipo, fechaVencimiento);
+                    };
+                    document.body.appendChild(script);
+                }
+            })
+            .catch(error => console.error('Error cargando módulo pagos:', error));
+    } else {
+        prellenarPago(pagoId, patente, tipo, fechaVencimiento);
+    }
+}
+
+function cargarCombustible() {
+    const container = document.getElementById('module-combustible');
+
+    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
+        if (window.CombustibleView && !window.combustibleView) {
+            window.combustibleView = new CombustibleView();
+        }
+        return;
+    }
+
+    fetch('modules/combustible.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/combustible.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/combustible.js';
+                script.onload = () => {
+                    if (window.CombustibleView && !window.combustibleView) {
+                        window.combustibleView = new CombustibleView();
+                    }
+                };
+                script.onerror = () => {
+                    console.error('Error cargando script de combustible');
+                    container.innerHTML = '<p class="text-danger">Error al cargar el módulo. Por favor recarga la página.</p>';
+                };
+                document.body.appendChild(script);
+            }
+        })
+        .catch(error => console.error('Error cargando módulo combustible:', error));
+}
+
+function cargarTalleres() {
+    const container = document.getElementById('module-talleres');
+
+    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
+        return;
+    }
+
+    fetch('modules/talleres.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/talleres.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/talleres.js';
+                script.onload = () => {
+                    if (window.talleresView) {
+                        window.talleresView.init();
+                    }
+                };
+                script.onerror = () => {
+                    console.error('Error cargando script de talleres');
+                    container.innerHTML = '<p class="text-danger">Error al cargar el módulo. Por favor recarga la página.</p>';
+                };
+                document.body.appendChild(script);
+            }
+        })
+        .catch(error => {
+            console.error('Error cargando módulo talleres:', error);
+            container.innerHTML = '<p class="text-danger">Error de conexión al cargar el módulo. Por favor recarga la página.</p>';
+        });
+}
+
+function prellenarPago(pagoId, patente, tipo, fechaVencimiento) {
+    // Esperar un poco para que el módulo cargue
+    setTimeout(() => {
+        if (!window.pagosView) {
+            console.error('View de pagos no disponible');
+            return;
+        }
+
+        // Buscar el vehículo por patente
+        const vehiculoSelect = document.querySelector('select[name="vehiculo_id"]');
+        const tipoSelect = document.querySelector('select[name="tipo"]');
+        const fechaVencimientoInput = document.querySelector('input[name="fecha_vencimiento"]');
+        const montoInput = document.querySelector('input[name="monto"]');
+        const observacionesInput = document.querySelector('textarea[name="observaciones"]');
+
+        if (!vehiculoSelect || !tipoSelect || !montoInput) {
+            console.error('Elementos del formulario no encontrados');
+            return;
+        }
+
+        // Seleccionar el vehículo
+        Array.from(vehiculoSelect.options).forEach(option => {
+            if (option.text.includes(patente)) {
+                vehiculoSelect.value = option.value;
+            }
+        });
+
+        // Mapeo de tipos
+        const tipoMapping = {
+            'VTV': 'otro',
+            'Seguro': 'seguro',
+            'Patente': 'patente',
+            'Servicios': 'servicios'
+        };
+
+        // Prellenar tipo
+        tipoSelect.value = tipoMapping[tipo] || 'otro';
+
+        // Prellenar fecha de vencimiento (para referencia, se puede cambiar)
+        fechaVencimientoInput.value = fechaVencimiento;
+
+        // Agregar observación
+        observacionesInput.value = 'Pago de ' + tipo + ' - ' + patente + ' - Vencía: ' + fechaVencimiento;
+
+        // Mostrar mensaje informativo
+        alert('💰 Pago de ' + tipo + '\n\nVehículo: ' + patente + '\nVencimiento original: ' + fechaVencimiento + '\n\nCompleta el monto y la fecha de pago, luego guarda.');
+    }, 500);
+}
+
+// Función para abrir el formulario de nuevo telepase desde cualquier lugar
+function nuevoTelepase() {
+    cargarTelepases();
+
+    const container = document.getElementById('module-telepases');
+
+    setTimeout(() => {
+        if (window.telepasesView && window.telepasesView.modal) {
+            window.telepasesView.nuevoTelepase();
+        } else {
+            console.error('La vista de telepases aún no está completamente inicializada');
+            alert('❌ Error: El módulo de telepases aún no está completamente cargado. Por favor espera unos segundos e intenta nuevamente.');
+        }
+    }, 500);
 }

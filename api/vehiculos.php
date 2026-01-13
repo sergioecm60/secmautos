@@ -63,6 +63,8 @@ switch ($method) {
             $motor = sanitizar_input($_POST['motor'] ?? '');
             $chasis = sanitizar_input($_POST['chasis'] ?? '');
             $titularidad = sanitizar_input($_POST['titularidad'] ?? '');
+            $titulo_automotor = sanitizar_input($_POST['titulo_automotor'] ?? '');
+            $cedula_verde = sanitizar_input($_POST['cedula_verde'] ?? '');
             $kilometraje_actual = (int)($_POST['kilometraje_actual'] ?? 0);
             $estado = sanitizar_input($_POST['estado'] ?? 'disponible');
             $fecha_vtv = !empty($_POST['fecha_vtv']) ? $_POST['fecha_vtv'] : null;
@@ -70,23 +72,30 @@ switch ($method) {
             $fecha_patente = !empty($_POST['fecha_patente']) ? $_POST['fecha_patente'] : null;
             $km_proximo_service = (int)($_POST['km_proximo_service'] ?? 0);
             $observaciones = sanitizar_input($_POST['observaciones'] ?? '');
-            
+            $color = sanitizar_input($_POST['color'] ?? '');
+            $tipo_vehiculo = sanitizar_input($_POST['tipo_vehiculo'] ?? 'Auto');
+            $carga_maxima_kg = (int)($_POST['carga_maxima_kg'] ?? 0);
+            $km_odometro_inicial = (int)($_POST['km_odometro_inicial'] ?? 0);
+            $ciclo_mantenimiento_preventivo_km = (int)($_POST['ciclo_mantenimiento_preventivo_km'] ?? 0);
+
             if (empty($patente) || empty($marca) || empty($modelo)) {
                 json_response(['success' => false, 'message' => 'Patente, marca y modelo son obligatorios'], 400);
             }
-            
+
             $stmt = $pdo->prepare("
                 INSERT INTO vehiculos (
-                    patente, marca, modelo, anio, motor, chasis, titularidad,
-                    kilometraje_actual, estado, fecha_vtv, fecha_seguro, 
-                    fecha_patente, km_proximo_service, observaciones
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    patente, marca, modelo, color, tipo_vehiculo, carga_maxima_kg, anio, motor, chasis, titularidad,
+                    titulo_automotor, cedula_verde,
+                    kilometraje_actual, estado, fecha_vtv, fecha_seguro,
+                    fecha_patente, km_proximo_service, km_odometro_inicial, ciclo_mantenimiento_preventivo_km, observaciones
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
-            
+
             $stmt->execute([
-                $patente, $marca, $modelo, $anio, $motor, $chasis, $titularidad,
+                $patente, $marca, $modelo, $color, $tipo_vehiculo, $carga_maxima_kg, $anio, $motor, $chasis, $titularidad,
+                $titulo_automotor, $cedula_verde,
                 $kilometraje_actual, $estado, $fecha_vtv, $fecha_seguro,
-                $fecha_patente, $km_proximo_service, $observaciones
+                $fecha_patente, $km_proximo_service, $km_odometro_inicial, $ciclo_mantenimiento_preventivo_km, $observaciones
             ]);
             
             registrarLog($_SESSION['usuario_id'], 'CREAR_VEHICULO', 'vehiculos', "Vehículo creado: $patente", $pdo);
@@ -116,6 +125,8 @@ switch ($method) {
             $motor = sanitizar_input($_PUT['motor'] ?? '');
             $chasis = sanitizar_input($_PUT['chasis'] ?? '');
             $titularidad = sanitizar_input($_PUT['titularidad'] ?? '');
+            $titulo_automotor = sanitizar_input($_PUT['titulo_automotor'] ?? '');
+            $cedula_verde = sanitizar_input($_PUT['cedula_verde'] ?? '');
             $kilometraje_actual = (int)($_PUT['kilometraje_actual'] ?? 0);
             $estado = sanitizar_input($_PUT['estado'] ?? 'disponible');
             $fecha_vtv = !empty($_PUT['fecha_vtv']) ? $_PUT['fecha_vtv'] : null;
@@ -123,6 +134,11 @@ switch ($method) {
             $fecha_patente = !empty($_PUT['fecha_patente']) ? $_PUT['fecha_patente'] : null;
             $km_proximo_service = (int)($_PUT['km_proximo_service'] ?? 0);
             $observaciones = sanitizar_input($_PUT['observaciones'] ?? '');
+            $color = sanitizar_input($_PUT['color'] ?? '');
+            $tipo_vehiculo = sanitizar_input($_PUT['tipo_vehiculo'] ?? 'Auto');
+            $carga_maxima_kg = (int)($_PUT['carga_maxima_kg'] ?? 0);
+            $km_odometro_inicial = (int)($_PUT['km_odometro_inicial'] ?? 0);
+            $ciclo_mantenimiento_preventivo_km = (int)($_PUT['ciclo_mantenimiento_preventivo_km'] ?? 0);
 
             if (empty($id) || empty($patente) || empty($marca) || empty($modelo)) {
                 json_response(['success' => false, 'message' => 'ID, patente, marca y modelo son obligatorios'], 400);
@@ -130,17 +146,18 @@ switch ($method) {
 
             $stmt = $pdo->prepare("
                 UPDATE vehiculos SET
-                    patente = ?, marca = ?, modelo = ?, anio = ?, motor = ?,
-                    chasis = ?, titularidad = ?, kilometraje_actual = ?, estado = ?,
-                    fecha_vtv = ?, fecha_seguro = ?, fecha_patente = ?,
-                    km_proximo_service = ?, observaciones = ?
+                    patente = ?, marca = ?, modelo = ?, color = ?, tipo_vehiculo = ?, carga_maxima_kg = ?,
+                    anio = ?, motor = ?, chasis = ?, titularidad = ?, titulo_automotor = ?, cedula_verde = ?,
+                    kilometraje_actual = ?, estado = ?, fecha_vtv = ?, fecha_seguro = ?, fecha_patente = ?,
+                    km_proximo_service = ?, km_odometro_inicial = ?, ciclo_mantenimiento_preventivo_km = ?, observaciones = ?
                 WHERE id = ?
             ");
 
             $stmt->execute([
-                $patente, $marca, $modelo, $anio, $motor, $chasis, $titularidad,
-                $kilometraje_actual, $estado, $fecha_vtv, $fecha_seguro,
-                $fecha_patente, $km_proximo_service, $observaciones, $id
+                $patente, $marca, $modelo, $color, $tipo_vehiculo, $carga_maxima_kg,
+                $anio, $motor, $chasis, $titularidad, $titulo_automotor, $cedula_verde,
+                $kilometraje_actual, $estado, $fecha_vtv, $fecha_seguro, $fecha_patente,
+                $km_proximo_service, $km_odometro_inicial, $ciclo_mantenimiento_preventivo_km, $observaciones, $id
             ]);
 
             registrarLog($_SESSION['usuario_id'], 'ACTUALIZAR_VEHICULO', 'vehiculos', "Vehículo actualizado: $patente (ID: $id)", $pdo);

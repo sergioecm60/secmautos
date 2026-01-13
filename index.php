@@ -43,6 +43,9 @@ requiereAutenticacion();
                 <a href="#" class="nav-btn" data-module="compras_ventas">💸 Compras/Ventas</a>
                 <a href="#" class="nav-btn" data-module="transferencias">📂 Transferencias</a>
                 <a href="#" class="nav-btn" data-module="pagos">💰 Pagos</a>
+                <a href="#" class="nav-btn" data-module="combustible">⛽ Combustible</a>
+                <a href="#" class="nav-btn" data-module="talleres">🔧 Talleres</a>
+                <a href="#" class="nav-btn" data-module="telepases">🎫 Telepases</a>
                 <a href="#" class="nav-btn" data-module="reportes">📈 Reportes</a>
                 <a href="#" class="nav-btn" data-module="usuarios">👤 Usuarios</a>
                 <a href="#" class="nav-btn" data-module="configuracion">⚙️ Configuración</a>
@@ -78,6 +81,9 @@ requiereAutenticacion();
         <div id="module-compras_ventas" class="module"></div>
         <div id="module-transferencias" class="module"></div>
         <div id="module-pagos" class="module"></div>
+        <div id="module-combustible" class="module"></div>
+        <div id="module-talleres" class="module"></div>
+        <div id="module-telepases" class="module"></div>
         <div id="module-ficha_vehiculo" class="module"></div>
         <div id="module-reportes" class="module"></div>
         <div id="module-autorizaciones" class="module"></div>

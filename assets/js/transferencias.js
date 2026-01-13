@@ -9,12 +9,10 @@ class TransferenciasView {
             transferencias: [],
             vehiculos: []
         };
-        this.modal = null;
         this.init();
     }
 
     init() {
-        this.modal = new bootstrap.Modal(document.getElementById('modalTransferencia'));
         this.loadInitialData();
         this.initEventListeners();
     }
@@ -93,6 +91,12 @@ class TransferenciasView {
     }
 
     openModal(id = null) {
+        const modalElement = document.getElementById('modalTransferencia');
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+        
+        // Si ya existe una instancia, la usamos. Si no, creamos una nueva.
+        const modal = modalInstance || new bootstrap.Modal(modalElement);
+        
         const form = document.getElementById('form-transferencia');
         form.reset();
         document.getElementById('transferencia-id').value = id || '';
@@ -110,7 +114,7 @@ class TransferenciasView {
                 }
             });
         }
-        this.modal.show();
+        modal.show();
     }
 
     async delete(id) {
@@ -145,7 +149,11 @@ class TransferenciasView {
             const res = await this.fetchData(this.api.transferencias, method, formData);
             if (res.success) {
                 this.showSuccess(res.message);
-                this.modal.hide();
+                const modalElement = document.getElementById('modalTransferencia');
+                const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
                 this.loadInitialData(); // Recargar
             } else {
                 this.showError(res.message);
@@ -177,4 +185,3 @@ class TransferenciasView {
 }
 
 window.TransferenciasView = TransferenciasView;
-window.transferenciasView = new TransferenciasView();

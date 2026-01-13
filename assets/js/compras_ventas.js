@@ -92,19 +92,31 @@ class ComprasVentasView {
     populateVehiculosSelects() {
         const createOption = v => `<option value="${v.id}">${v.patente} - ${v.marca} ${v.modelo}</option>`;
         const vehiculosActivos = this.data.vehiculos.filter(v => v.estado !== 'baja');
-        
-        const compraSelect = document.querySelector('#form-compra select[name="vehiculo_id"]');
+
+        const compraSelect = document.querySelector('#form-compras select[name="vehiculo_id"]');
+        if (!compraSelect) {
+            console.error('Select de compras no encontrado');
+            return;
+        }
         compraSelect.innerHTML = '<option value="">Seleccione un vehículo</option>' + this.data.vehiculos.map(createOption).join('');
-        
-        const ventaSelect = document.querySelector('#form-venta select[name="vehiculo_id"]');
+
+        const ventaSelect = document.querySelector('#form-ventas select[name="vehiculo_id"]');
+        if (!ventaSelect) {
+            console.error('Select de ventas no encontrado');
+            return;
+        }
         ventaSelect.innerHTML = '<option value="">Seleccione un vehículo</option>' + vehiculosActivos.map(createOption).join('');
     }
 
     openModal(type, id = null) {
-        const form = document.getElementById(`form-${type}`);
+        const form = document.querySelector(`#form-${type}`);
+        if (!form) {
+            console.error(`Formulario form-${type} no encontrado`);
+            return;
+        }
         form.reset();
-        document.querySelector(`#${type}-id`).value = id || '';
-        
+        document.getElementById(`${type}-id`).value = id || '';
+
         if (id) {
             const item = this.data[type].find(i => i.id == id);
             Object.keys(item).forEach(key => {
@@ -118,7 +130,7 @@ class ComprasVentasView {
                 }
             });
         }
-        
+
         this.modals[type].show();
     }
 
@@ -140,7 +152,11 @@ class ComprasVentasView {
     }
 
     async save(type) {
-        const form = document.getElementById(`form-${type}`);
+        const form = document.querySelector(`#form-${type}`);
+        if (!form) {
+            console.error(`Formulario form-${type} no encontrado`);
+            return;
+        }
         if (!form.checkValidity()) {
             this.showError('Por favor, complete los campos obligatorios.');
             return;
@@ -186,4 +202,3 @@ class ComprasVentasView {
 }
 
 window.ComprasVentasView = ComprasVentasView;
-window.comprasVentasView = new ComprasVentasView();

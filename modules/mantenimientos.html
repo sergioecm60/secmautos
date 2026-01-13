@@ -10,8 +10,9 @@
         <table class="table table-hover" id="tabla-mantenimientos">
             <thead>
                 <tr>
-                    <th>Fecha</th>
+                    <th>Fecha Ingreso</th>
                     <th>Vehículo</th>
+                    <th>Taller</th>
                     <th>Tipo</th>
                     <th>Descripción</th>
                     <th>Costo</th>
@@ -34,47 +35,83 @@
             </div>
             <div class="modal-body">
                 <form id="form-mantenimiento" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                     <input type="hidden" name="id" id="mantenimiento-id">
+                    
+                    <h6 class="mb-3 text-primary">🚗 Datos del Vehículo y Taller</h6>
                     <div class="row g-3">
-                        <div class="col-md-7">
+                        <div class="col-md-6">
                             <label class="form-label">Vehículo *</label>
-                            <select class="form-select" name="vehiculo_id" required></select>
-                        </div>
-                        <div class="col-md-5">
-                            <label class="form-label">Fecha *</label>
-                            <input type="date" class="form-control" name="fecha" required>
+                            <select class="form-select" name="vehiculo_id" id="mantenimiento-vehiculo" required></select>
                         </div>
                         <div class="col-md-6">
+                            <label class="form-label">Taller</label>
+                            <select class="form-select" name="taller_id" id="mantenimiento-taller"></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha Ingreso *</label>
+                            <input type="date" class="form-control" name="fecha" id="mantenimiento-fecha" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha Salida</label>
+                            <input type="date" class="form-control" name="fecha_salida" id="mantenimiento-fecha-salida">
+                        </div>
+                    </div>
+
+                    <h6 class="mt-4 mb-3 text-warning">🔧 Detalles del Mantenimiento</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
                             <label class="form-label">Tipo</label>
-                            <select class="form-select" name="tipo">
+                            <select class="form-select" name="tipo" id="mantenimiento-tipo" onchange="togglePaquetes()">
                                 <option value="preventivo">Preventivo</option>
                                 <option value="correctivo">Correctivo</option>
                             </select>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Kilometraje</label>
-                            <input type="number" class="form-control" name="kilometraje">
+                            <input type="number" class="form-control" name="kilometraje" id="mantenimiento-kilometraje">
                         </div>
-                        <div class="col-12">
-                            <label class="form-label">Descripción *</label>
-                            <textarea class="form-control" name="descripcion" rows="2" required></textarea>
+                    </div>
+
+                    <div id="seccion-paquetes" style="display: none;">
+                        <div class="mb-3">
+                            <label class="form-label">Paquete de Mantenimiento</label>
+                            <select class="form-select" name="paquete_mantenimiento" id="mantenimiento-paquete" onchange="cargarItemsPaquete()">
+                                <option value="">Seleccionar paquete...</option>
+                            </select>
                         </div>
+                        <div id="lista-items-paquete" class="mb-3" style="display: none;">
+                            <label class="form-label">Ítems del Paquete</label>
+                            <ul class="list-group" id="items-paquete-lista"></ul>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Descripción *</label>
+                        <textarea class="form-control" name="descripcion" rows="2" required id="mantenimiento-descripcion"></textarea>
+                    </div>
+
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Proveedor</label>
-                            <input type="text" class="form-control" name="proveedor">
+                            <input type="text" class="form-control" name="proveedor" id="mantenimiento-proveedor">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Costo</label>
-                            <input type="number" step="0.01" class="form-control" name="costo">
+                            <input type="number" step="0.01" class="form-control" name="costo" id="mantenimiento-costo">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha Pago</label>
+                            <input type="date" class="form-control" name="fecha_pago" id="mantenimiento-fecha-pago">
                         </div>
                         <div class="col-12">
                            <label class="form-label">Observaciones</label>
-                           <textarea class="form-control" name="observaciones" rows="2"></textarea>
+                           <textarea class="form-control" name="observaciones" rows="2" id="mantenimiento-observaciones"></textarea>
                         </div>
                         <div class="col-12">
                            <label class="form-label">Comprobante (subir archivo)</label>
                            <input type="file" class="form-control" name="comprobante_file">
-                           <input type="hidden" name="comprobante">
+                           <input type="hidden" name="comprobante" id="mantenimiento-comprobante">
                         </div>
                     </div>
                 </form>
@@ -86,3 +123,13 @@
         </div>
     </div>
 </div>
+
+<script>
+window.togglePaquetes = function() {
+    window.mantenimientosView.togglePaquetes();
+};
+
+window.cargarItemsPaquete = function() {
+    window.mantenimientosView.cargarItemsPaquete();
+};
+</script>

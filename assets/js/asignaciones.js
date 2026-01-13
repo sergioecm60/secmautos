@@ -149,7 +149,10 @@ class AsignacionesView {
         document.getElementById('form-asignacion').reset();
         document.getElementById('asignacion-id').value = '';
         document.getElementById('modal-asignacion-title').textContent = 'Nueva Asignación';
-        new bootstrap.Modal(document.getElementById('modalAsignacion')).show();
+
+        const modalElement = document.getElementById('modalAsignacion');
+        const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+        modalInstance.show();
     }
 
     actualizarKmSalida(vehiculoId) {
@@ -198,7 +201,9 @@ class AsignacionesView {
         document.getElementById('devolucion-km-salida').textContent = `${asignacion.km_salida.toLocaleString()} km`;
         document.getElementById('devolucion-km_regreso').min = asignacion.km_salida;
 
-        new bootstrap.Modal(document.getElementById('modalDevolucion')).show();
+        const modalElement = document.getElementById('modalDevolucion');
+        const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+        modalInstance.show();
     }
 
     async confirmarDevolucion() {
@@ -269,4 +274,3 @@ class AsignacionesView {
 }
 
 window.AsignacionesView = AsignacionesView;
-window.asignacionesView = new AsignacionesView();

@@ -15,9 +15,13 @@ switch ($method) {
             $sql = "
                 SELECT
                     p.*,
-                    v.patente, v.marca, v.modelo
+                    v.patente, v.marca, v.modelo,
+                    e.nombre as nombre_empleado, e.apellido as apellido_empleado,
+                    m.motivo as motivo_multa, m.acta_numero as numero_acta_multa
                 FROM pagos p
                 JOIN vehiculos v ON p.vehiculo_id = v.id
+                LEFT JOIN empleados e ON p.empleado_id = e.id
+                LEFT JOIN multas m ON p.multa_id = m.id
             ";
 
             $params = [];
@@ -25,6 +29,18 @@ switch ($method) {
             if (isset($_GET['vehiculo_id'])) {
                 $sql .= " WHERE p.vehiculo_id = ?";
                 $params[] = (int)$_GET['vehiculo_id'];
+            }
+
+            if (isset($_GET['empleado_id'])) {
+                $sql .= (isset($_GET['vehiculo_id'])) ? " AND" : " WHERE";
+                $sql .= " p.empleado_id = ?";
+                $params[] = (int)$_GET['empleado_id'];
+            }
+
+            if (isset($_GET['tipo'])) {
+                $sql .= (isset($_GET['vehiculo_id']) || isset($_GET['empleado_id'])) ? " AND" : " WHERE";
+                $sql .= " p.tipo = ?";
+                $params[] = sanitizar_input($_GET['tipo']);
             }
 
             $sql .= " ORDER BY p.fecha_vencimiento ASC, p.created_at DESC";
@@ -47,6 +63,9 @@ switch ($method) {
         try {
             $vehiculo_id = (int)($_POST['vehiculo_id'] ?? 0);
             $tipo = sanitizar_input($_POST['tipo'] ?? '');
+            $aseguradora = sanitizar_input($_POST['aseguradora'] ?? '');
+            $poliza_numero = sanitizar_input($_POST['poliza_numero'] ?? '');
+            $fecha_inicio = !empty($_POST['fecha_inicio']) ? $_POST['fecha_inicio'] : null;
             $fecha_vencimiento = $_POST['fecha_vencimiento'] ?? '';
             $fecha_pago = !empty($_POST['fecha_pago']) ? $_POST['fecha_pago'] : null;
             $monto = (float)($_POST['monto'] ?? 0);
@@ -59,10 +78,10 @@ switch ($method) {
             }
 
             $stmt = $pdo->prepare("
-                INSERT INTO pagos (vehiculo_id, tipo, fecha_vencimiento, fecha_pago, monto, comprobante, observaciones, pagado)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO pagos (vehiculo_id, tipo, aseguradora, poliza_numero, fecha_inicio, fecha_vencimiento, fecha_pago, monto, comprobante, observaciones, pagado)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
-            $stmt->execute([$vehiculo_id, $tipo, $fecha_vencimiento, $fecha_pago, $monto, $comprobante, $observaciones, $pagado]);
+            $stmt->execute([$vehiculo_id, $tipo, $aseguradora, $poliza_numero, $fecha_inicio, $fecha_vencimiento, $fecha_pago, $monto, $comprobante, $observaciones, $pagado]);
 
             registrarLog($_SESSION['usuario_id'], 'REGISTRAR_PAGO', 'pagos', "Pago registrado para vehículo $vehiculo_id", $pdo);
 
@@ -86,21 +105,42 @@ switch ($method) {
                 json_response(['success' => false, 'message' => 'ID de pago requerido'], 400);
             }
 
+            $vehiculo_id = (int)($_PUT['vehiculo_id'] ?? 0);
+            $tipo = sanitizar_input($_PUT['tipo'] ?? '');
+            $aseguradora = sanitizar_input($_PUT['aseguradora'] ?? '');
+            $poliza_numero = sanitizar_input($_PUT['poliza_numero'] ?? '');
+            $fecha_inicio = !empty($_PUT['fecha_inicio']) ? $_PUT['fecha_inicio'] : null;
+            $fecha_vencimiento = $_PUT['fecha_vencimiento'] ?? '';
+            $fecha_pago = !empty($_PUT['fecha_pago']) ? $_PUT['fecha_pago'] : null;
+            $monto = (float)($_PUT['monto'] ?? 0);
+            $comprobante = sanitizar_input($_PUT['comprobante'] ?? '');
+            $observaciones = sanitizar_input($_PUT['observaciones'] ?? '');
+            $pagado = isset($_PUT['pagado']) ? 1 : 0;
+
             $stmt = $pdo->prepare("
                 UPDATE pagos
-                SET pagado = 1,
-                    fecha_pago = COALESCE(?, fecha_pago)
+                SET vehiculo_id = ?,
+                    tipo = ?,
+                    aseguradora = ?,
+                    poliza_numero = ?,
+                    fecha_inicio = ?,
+                    fecha_vencimiento = ?,
+                    fecha_pago = ?,
+                    monto = ?,
+                    comprobante = ?,
+                    observaciones = ?,
+                    pagado = ?
                 WHERE id = ?
             ");
-            $stmt->execute([$_PUT['fecha_pago'] ?? date('Y-m-d'), $id]);
+            $stmt->execute([$vehiculo_id, $tipo, $aseguradora, $poliza_numero, $fecha_inicio, $fecha_vencimiento, $fecha_pago, $monto, $comprobante, $observaciones, $pagado, $id]);
 
             if ($stmt->rowCount() === 0) {
                 json_response(['success' => false, 'message' => 'Pago no encontrado'], 404);
             }
 
-            registrarLog($_SESSION['usuario_id'], 'MARCAR_PAGO_PAGADO', 'pagos', "Pago $id marcado como pagado", $pdo);
+            registrarLog($_SESSION['usuario_id'], 'ACTUALIZAR_PAGO', 'pagos', "Pago $id actualizado", $pdo);
 
-            json_response(['success' => true, 'message' => 'Pago marcado como pagado']);
+            json_response(['success' => true, 'message' => 'Pago actualizado correctamente']);
         } catch (Exception $e) {
             json_response(['success' => false, 'message' => 'Error al actualizar pago: ' . $e->getMessage()], 500);
         }

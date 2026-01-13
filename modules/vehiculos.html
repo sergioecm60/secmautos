@@ -31,11 +31,14 @@
             <thead class="table-dark">
                 <tr>
                     <th>Patente</th>
+                    <th>Tipo</th>
                     <th>Marca</th>
                     <th>Modelo</th>
+                    <th>Color</th>
                     <th>Año</th>
                     <th>Km</th>
                     <th>Estado</th>
+                    <th>Documentación</th>
                     <th>VTV</th>
                     <th>Seguro</th>
                     <th>Asignado a</th>
@@ -64,10 +67,30 @@
                     <input type="hidden" name="id" id="vehiculo-id">
                     <input type="hidden" name="csrf_token" id="vehiculo-csrf">
 
+                    <h6 class="mt-3 mb-3 text-primary">🚗 Datos del Vehículo</h6>
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label">Patente *</label>
                             <input type="text" class="form-control" name="patente" id="vehiculo-patente" required placeholder="ABC123">
+                            <small class="text-muted">Ej: EGB747 o AA123BB</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Tipo de Vehículo *</label>
+                            <select class="form-select" name="tipo_vehiculo" id="vehiculo-tipo">
+                                <option value="Auto">Auto</option>
+                                <option value="Camioneta">Camioneta</option>
+                                <option value="Van">Van</option>
+                                <option value="Camion">Camión</option>
+                                <option value="Motocicleta">Motocicleta</option>
+                                <option value="Triciclo">Triciclo</option>
+                                <option value="Cuatriciclo">Cuatriciclo</option>
+                                <option value="Acoplado">Acoplado</option>
+                                <option value="Motor Home">Motor Home</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Color</label>
+                            <input type="text" class="form-control" name="color" id="vehiculo-color" placeholder="Ej: Blanco, Rojo">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Marca *</label>
@@ -77,9 +100,13 @@
                             <label class="form-label">Modelo *</label>
                             <input type="text" class="form-control" name="modelo" id="vehiculo-modelo" required placeholder="Ej: Focus">
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label class="form-label">Año</label>
                             <input type="number" class="form-control" name="anio" id="vehiculo-anio" min="1990" max="2030" placeholder="2020">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Carga Máxima (kg)</label>
+                            <input type="number" class="form-control" name="carga_maxima_kg" id="vehiculo-carga-maxima" min="0" placeholder="Para camiones">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Motor</label>
@@ -89,17 +116,26 @@
                             <label class="form-label">Chasis</label>
                             <input type="text" class="form-control" name="chasis" id="vehiculo-chasis" placeholder="Número de chasis">
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-12">
                             <label class="form-label">Titularidad</label>
                             <input type="text" class="form-control" name="titularidad" id="vehiculo-titularidad" placeholder="Nombre del titular">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Kilometraje Actual</label>
-                            <input type="number" class="form-control" name="kilometraje_actual" id="vehiculo-kilometraje" min="0" placeholder="0">
+                            <label class="form-label">Título Automotor</label>
+                            <input type="text" class="form-control" name="titulo_automotor" id="vehiculo-titulo-automotor" placeholder="Número de título">
                         </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Cédula Verde</label>
+                            <input type="text" class="form-control" name="cedula_verde" id="vehiculo-cedula-verde" placeholder="Número de cédula verde">
+                        </div>
+                    </div>
+
+                    <h6 class="mt-4 mb-3 text-success">📋 Documentación</h6>
+                    <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label">Fecha VTV</label>
                             <input type="date" class="form-control" name="fecha_vtv" id="vehiculo-fecha-vtv">
+                            <small class="text-muted">Se calcula automáticamente según la patente</small>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Fecha Seguro</label>
@@ -109,10 +145,29 @@
                             <label class="form-label">Fecha Patente</label>
                             <input type="date" class="form-control" name="fecha_patente" id="vehiculo-fecha-patente">
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">KM Próximo Service</label>
-                            <input type="number" class="form-control" name="km_proximo_service" id="vehiculo-km-service" min="0" placeholder="10000">
+                    </div>
+
+                    <h6 class="mt-4 mb-3 text-warning">🔧 Control de Mantenimiento</h6>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Odómetro Inicial</label>
+                            <input type="number" class="form-control" name="km_odometro_inicial" id="vehiculo-odometro-inicial" min="0" value="0">
                         </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Kilometraje Actual</label>
+                            <input type="number" class="form-control" name="kilometraje_actual" id="vehiculo-kilometraje" min="0" value="0">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Ciclo Preventivo (km)</label>
+                            <input type="number" class="form-control" name="ciclo_mantenimiento_preventivo_km" id="vehiculo-ciclo-preventivo" min="0" placeholder="Ej: 5000">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">KM Próximo Service</label>
+                            <input type="number" class="form-control" name="km_proximo_service" id="vehiculo-km-service" min="0" placeholder="0">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-2">
                         <div class="col-md-6">
                             <label class="form-label">Estado</label>
                             <select class="form-select" name="estado" id="vehiculo-estado">
@@ -122,10 +177,11 @@
                                 <option value="baja">Baja</option>
                             </select>
                         </div>
-                        <div class="col-12">
-                            <label class="form-label">Observaciones</label>
-                            <textarea class="form-control" name="observaciones" id="vehiculo-observaciones" rows="3" placeholder="Observaciones adicionales..."></textarea>
-                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="form-label">Observaciones</label>
+                        <textarea class="form-control" name="observaciones" id="vehiculo-observaciones" rows="3" placeholder="Observaciones adicionales..."></textarea>
                     </div>
                 </form>
             </div>

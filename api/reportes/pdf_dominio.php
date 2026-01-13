@@ -57,11 +57,11 @@ try {
     $stmt->execute([$vehiculo_id]);
     $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $stmt = $pdo->prepare("SELECT * FROM compras WHERE vehiculo_id = ? ORDER BY fecha DESC LIMIT1");
+    $stmt = $pdo->prepare("SELECT * FROM compras WHERE vehiculo_id = ? ORDER BY fecha DESC LIMIT 1");
     $stmt->execute([$vehiculo_id]);
     $compra = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $stmt = $pdo->prepare("SELECT * FROM ventas WHERE vehiculo_id = ? ORDER BY fecha DESC LIMIT1");
+    $stmt = $pdo->prepare("SELECT * FROM ventas WHERE vehiculo_id = ? ORDER BY fecha DESC LIMIT 1");
     $stmt->execute([$vehiculo_id]);
     $venta = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -113,7 +113,7 @@ function formatMoney($amount) {
     <section>
         <div class="report-title">📅 Vencimientos</div>
         <table>
-            <tr><th>TVT</th><td><?= formatDate($vehiculo['fecha_tvt']) ?></td></tr>
+             <tr><th>VTV</th><td><?= formatDate($vehiculo['fecha_vtv']) ?></td></tr>
             <tr><th>Seguro</th><td><?= formatDate($vehiculo['fecha_seguro']) ?></td></tr>
             <tr><th>Patente</th><td><?= formatDate($vehiculo['fecha_patente']) ?></td></tr>
         </table>

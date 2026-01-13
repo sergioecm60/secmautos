@@ -1,6 +1,39 @@
+# Configuracion sensible
 .env
-config/config.php
+config/config.local.php
+
+# Logs y sesiones
+logs/
+sessions/
+assets/img/uploads/
+
+# Vendor (si usamos composer)
 vendor/
-sessions/*
-logs/*
-assets/img/uploads/*
+
+# Archivos temporales
+tmpclaude-*/
+*.tmp
+*.temp
+*.log
+*.swp
+*.swo
+*~
+
+# IDEs y editores
+.vscode/
+.idea/
+*.sublime-*
+.DS_Store
+
+# Archivos temporales del proyecto
+test_api.php
+diagnostico.php
+check_vehiculos.php
+analizar_excel.py
+analisis_excel.json
+temp_analisis_excel*.py
+
+# Archivos de backup y cache
+*.sql.gz
+*.sql.bz2
+.cache/

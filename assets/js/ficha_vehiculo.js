@@ -11,13 +11,12 @@ function cargarFichaVehiculo(id) {
         fetch(`api/pagos.php?vehiculo_id=${id}`).then(r => r.json()),
         fetch(`api/compras.php?vehiculo_id=${id}`).then(r => r.json()),
         fetch(`api/ventas.php?vehiculo_id=${id}`).then(r => r.json()),
-        fetch(`api/ceta.php?vehiculo_id=${id}`).then(r => r.json()),
         fetch(`api/transferencias.php?vehiculo_id=${id}`).then(r => r.json())
     ])
-    .then(([vehiculo, asignaciones, multas, mantenimientos, pagos, compras, ventas, ceta, transferencias]) => {
+    .then(([vehiculo, asignaciones, multas, mantenimientos, pagos, compras, ventas, transferencias]) => {
         if (vehiculo.success && vehiculo.data.length > 0) {
             vehiculoActual = vehiculo.data[0];
-            mostrarFicha(vehiculoActual, asignaciones, multas, mantenimientos, pagos, compras, ventas, ceta, transferencias);
+            mostrarFicha(vehiculoActual, asignaciones, multas, mantenimientos, pagos, compras, ventas, transferencias);
         } else {
             mostrarError('Vehículo no encontrado');
         }
@@ -28,7 +27,7 @@ function cargarFichaVehiculo(id) {
     });
 }
 
-function mostrarFicha(vehiculo, asignaciones, multas, mantenimientos, pagos, compras, ventas, ceta, transferencias) {
+function mostrarFicha(vehiculo, asignaciones, multas, mantenimientos, pagos, compras, ventas, transferencias) {
     document.getElementById('ficha-loading').classList.add('d-none');
     document.getElementById('ficha-error').classList.add('d-none');
     document.getElementById('ficha-content').classList.remove('d-none');
@@ -47,13 +46,6 @@ function mostrarFicha(vehiculo, asignaciones, multas, mantenimientos, pagos, com
     document.getElementById('ficha-vtv').textContent = vehiculo.fecha_vtv ? formatDate(vehiculo.fecha_vtv) : '-';
     document.getElementById('ficha-seguro').textContent = vehiculo.fecha_seguro ? formatDate(vehiculo.fecha_seguro) : '-';
     document.getElementById('ficha-patente-vencimiento').textContent = vehiculo.fecha_patente ? formatDate(vehiculo.fecha_patente) : '-';
-
-    if (ceta.success && ceta.data.length > 0) {
-        const cetaActiva = ceta.data[0];
-        document.getElementById('ficha-ceta').textContent = `${cetaActiva.numero} (${formatDate(cetaActiva.fecha_vencimiento)})`;
-    } else {
-        document.getElementById('ficha-ceta').textContent = '-';
-    }
 
     if (compras.success && compras.data.length > 0) {
         const compra = compras.data[0];

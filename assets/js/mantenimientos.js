@@ -3,31 +3,38 @@ class MantenimientosView {
         this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         this.api = {
             mantenimientos: 'api/mantenimientos.php',
-            vehiculos: 'api/vehiculos.php'
+            vehiculos: 'api/vehiculos.php',
+            talleres: 'api/talleres.php',
+            paquetes: 'api/paquetes_mantenimiento.php'
         };
         this.data = {
             mantenimientos: [],
-            vehiculos: []
+            vehiculos: [],
+            talleres: [],
+            paquetes: []
         };
         this.modal = null;
-        this.init();
     }
 
-    init() {
+    async init() {
         this.modal = new bootstrap.Modal(document.getElementById('modalMantenimiento'));
-        this.loadInitialData();
+        await this.loadInitialData();
         this.initEventListeners();
     }
 
     async loadInitialData() {
         try {
-            const [mantenimientosRes, vehiculosRes] = await Promise.all([
+            const [mantenimientosRes, vehiculosRes, talleresRes, paquetesRes] = await Promise.all([
                 this.fetchData(this.api.mantenimientos),
-                this.fetchData(this.api.vehiculos)
+                this.fetchData(this.api.vehiculos),
+                this.fetchData(this.api.talleres),
+                this.fetchData(this.api.paquetes)
             ]);
 
             if (mantenimientosRes.success) this.data.mantenimientos = mantenimientosRes.data;
             if (vehiculosRes.success) this.data.vehiculos = vehiculosRes.data;
+            if (talleresRes.success) this.data.talleres = talleresRes.data;
+            if (paquetesRes.success) this.data.paquetes = paquetesRes.data;
 
             this.render();
         } catch (error) {
@@ -54,6 +61,57 @@ class MantenimientosView {
     render() {
         this.renderTable();
         this.populateVehiculosSelect();
+        this.populateTalleresSelect();
+        this.populatePaquetesSelect();
+    }
+
+    init() {
+        this.modal = new bootstrap.Modal(document.getElementById('modalMantenimiento'));
+        this.loadInitialData();
+        this.initEventListeners();
+    }
+
+    async loadInitialData() {
+        try {
+            const [mantenimientosRes, vehiculosRes, talleresRes, paquetesRes] = await Promise.all([
+                this.fetchData(this.api.mantenimientos),
+                this.fetchData(this.api.vehiculos),
+                this.fetchData(this.api.talleres),
+                this.fetchData(this.api.paquetes)
+            ]);
+
+            if (mantenimientosRes.success) this.data.mantenimientos = mantenimientosRes.data;
+            if (vehiculosRes.success) this.data.vehiculos = vehiculosRes.data;
+            if (talleresRes.success) this.data.talleres = talleresRes.data;
+            if (paquetesRes.success) this.data.paquetes = paquetesRes.data;
+
+            this.render();
+        } catch (error) {
+            this.showError('Error cargando datos iniciales.');
+            console.error('Error en loadInitialData:', error);
+        }
+    }
+    
+    initEventListeners() {
+        document.getElementById('btn-nuevo-mantenimiento').addEventListener('click', () => this.openModal());
+        document.getElementById('btn-guardar-mantenimiento').addEventListener('click', () => this.save());
+        
+        document.getElementById('tabla-mantenimientos').addEventListener('click', e => {
+            if (e.target.closest('.btn-edit')) {
+                const id = e.target.closest('.btn-edit').dataset.id;
+                this.openModal(id);
+            } else if (e.target.closest('.btn-delete')) {
+                const id = e.target.closest('.btn-delete').dataset.id;
+                this.delete(id);
+            }
+        });
+    }
+
+    render() {
+        this.renderTable();
+        this.populateVehiculosSelect();
+        this.populateTalleresSelect();
+        this.populatePaquetesSelect();
     }
 
     renderTable() {
@@ -61,8 +119,9 @@ class MantenimientosView {
         tbody.innerHTML = this.data.mantenimientos.map(item => `
             <tr>
                 <td>${this.formatDate(item.fecha)}</td>
-                <td>${item.patente}</td>
-                <td><span class="badge bg-info">${item.tipo}</span></td>
+                <td><strong>${item.patente || ''}</strong></td>
+                <td>${item.nombre_taller || item.proveedor || '-'}</td>
+                <td><span class="badge ${item.tipo === 'preventivo' ? 'bg-info' : 'bg-warning'}">${item.tipo}</span></td>
                 <td>${item.descripcion}</td>
                 <td>$${parseFloat(item.costo || 0).toLocaleString('es-AR')}</td>
                 <td>${(item.kilometraje || 0).toLocaleString('es-AR')} km</td>
@@ -85,10 +144,67 @@ class MantenimientosView {
         });
     }
 
+    populateTalleresSelect() {
+        const select = document.querySelector('#form-mantenimiento select[name="taller_id"]');
+        select.innerHTML = '<option value="">Seleccione un taller</option>' + this.data.talleres.map(t => `<option value="${t.id}">${t.nombre}</option>`).join('');
+    }
+
+    populatePaquetesSelect() {
+        const select = document.querySelector('#form-mantenimiento select[name="paquete_mantenimiento"]');
+        select.innerHTML = '<option value="">Seleccionar paquete...</option>';
+        
+        this.data.paquetes.forEach(p => {
+            select.innerHTML += `<option value="${p.codigo}" data-id="${p.id}">${p.codigo} - ${p.nombre}</option>`;
+        });
+    }
+
+    togglePaquetes() {
+        const tipo = document.querySelector('#form-mantenimiento select[name="tipo"]').value;
+        const seccionPaquetes = document.getElementById('seccion-paquetes');
+        
+        if (tipo === 'preventivo') {
+            seccionPaquetes.style.display = 'block';
+        } else {
+            seccionPaquetes.style.display = 'none';
+        }
+    }
+
+    cargarItemsPaquete() {
+        const select = document.querySelector('#form-mantenimiento select[name="paquete_mantenimiento"]');
+        const selectedOption = select.options[select.selectedIndex];
+        const paqueteId = selectedOption.dataset.id;
+        const descripcionTextarea = document.querySelector('#form-mantenimiento textarea[name="descripcion"]');
+        const listaItems = document.getElementById('items-paquete-lista');
+        const seccionLista = document.getElementById('lista-items-paquete');
+        
+        if (!paqueteId) {
+            seccionLista.style.display = 'none';
+            return;
+        }
+
+        const paquete = this.data.paquetes.find(p => p.id == paqueteId);
+        
+        if (paquete && paquete.items && paquete.items.length > 0) {
+            seccionLista.style.display = 'block';
+            listaItems.innerHTML = paquete.items.map(item => `<li class="list-group-item">${item}</li>`).join('');
+            
+            descripcionTextarea.value = paquete.items.map((item, index) => `${index + 1}. ${item}`).join('\n');
+        } else {
+            seccionLista.style.display = 'none';
+            descripcionTextarea.value = '';
+        }
+    }
+
     openModal(id = null) {
         const form = document.getElementById('form-mantenimiento');
         form.reset();
         document.getElementById('mantenimiento-id').value = id || '';
+        
+        this.populateVehiculosSelect();
+        this.populateTalleresSelect();
+        this.populatePaquetesSelect();
+        document.getElementById('seccion-paquetes').style.display = 'none';
+        document.getElementById('lista-items-paquete').style.display = 'none';
         
         if (id) {
             const item = this.data.mantenimientos.find(i => i.id == id);
@@ -102,6 +218,15 @@ class MantenimientosView {
                     }
                 }
             });
+            
+            if (item.tipo === 'preventivo') {
+                document.getElementById('seccion-paquetes').style.display = 'block';
+                if (item.paquete_mantenimiento) {
+                    const paqueteSelect = document.querySelector('#form-mantenimiento select[name="paquete_mantenimiento"]');
+                    paqueteSelect.value = item.paquete_mantenimiento;
+                    this.cargarItemsPaquete();
+                }
+            }
         }
         this.modal.show();
     }

@@ -1,0 +1,157 @@
+<div class="card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>⛽ Control de Consumo de Combustible</h3>
+        <button class="btn btn-primary" onclick="window.combustibleView.nuevaCarga()">
+            <i class="bi bi-plus-circle"></i> Nueva Carga
+        </button>
+    </div>
+
+    <div class="row g-2 mb-3">
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="filtro-patente" placeholder="Filtrar por patente">
+        </div>
+        <div class="col-md-3">
+            <input type="date" class="form-control" id="filtro-fecha-desde" placeholder="Fecha desde">
+        </div>
+        <div class="col-md-3">
+            <input type="date" class="form-control" id="filtro-fecha-hasta" placeholder="Fecha hasta">
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-secondary" onclick="window.combustibleView.filtrar()">Filtrar</button>
+            <button class="btn btn-info" onclick="window.combustibleView.exportarRegistros()">
+                <i class="bi bi-file-earmark-text"></i> Exportar CSV
+            </button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover" id="tabla-consumo">
+            <thead>
+                <tr>
+                    <th>Fecha/Hora</th>
+                    <th>Patente</th>
+                    <th>Vehículo</th>
+                    <th>Conductor</th>
+                    <th>Tipo Combustible</th>
+                    <th>Litros</th>
+                    <th>Precio/Litro</th>
+                    <th>Odómetro</th>
+                    <th>Km Recorridos</th>
+                    <th>Rendimiento</th>
+                    <th>Costo Total</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-consumo-body">
+                <tr>
+                    <td colspan="12" class="text-center">Cargando registros...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Nueva Carga -->
+<div class="modal fade" id="modalCargaCombustible" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCargaTitle">Nueva Carga</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-carga">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                    <input type="hidden" name="id" id="carga-id">
+                    <input type="hidden" name="vehiculo_id" id="carga-vehiculo-id">
+                    <input type="hidden" name="empleado_id" id="carga-empleado-id">
+                    <input type="hidden" name="patente" id="carga-patente">
+                    <input type="hidden" name="marca" id="carga-marca">
+                    <input type="hidden" name="modelo" id="carga-modelo">
+                    <input type="hidden" name="version" id="carga-version">
+                    <input type="hidden" name="conductor" id="carga-conductor">
+
+                    <div class="mb-3">
+                        <label class="form-label">Vehículo *</label>
+                        <select class="form-select" id="carga-vehiculo" required>
+                            <option value="">Seleccione un vehículo</option>
+                        </select>
+                        <div id="vehiculo-info" class="mt-2 text-muted small"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Conductor / Empresa (Opcional)</label>
+                        <input type="text" class="form-control" id="carga-conductor-nombre" list="lista-conductores" placeholder="Seleccione un empleado o escriba el nombre de la empresa">
+                        <datalist id="lista-conductores">
+                            <option value="">-- Escriba para empresa o seleccione empleado --</option>
+                        </datalist>
+                        <input type="hidden" id="carga-empleado-id" name="empleado_id">
+                        <small class="text-muted">
+                            Si selecciona un empleado, el gasto se asigna a ese empleado (uso personal).
+                            Si escribe el nombre de una empresa u otro, el gasto es de esa entidad.
+                        </small>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha de Carga *</label>
+                            <input type="date" class="form-control" name="fecha_carga" id="carga-fecha" required value="<?= date('Y-m-d') ?>">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Hora de Carga *</label>
+                            <input type="time" class="form-control" name="hora_carga" id="carga-hora" required value="<?= date('H:i') ?>">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Lugar de Carga</label>
+                        <input type="text" class="form-control" name="lugar_carga" id="carga-lugar" placeholder="Ej: Estación YPF - Centro">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Combustible *</label>
+                        <select class="form-select" name="tipo_comb" id="carga-tipo" required>
+                            <optgroup label="Nafta">
+                                <option value="Nafta">Nafta</option>
+                                <option value="Nafta Super">Nafta Super</option>
+                                <option value="Nafta Premium">Nafta Premium</option>
+                            </optgroup>
+                            <optgroup label="Diesel">
+                                <option value="Diesel">Diesel</option>
+                                <option value="Diesel Comun">Diesel Común</option>
+                                <option value="Diesel Premium">Diesel Premium</option>
+                            </optgroup>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label class="form-label">Litros Cargados *</label>
+                            <input type="number" step="0.01" class="form-control" name="litros" id="carga-litros" required min="0" placeholder="0.00">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Precio por Litro ($) *</label>
+                            <input type="number" step="0.01" class="form-control" name="precio_litro" id="carga-precio" required min="0" placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Odómetro Actual (km) *</label>
+                        <input type="number" class="form-control" name="odometro" id="carga-odometro" required min="0" placeholder="0">
+                        <small class="text-muted" id="odometro-info">Se usará para calcular km recorridos desde la última carga</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Observaciones</label>
+                        <textarea class="form-control" name="observaciones" id="carga-observaciones" rows="2" placeholder="Observaciones adicionales..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="window.combustibleView.guardar()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>

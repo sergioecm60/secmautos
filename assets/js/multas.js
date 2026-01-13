@@ -97,6 +97,8 @@ class MultasView {
         document.getElementById('multa-empleado-id').value = '';
         document.getElementById('multa-estado-form').disabled = true;
         document.getElementById('fecha-pago-container').style.display = 'none';
+        document.getElementById('modal-multa-title').textContent = 'Registrar Nueva Multa';
+        document.getElementById('btn-guardar-multa').textContent = 'Guardar Multa';
         this.modal.show();
     }
 
@@ -161,30 +163,39 @@ class MultasView {
                 const multa = res.data;
                 const form = document.getElementById('form-multa');
                 document.getElementById('multa-id').value = multa.id;
+                document.getElementById('modal-multa-title').textContent = 'Editar Multa';
+                document.getElementById('btn-guardar-multa').textContent = 'Actualizar Multa';
                 document.getElementById('multa-vehiculo').value = multa.vehiculo_id;
-                document.getElementById('multa-fecha').value = multa.fecha_multa;
+                
+                // Convertir fecha para datetime-local
+                if (multa.fecha_multa) {
+                    const fecha = new Date(multa.fecha_multa);
+                    const fechaFormateada = fecha.toISOString().slice(0, 16);
+                    document.getElementById('multa-fecha').value = fechaFormateada;
+                }
+                
                 document.getElementById('multa-motivo').value = multa.motivo;
                 document.getElementById('multa-acta').value = multa.numero_acta || '';
                 document.getElementById('multa-monto').value = multa.monto;
                 document.getElementById('multa-estado-form').value = multa.pagada;
                 document.getElementById('multa-empleado-id').value = multa.empleado_id || '';
-
+                
                 if (multa.empleado_id) {
                     document.getElementById('multa-empleado-info').textContent = 'Empleado asignado en el registro original.';
                 }
-
+                
                 if (multa.pagada == 1) {
                     document.getElementById('multa-estado-form').disabled = false;
                     document.getElementById('fecha-pago-container').style.display = 'block';
                     document.getElementById('multa-fecha-pago').value = multa.fecha_pago ? multa.fecha_pago.split(' ')[0] : '';
                 }
-
+                
                 this.modal.show();
             } else {
-                this.mostrarError(res.message);
+                this.showError(res.message);
             }
         } catch (error) {
-            this.mostrarError('Error al cargar multa');
+            this.showError('Error al cargar multa');
             console.error('Error cargando multa:', error);
         }
     }
@@ -249,7 +260,8 @@ class MultasView {
         const select = document.querySelector(selector);
         select.innerHTML = `<option value="">${placeholder}</option>`;
         data.forEach(item => {
-            select.innerHTML += `<option value="${item[valueField]}">${textField(item)}</option>`;
+            const valor = item[valueField];
+            select.innerHTML += `<option value="${valor}">${textField(item)}</option>`;
         });
     }
     

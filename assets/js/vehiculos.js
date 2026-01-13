@@ -32,18 +32,21 @@ class VehiculosView {
         const items = vehiculos || this.vehiculos;
 
         if (items.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10" class="text-center">No hay vehículos registrados</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="13" class="text-center">No hay vehículos registrados</td></tr>';
             return;
         }
 
         tbody.innerHTML = items.map(v => `
             <tr>
                 <td><strong>${v.patente}</strong></td>
+                <td>${v.tipo_vehiculo || '-'}</td>
                 <td>${v.marca || '-'}</td>
                 <td>${v.modelo || '-'}</td>
+                <td>${v.color || '-'}</td>
                 <td>${v.anio || '-'}</td>
                 <td>${v.kilometraje_actual ? v.kilometraje_actual.toLocaleString() + ' km' : '-'}</td>
                 <td>${this.getBadgeEstado(v.estado)}</td>
+                <td>${this.getBadgeEstadoDocumentacion(v.estado_documentacion)}</td>
                 <td>${this.formatFecha(v.fecha_vtv)}</td>
                 <td>${this.formatFecha(v.fecha_seguro)}</td>
                 <td>${v.empleado_actual || '-'}</td>
@@ -72,6 +75,15 @@ class VehiculosView {
         return badges[estado] || estado;
     }
 
+    getBadgeEstadoDocumentacion(estado) {
+        const badges = {
+            'al_dia': '<span class="badge bg-success">Al día</span>',
+            'deuda_una': '<span class="badge bg-warning">Deuda (1)</span>',
+            'deuda_varias': '<span class="badge bg-danger">Deuda (+1)</span>'
+        };
+        return badges[estado] || estado;
+    }
+
     formatFecha(fecha) {
         if (!fecha) return '-';
         const date = new Date(fecha + 'T00:00:00');
@@ -96,16 +108,23 @@ class VehiculosView {
         document.getElementById('modalVehiculoTitulo').textContent = 'Editar Vehículo';
         document.getElementById('vehiculo-id').value = vehiculo.id;
         document.getElementById('vehiculo-patente').value = vehiculo.patente || '';
+        document.getElementById('vehiculo-tipo').value = vehiculo.tipo_vehiculo || 'Auto';
+        document.getElementById('vehiculo-color').value = vehiculo.color || '';
         document.getElementById('vehiculo-marca').value = vehiculo.marca || '';
         document.getElementById('vehiculo-modelo').value = vehiculo.modelo || '';
         document.getElementById('vehiculo-anio').value = vehiculo.anio || '';
+        document.getElementById('vehiculo-carga-maxima').value = vehiculo.carga_maxima_kg || '';
         document.getElementById('vehiculo-motor').value = vehiculo.motor || '';
         document.getElementById('vehiculo-chasis').value = vehiculo.chasis || '';
         document.getElementById('vehiculo-titularidad').value = vehiculo.titularidad || '';
-        document.getElementById('vehiculo-kilometraje').value = vehiculo.kilometraje_actual || '';
+        document.getElementById('vehiculo-titulo-automotor').value = vehiculo.titulo_automotor || '';
+        document.getElementById('vehiculo-cedula-verde').value = vehiculo.cedula_verde || '';
         document.getElementById('vehiculo-fecha-vtv').value = vehiculo.fecha_vtv || '';
         document.getElementById('vehiculo-fecha-seguro').value = vehiculo.fecha_seguro || '';
         document.getElementById('vehiculo-fecha-patente').value = vehiculo.fecha_patente || '';
+        document.getElementById('vehiculo-odometro-inicial').value = vehiculo.km_odometro_inicial || 0;
+        document.getElementById('vehiculo-kilometraje').value = vehiculo.kilometraje_actual || '';
+        document.getElementById('vehiculo-ciclo-preventivo').value = vehiculo.ciclo_mantenimiento_preventivo_km || '';
         document.getElementById('vehiculo-km-service').value = vehiculo.km_proximo_service || '';
         document.getElementById('vehiculo-estado').value = vehiculo.estado || 'disponible';
         document.getElementById('vehiculo-observaciones').value = vehiculo.observaciones || '';

@@ -6,42 +6,77 @@
         </button>
     </div>
 
+    <!-- Pestañas de tipo de pago -->
+    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="pills-todos-tab" data-tipo="" onclick="filtrarPorTipo('')">
+                📋 Todos
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-patente-tab" data-tipo="patente" onclick="filtrarPorTipo('patente')">
+                🏛️ Patentes
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-seguro-tab" data-tipo="seguro" onclick="filtrarPorTipo('seguro')">
+                🛡️ Seguros
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-vtv-tab" data-tipo="vtv" onclick="filtrarPorTipo('vtv')">
+                🔍 VTV
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-multa-tab" data-tipo="multa" onclick="filtrarPorTipo('multa')">
+                ⚠️ Multas
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-servicios-tab" data-tipo="servicios" onclick="filtrarPorTipo('servicios')">
+                🛠️ Servicios
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-otro-tab" data-tipo="otro" onclick="filtrarPorTipo('otro')">
+                📦 Otros
+            </button>
+        </li>
+    </ul>
+
+    <!-- Filtros adicionales -->
     <div class="row g-2 mb-3">
         <div class="col-md-3">
-            <input type="text" class="form-control" id="filtro-patente" placeholder="Buscar por patente">
+            <input type="text" class="form-control" id="filtro-patente" placeholder="Buscar por patente" onchange="filtrarPagos()">
         </div>
         <div class="col-md-3">
-            <select class="form-select" id="filtro-tipo">
-                <option value="">Todos los tipos</option>
-                <option value="patente">Patente</option>
-                <option value="seguro">Seguro</option>
-                <option value="servicios">Servicios</option>
-                <option value="otro">Otro</option>
-            </select>
-        </div>
-        <div class="col-md-3">
-            <select class="form-select" id="filtro-pagado">
+            <select class="form-select" id="filtro-pagado" onchange="filtrarPagos()">
                 <option value="">Todos los estados</option>
                 <option value="0">Pendientes</option>
                 <option value="1">Pagados</option>
             </select>
         </div>
         <div class="col-md-3">
-            <button class="btn btn-secondary" onclick="filtrarPagos()">Filtrar</button>
+            <input type="date" class="form-control" id="filtro-fecha-desde" placeholder="Desde" onchange="filtrarPagos()">
+        </div>
+        <div class="col-md-3">
+            <input type="date" class="form-control" id="filtro-fecha-hasta" placeholder="Hasta" onchange="filtrarPagos()">
         </div>
     </div>
 
+    <!-- Tabla de pagos -->
     <div class="table-responsive">
         <table class="table table-hover" id="tabla-pagos">
             <thead>
                 <tr>
                     <th>Patente</th>
                     <th>Tipo</th>
+                    <th>Detalle</th>
                     <th>Vencimiento</th>
                     <th>Monto</th>
                     <th>Estado</th>
                     <th>Fecha Pago</th>
-                    <th>Comprobante</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -50,8 +85,9 @@
     </div>
 </div>
 
+<!-- Modal Formulario Pago -->
 <div class="modal fade" id="modalPago" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalPagoTitle">Nuevo Pago</h5>
@@ -60,50 +96,204 @@
             <div class="modal-body">
                 <form id="form-pago">
                     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                    <input type="hidden" name="id" id="pago-id">
 
-                    <div class="mb-3">
-                        <label class="form-label">Vehículo *</label>
-                        <select class="form-select" name="vehiculo_id" required>
-                            <option value="">Seleccionar vehículo</option>
-                        </select>
+                    <!-- Vehículo y Tipo (siempre visible) -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Vehículo *</label>
+                            <select class="form-select" name="vehiculo_id" id="pago-vehiculo" required>
+                                <option value="">Seleccionar vehículo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tipo de Pago *</label>
+                            <select class="form-select" name="tipo" id="pago-tipo" required onchange="toggleCamposPorTipo()">
+                                <option value="">Seleccionar tipo</option>
+                                <option value="patente">🏛️ Patente (Impuesto Automotor)</option>
+                                <option value="seguro">🛡️ Seguro</option>
+                                <option value="vtv">🔍 VTV (Verificación Técnica)</option>
+                                <option value="multa">⚠️ Multa</option>
+                                <option value="servicios">🛠️ Servicios</option>
+                                <option value="otro">📦 Otro</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Tipo de Pago *</label>
-                        <select class="form-select" name="tipo" required>
-                            <option value="">Seleccionar tipo</option>
-                            <option value="patente">Patente</option>
-                            <option value="seguro">Seguro</option>
-                            <option value="servicios">Servicios</option>
-                            <option value="otro">Otro</option>
-                        </select>
+
+                    <!-- Campos específicos para PATENTE -->
+                    <div id="campos-patente" class="campos-tipo" style="display: none;">
+                        <hr class="my-3">
+                        <h6 class="text-primary">🏛️ Datos de Patente (Impuesto Automotor)</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Cuota</label>
+                                <select class="form-select" name="cuota_patente">
+                                    <option value="anual">Anual (única cuota)</option>
+                                    <option value="1">1ra Cuota (Semestre 1)</option>
+                                    <option value="2">2da Cuota (Semestre 2)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Fecha Vencimiento *</label>
+                                <input type="date" class="form-control" name="fecha_vencimiento_patente">
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Fecha de Vencimiento *</label>
-                        <input type="date" class="form-control" name="fecha_vencimiento" required>
+
+                    <!-- Campos específicos para SEGURO -->
+                    <div id="campos-seguro" class="campos-tipo" style="display: none;">
+                        <hr class="my-3">
+                        <h6 class="text-primary">🛡️ Datos del Seguro</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Aseguradora *</label>
+                                <input type="text" class="form-control" name="aseguradora" placeholder="Ej: Pacífico, Mapfre">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Número de Póliza</label>
+                                <input type="text" class="form-control" name="poliza_numero" placeholder="Ej: 12345678">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Fecha Inicio</label>
+                                <input type="date" class="form-control" name="fecha_inicio">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Fecha Vencimiento *</label>
+                                <input type="date" class="form-control" name="fecha_vencimiento_seguro">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Estado Póliza</label>
+                                <select class="form-select" name="estado_poliza">
+                                    <option value="vigente">Vigente</option>
+                                    <option value="vencida">Vencida</option>
+                                    <option value="cancelada">Cancelada</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Monto</label>
-                        <input type="number" step="0.01" class="form-control" name="monto" placeholder="0.00">
+
+                    <!-- Campos específicos para VTV -->
+                    <div id="campos-vtv" class="campos-tipo" style="display: none;">
+                        <hr class="my-3">
+                        <h6 class="text-primary">🔍 Datos de VTV</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Fecha de Inspección *</label>
+                                <input type="date" class="form-control" name="fecha_inspeccion_vtv">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Fecha Vencimiento *</label>
+                                <input type="date" class="form-control" name="fecha_vencimiento_vtv">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Resultado VTV</label>
+                                <select class="form-select" name="resultado_vtv">
+                                    <option value="aprobada">✅ Aprobada</option>
+                                    <option value="condicional">⚠️ Condicional</option>
+                                    <option value="rechazada">❌ Rechazada</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Número Oblea/Certificado</label>
+                                <input type="text" class="form-control" name="numero_oblea_vtv" placeholder="Ej: VTV-2024-12345">
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Nº Comprobante</label>
-                        <input type="text" class="form-control" name="comprobante">
+
+                    <!-- Campos específicos para MULTA -->
+                    <div id="campos-multa" class="campos-tipo" style="display: none;">
+                        <hr class="my-3">
+                        <h6 class="text-primary">⚠️ Datos de Multa</h6>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">Multa Existente</label>
+                                <select class="form-select" id="select-multa" name="multa_id">
+                                    <option value="">Seleccionar multa pendiente...</option>
+                                </select>
+                                <small class="text-muted">O cree una nueva multa desde el módulo de Multas</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Número de Acta</label>
+                                <input type="text" class="form-control" name="numero_acta_multa" placeholder="Ej: 123456">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Fecha Vencimiento *</label>
+                                <input type="date" class="form-control" name="fecha_vencimiento_multa">
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Fecha de Pago</label>
-                        <input type="date" class="form-control" name="fecha_pago">
-                        <small class="text-muted">Dejar vacío para marcar como pendiente</small>
+
+                    <!-- Campos específicos para SERVICIOS y OTRO -->
+                    <div id="campos-general" class="campos-tipo" style="display: none;">
+                        <hr class="my-3">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">Descripción del Servicio/Pago</label>
+                                <input type="text" class="form-control" name="descripcion_servicio" placeholder="Ej: Lavado, Estacionamiento, etc.">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Fecha Vencimiento *</label>
+                                <input type="date" class="form-control" name="fecha_vencimiento_general">
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Observaciones</label>
-                        <textarea class="form-control" name="observaciones" rows="2"></textarea>
+
+                    <!-- Campos comunes a todos -->
+                    <hr class="my-3">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Monto ($) *</label>
+                            <input type="number" step="0.01" class="form-control" name="monto" id="pago-monto" required placeholder="0.00">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nº Comprobante</label>
+                            <input type="text" class="form-control" name="comprobante" id="pago-comprobante" placeholder="Ej: A-001234">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">¿Ya está pagado?</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="pago-pagado" name="pagado" onchange="toggleFechaPago()">
+                                <label class="form-check-label" for="pago-pagado">Marcar como pagado</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6" id="campo-fecha-pago" style="display: none;">
+                            <label class="form-label">Fecha de Pago</label>
+                            <input type="date" class="form-control" name="fecha_pago" id="pago-fecha-pago">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Observaciones</label>
+                            <textarea class="form-control" name="observaciones" id="pago-observaciones" rows="2" placeholder="Observaciones adicionales..."></textarea>
+                        </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="guardarPago()">Guardar</button>
+                <button type="button" class="btn btn-primary" onclick="guardarPago()">Guardar Pago</button>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.nav-pills .nav-link {
+    border-radius: 20px;
+    margin-right: 5px;
+    font-size: 0.9rem;
+}
+
+.nav-pills .nav-link.active {
+    background-color: var(--bs-primary);
+}
+
+.campos-tipo {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.dark-theme .campos-tipo {
+    background-color: #2b2b2b;
+}
+</style>

@@ -63,15 +63,44 @@ class AutorizacionesView {
     }
 
     renderTable() {
+        this.renderTableWithData(this.data.autorizaciones);
+    }
+
+    getBadgeEstado(activa) {
+        return activa == 1
+            ? '<span class="badge bg-success">Activa</span>'
+            : '<span class="badge bg-danger">Revocada</span>';
+    }
+
+    filtrarAutorizaciones() {
+        const filtroEmpleado = document.getElementById('filtro-autorizacion-empleado').value.toLowerCase();
+        const filtroPatente = document.getElementById('filtro-autorizacion-patente').value.toLowerCase();
+        const filtroEstado = document.getElementById('filtro-autorizacion-estado').value;
+
+        const filtrados = this.data.autorizaciones.filter(a => {
+            const empleado = (a.nombre + ' ' + (a.apellido || '')).toLowerCase();
+            const patente = (a.patente || '').toLowerCase();
+
+            const matchEmpleado = !filtroEmpleado || empleado.includes(filtroEmpleado);
+            const matchPatente = !filtroPatente || patente.includes(filtroPatente);
+            const matchEstado = !filtroEstado || a.activa.toString() === filtroEstado;
+
+            return matchEmpleado && matchPatente && matchEstado;
+        });
+
+        this.renderTableWithData(filtrados);
+    }
+
+    renderTableWithData(data) {
         const tbody = document.querySelector('#tabla-autorizaciones tbody');
         tbody.innerHTML = '';
 
-        if (this.data.autorizaciones.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay autorizaciones registradas</td></tr>';
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay autorizaciones con estos filtros</td></tr>';
             return;
         }
 
-        this.data.autorizaciones.forEach(a => {
+        data.forEach(a => {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td><strong></strong></td>
@@ -113,12 +142,6 @@ class AutorizacionesView {
 
             tbody.appendChild(row);
         });
-    }
-
-    getBadgeEstado(activa) {
-        return activa == 1
-            ? '<span class="badge bg-success">Activa</span>'
-            : '<span class="badge bg-danger">Revocada</span>';
     }
 
     populateSelects() {
@@ -237,4 +260,8 @@ class AutorizacionesView {
 }
 
 window.AutorizacionesView = AutorizacionesView;
-window.autorizacionesView = new AutorizacionesView();
+window.filtrarAutorizaciones = function() {
+    if (window.autorizacionesView) {
+        window.autorizacionesView.filtrarAutorizaciones();
+    }
+};

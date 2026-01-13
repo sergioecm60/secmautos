@@ -95,34 +95,7 @@ try {
         echo "   - Alerta PATENTE creada para patente {$v['patente']}\n";
     }
 
-    // 5. CETA próxima a vencer (15 días antes)
-    $stmt = $pdo->prepare("
-        SELECT c.id, c.vehiculo_id, c.fecha_vencimiento, v.patente
-        FROM ceta c
-        JOIN vehiculos v ON c.vehiculo_id = v.id
-        WHERE v.estado != 'baja'
-        AND c.fecha_vencimiento BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 15 DAY)
-        AND c.vehiculo_id NOT IN (
-            SELECT vehiculo_id
-            FROM alertas
-            WHERE tipo_alerta = 'ceta' AND resuelta = 0
-        )
-    ");
-    $stmt->execute();
-    $cetas = $stmt->fetchAll();
-
-    foreach ($cetas as $c) {
-        $dias = (strtotime($c['fecha_vencimiento']) - strtotime(date('Y-m-d'))) / 86400;
-        $dias = floor($dias);
-        $mensaje = "CETA vence en $dias días (el {$c['fecha_vencimiento']}) - Patente {$c['patente']}";
-
-        $pdo->prepare("INSERT INTO alertas (vehiculo_id, tipo_alerta, mensaje, fecha_alerta) VALUES (?, 'ceta', ?, CURDATE())")
-            ->execute([$c['vehiculo_id'], $mensaje]);
-
-        echo "   - Alerta CETA creada para patente {$c['patente']}\n";
-    }
-
-    // 6. Kilometraje próximo a service (1000 km antes)
+    // 5. Kilometraje próximo a service (1000 km antes)
     $stmt = $pdo->prepare("
         SELECT id, patente, kilometraje_actual, km_proximo_service
         FROM vehiculos

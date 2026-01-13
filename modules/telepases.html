@@ -1,0 +1,225 @@
+<div class="card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>🎫 Dispositivos Telepase</h3>
+        <div>
+            <button class="btn btn-success me-2" onclick="window.telepasesView.abrirModalImportarPagos()">
+                <i class="bi bi-upload"></i> Importar Pagos
+            </button>
+            <button class="btn btn-primary" onclick="window.telepasesView.nuevoTelepase()">
+                <i class="bi bi-plus-circle"></i> Nuevo Dispositivo
+            </button>
+        </div>
+    </div>
+
+    <div class="row g-2 mb-3">
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="filtro-patente" placeholder="Buscar por patente">
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="filtro-dispositivo" placeholder="Número dispositivo">
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="filtro-estado">
+                <option value="">Todos los estados</option>
+                <option value="habilitado">Habilitado</option>
+                <option value="deshabilitado">Deshabilitado</option>
+                <option value="baja">Baja</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-secondary w-100" onclick="window.telepasesView.filtrar()">
+                <i class="bi bi-search"></i> Filtrar
+            </button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover" id="tabla-telepases">
+            <thead>
+                <tr>
+                    <th>Patente</th>
+                    <th>Marca</th>
+                    <th>Modelo</th>
+                    <th>Nº Dispositivo</th>
+                    <th>Fecha Activación</th>
+                    <th>Fecha Baja</th>
+                    <th>Estado</th>
+                    <th>Pagos Pendientes</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-telepases-body"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Dispositivo Telepase -->
+<div class="modal fade" id="modalTelepase" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTelepaseTitle">Nuevo Dispositivo Telepase</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-telepase">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                    <input type="hidden" name="id" id="telepase-id">
+
+                    <div class="mb-3">
+                        <label class="form-label">Vehículo *</label>
+                        <select class="form-select" name="vehiculo_id" id="telepase-vehiculo" required>
+                            <option value="">Seleccionar vehículo...</option>
+                        </select>
+                        <small class="text-muted">Selecciona el vehículo donde se instalará el dispositivo</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Número de Dispositivo *</label>
+                        <input type="text" class="form-control" name="numero_dispositivo" id="telepase-dispositivo" required
+                               placeholder="Ej: 91767380" pattern="[0-9]{8,10}" maxlength="15">
+                        <small class="text-muted">Número único del dispositivo telepase (8-10 dígitos)</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Fecha de Activación *</label>
+                        <input type="date" class="form-control" name="fecha_activacion" id="telepase-fecha-activacion" required>
+                        <small class="text-muted">Fecha en que se activó el dispositivo</small>
+                    </div>
+
+                    <div class="mb-3" id="campo-fecha-baja" style="display: none;">
+                        <label class="form-label">Fecha de Baja</label>
+                        <input type="date" class="form-control" name="fecha_baja" id="telepase-fecha-baja">
+                        <small class="text-muted">Fecha de baja del dispositivo (venta, cambio de parabrisas, etc.)</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Estado *</label>
+                        <select class="form-select" name="estado" id="telepase-estado" required onchange="toggleFechaBaja()">
+                            <option value="habilitado">Habilitado</option>
+                            <option value="deshabilitado">Deshabilitado</option>
+                            <option value="baja">Baja</option>
+                        </select>
+                        <small class="text-muted">Estado actual del dispositivo</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Observaciones</label>
+                        <textarea class="form-control" name="observaciones" id="telepase-observaciones" rows="3"
+                                  placeholder="Observaciones adicionales (cambio de parabrisas, motivo de baja, etc.)"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="window.telepasesView.guardar()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Pagos del Dispositivo -->
+<div class="modal fade" id="modalPagosTelepase" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Historial de Pagos - <span id="pagos-dispositivo-numero"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Período</th>
+                                <th>Concesionario</th>
+                                <th>N° Comprobante</th>
+                                <th>Vencimiento</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-pagos-telepase"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Importar Pagos desde TXT -->
+<div class="modal fade" id="modalImportarPagos" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Importar Pagos de Telepase</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Formato esperado:</strong> Período | Concesionario | N° Comprobante | Vencimiento | Venc. Recargo | Monto | Monto Recargo | Estado
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Dispositivo Telepase</label>
+                    <select class="form-select" id="import-dispositivo" required>
+                        <option value="">Seleccionar dispositivo...</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Archivo TXT o CSV</label>
+                    <input type="file" class="form-control" id="import-file" accept=".txt,.csv" onchange="window.telepasesView.previewImport()">
+                </div>
+
+                <div id="preview-import" style="display: none;">
+                    <h6>Vista previa de datos:</h6>
+                    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="select-all-import" onchange="window.telepasesView.toggleSelectAll()"></th>
+                                    <th>Período</th>
+                                    <th>Concesionario</th>
+                                    <th>N° Comprobante</th>
+                                    <th>Vencimiento</th>
+                                    <th>Monto</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="preview-import-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-importar" onclick="window.telepasesView.importarPagos()" disabled>
+                    Importar Seleccionados
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleFechaBaja() {
+    const estado = document.getElementById('telepase-estado').value;
+    const campoFechaBaja = document.getElementById('campo-fecha-baja');
+    const inputFechaBaja = document.getElementById('telepase-fecha-baja');
+
+    if (estado === 'baja') {
+        campoFechaBaja.style.display = 'block';
+        inputFechaBaja.required = true;
+    } else {
+        campoFechaBaja.style.display = 'none';
+        inputFechaBaja.required = false;
+        inputFechaBaja.value = '';
+    }
+}
+</script>

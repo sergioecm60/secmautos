@@ -1,0 +1,87 @@
+<div class="card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>🔧 Talleres de Mantenimiento</h3>
+        <button class="btn btn-primary" onclick="window.talleresView.nuevoTaller()">
+            <i class="bi bi-plus-circle"></i> Nuevo Taller
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover" id="tabla-talleres">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Dirección</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Contacto Principal</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-talleres-body">
+                <tr>
+                    <td colspan="7" class="text-center">Cargando talleres...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Taller -->
+<div class="modal fade" id="modalTaller" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTallerTitle">Nuevo Taller</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-taller">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                    <input type="hidden" name="id" id="taller-id">
+
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del Taller *</label>
+                        <input type="text" class="form-control" name="nombre" id="taller-nombre" required placeholder="Ej: Taller Los Mecánicos">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Dirección</label>
+                        <input type="text" class="form-control" name="direccion" id="taller-direccion" placeholder="Ej: Calle Los Tulipanes 324">
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" name="telefono" id="taller-telefono" placeholder="Ej: 923456734">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" id="taller-email" placeholder="Ej: servicio@taller.com">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Contacto Principal</label>
+                        <input type="text" class="form-control" name="contacto_principal" id="taller-contacto" placeholder="Ej: Rosa Mercedes del Prado">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Observaciones</label>
+                        <textarea class="form-control" name="observaciones" id="taller-observaciones" rows="2" placeholder="Observaciones adicionales..."></textarea>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" name="activo" id="taller-activo" checked>
+                        <label class="form-check-label" for="taller-activo">Activo</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="window.talleresView.guardar()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
