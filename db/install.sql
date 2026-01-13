@@ -10,6 +10,11 @@ CREATE DATABASE IF NOT EXISTS secmautos CHARACTER SET utf8mb4 COLLATE utf8mb4_sp
 
 USE secmautos;
 
+-- NOTA: Las vistas mencionadas en producción (v_historial_pagos_telepase, v_telepases_completo)
+-- son del módulo de telepases que se desarrolló separadamente. Estas vistas NO están en
+-- este script de instalación y son puramente tablas del sistema principal.
+-- Si ves esas vistas en producción, probablemente son vistas temporales o caché de MySQL.
+
 -- ============================================================
 -- TABLA: usuarios
 -- ============================================================
@@ -70,6 +75,7 @@ CREATE TABLE vehiculos (
     imagen VARCHAR(255),
     observaciones TEXT,
     fecha_baja DATE NULL,
+    estado_documentacion ENUM('al_dia', 'vencida') DEFAULT 'al_dia',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_patente (patente),
@@ -464,6 +470,11 @@ BEGIN
     -- Si no tiene fecha de VTV y tiene patente y año, calcularla automáticamente
     IF NEW.fecha_vtv IS NULL AND NEW.patente IS NOT NULL AND NEW.anio IS NOT NULL THEN
         SET NEW.fecha_vtv = calcular_fecha_vtv(NEW.patente, NEW.anio);
+    END IF;
+
+    -- Calcular estado de documentación
+    IF NEW.fecha_vtv IS NOT NULL OR NEW.fecha_seguro IS NOT NULL OR NEW.fecha_patente IS NOT NULL THEN
+        SET NEW.estado_documentacion = calcular_estado_documentacion(NEW.fecha_vtv, NEW.fecha_seguro, NEW.fecha_patente);
     END IF;
 END$$
 
