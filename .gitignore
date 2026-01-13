@@ -24,6 +24,8 @@ tmpclaude-*/
 .idea/
 *.sublime-*
 .DS_Store
+# IDE Claude
+.claude/
 
 # Archivos temporales del proyecto
 test_api.php
