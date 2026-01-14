@@ -35,7 +35,7 @@ requiereAutenticacion();
             <nav class="nav-buttons">
                 <a href="#" class="nav-btn active" data-module="dashboard">📊 Dashboard</a>
                 <a href="#" class="nav-btn" data-module="vehiculos">🚗 Vehículos</a>
-                <a href="#" class="nav-btn" data-module="empleados">👥 Empleados</a>
+                <a href="#" class="nav-btn" data-module="empleados">👥 Conductores</a>
                 <a href="#" class="nav-btn" data-module="autorizaciones">🔐 Autorizaciones Manejo</a>
                 <a href="#" class="nav-btn" data-module="asignaciones">🔄 Asignaciones</a>
                 <a href="#" class="nav-btn" data-module="multas">⚠️ Multas</a>

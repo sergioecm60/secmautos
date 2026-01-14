@@ -17,7 +17,7 @@ class EmpleadosView {
     async nuevo() {
         document.getElementById('form-empleado').reset();
         document.getElementById('empleado-id').value = '';
-        document.getElementById('modalEmpleadoTitulo').textContent = 'Nuevo Empleado';
+        document.getElementById('modalEmpleadoTitulo').textContent = 'Nuevo Conductor';
         const csrfInput = document.getElementById('empleado-csrf');
         if (csrfInput) {
             csrfInput.value = this.csrfToken;
@@ -37,7 +37,7 @@ class EmpleadosView {
         document.getElementById('empleado-email').value = empleado.email || '';
         document.getElementById('empleado-direccion').value = empleado.direccion || '';
 
-        document.getElementById('modalEmpleadoTitulo').textContent = 'Editar Empleado';
+        document.getElementById('modalEmpleadoTitulo').textContent = 'Editar Conductor';
         const csrfInput = document.getElementById('empleado-csrf');
         if (csrfInput) {
             csrfInput.value = this.csrfToken;
@@ -46,7 +46,7 @@ class EmpleadosView {
     }
 
     async eliminar(id) {
-        if (!confirm('¿Está seguro de eliminar este empleado?')) return;
+        if (!confirm('¿Está seguro de eliminar este conductor?')) return;
 
         try {
             const res = await fetch('api/empleados.php', {
@@ -156,8 +156,8 @@ class EmpleadosView {
                 this.mostrarError(data.message);
             }
         } catch (error) {
-            console.error('Error guardando empleado:', error);
-            this.mostrarError('Error de conexión al guardar empleado');
+            console.error('Error guardando conductor:', error);
+            this.mostrarError('Error de conexión al guardar conductor');
         }
     }
 
