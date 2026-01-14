@@ -72,9 +72,9 @@ body.modern-login-body::before {
 
 /* ========== ENCABEZADO ========== */
 /* Barra de encabezado superior */
-.header { background: var(--gradient-primary); color: white; padding: 10px 0 12px 0; box-shadow: var(--shadow); }
-.header h1 { text-align: center; margin: 0; font-size: 1.6em; line-height: 1.2; }
-.header p { text-align: center; margin: 3px 0 0 0; opacity: 0.9; font-size: 0.85em; }
+.header { background: var(--gradient-primary); color: white; padding: 6px 0 10px 0; box-shadow: var(--shadow); }
+.header h1 { text-align: center; margin: 0; font-size: 1.4em; line-height: 1.1; }
+.header p { text-align: center; margin: 2px 0 0 0; opacity: 0.9; font-size: 0.8em; }
 
 /* Información del usuario y enlace de "Cerrar Sesión" */
 .user-info { text-align: right; margin-bottom: 15px; }

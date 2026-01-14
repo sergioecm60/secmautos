@@ -93,20 +93,6 @@ requiereAutenticacion();
         <div id="module-configuracion" class="module"></div>
     </div>
 
-    <footer class="page-footer-fixed">
-        <p>
-            <strong>SECM Flota de Autos</strong> |
-            By Sergio Cabrera |
-            Copyleft ©2025 |
-            <a href="licence.php">Licencia GNU GPL v3</a>
-        </p>
-        <p class="footer-contact">
-            ¿Necesitas ayuda?
-            <a href="mailto:sergiomiers@gmail.com">📧 sergiomiers@gmail.com</a> |
-            <a href="https://wa.me/541167598452" target="_blank">💬 WhatsApp +54 11 6759-8452</a>
-        </p>
-    </footer>
-
     <script>
         window.phpUsuarioId = '<?= $_SESSION['usuario_id'] ?? '' ?>';
     </script>
