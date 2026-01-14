@@ -68,10 +68,10 @@ class VehiculosView {
     getBadgeEstado(estado) {
         const badges = {
             'disponible': '<span class="badge bg-success">Disponible</span>',
-            'asignado': '<span class="badge bg-primary">Asignado</span>',
+            'asignado': '<span class="badge" style="background-color: #fd7e14;">Asignado</span>',
             'mantenimiento': '<span class="badge bg-warning">Mantenimiento</span>',
-            'vendido': '<span class="badge bg-secondary">Vendido</span>',
-            'baja': '<span class="badge bg-danger">Baja</span>'
+            'vendido': '<span class="badge bg-danger">Vendido</span>',
+            'baja': '<span class="badge bg-dark">Baja</span>'
         };
         return badges[estado] || estado;
     }
