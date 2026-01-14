@@ -55,7 +55,7 @@ function renderStats(data) {
         { label: 'Disponibles', value: d.disponibles, icon: '✅' },
         { label: 'Asignados', value: d.asignados, icon: '🔄' },
         { label: 'En Mantenimiento', value: d.mantenimiento, icon: '🔧' },
-        { label: 'Total Empleados', value: d.total_empleados, icon: '👥' },
+        { label: 'Total Conductores', value: d.total_empleados, icon: '👥' },
         { label: 'Alertas Activas', value: d.alertas_activas, icon: '⚠️' },
         { label: 'Multas Pendientes', value: d.multas_pendientes, icon: '💰' },
         { label: 'Mantenimientos Programados', value: d.mantenimientos_programados, icon: '📅' }
