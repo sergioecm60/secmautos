@@ -10,7 +10,6 @@ class AsignacionesView {
 
     init() {
         this.cargarDatos();
-        this.initEventListeners();
     }
 
     async cargarDatos() {
@@ -24,8 +23,10 @@ class AsignacionesView {
             if (asignaciones.success) this.renderAsignaciones(asignaciones.data);
             if (vehiculos.success) this.populateSelect('#asignacion-vehiculo', vehiculos.data, 'id', v => `${v.patente} - ${v.marca} ${v.modelo}`, 'Seleccione un vehículo');
             if (empleados.success) this.populateSelect('#asignacion-empleado', empleados.data, 'id', e => `${e.nombre} ${e.apellido} (${e.dni})`, 'Seleccione un empleado');
-            
+
             this.vehiculosDisponibles = vehiculos.success ? vehiculos.data : [];
+
+            this.initEventListeners();
         } catch (error) {
             this.mostrarError('Error al cargar datos iniciales.');
             console.error('Error en cargarDatos:', error);
