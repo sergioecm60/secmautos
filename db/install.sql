@@ -59,6 +59,7 @@ CREATE TABLE vehiculos (
     anio INT,
     motor VARCHAR(50),
     chasis VARCHAR(50),
+    titulo_dnrpa VARCHAR(100) COMMENT 'Código del título digital DNRPA (Registro/Tramite/Control)',
     titularidad VARCHAR(100),
     kilometraje_actual INT DEFAULT 0,
     estado ENUM('disponible', 'asignado', 'mantenimiento', 'baja') DEFAULT 'disponible',
@@ -75,6 +76,7 @@ CREATE TABLE vehiculos (
     INDEX idx_patente (patente),
     INDEX idx_estado (estado),
     INDEX idx_marca (marca),
+    INDEX idx_titulo_dnrpa (titulo_dnrpa),
     FULLTEXT INDEX idx_busqueda (patente, marca, modelo)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
 

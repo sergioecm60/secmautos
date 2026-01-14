@@ -1,7 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mysql -u root secmautos:*)"
+      "Bash(mysql -u root secmautos:*)",
+      "Bash(mysql:*)",
+      "Bash(git checkout:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(ls:*)",
+      "Bash(for file in db/create_talleres.sql db/create_consumo_combustible.sql db/create_paquetes_mantenimiento.sql)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(done)",
+      "Bash(curl:*)",
+      "Bash(php scripts/generar_alertas.php:*)",
+      "Bash(python3:*)",
+      "Bash(/c/laragon/bin/python/python-3.13/python -m pip install:*)"
     ]
   }
 }

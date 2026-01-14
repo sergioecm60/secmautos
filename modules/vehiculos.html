@@ -1,9 +1,14 @@
 <div class="card">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3>🚗 Gestión de Vehículos</h3>
-        <button class="btn btn-primary" onclick="window.vehiculosView.nuevoVehiculo()">
-            + Nuevo Vehículo
-        </button>
+        <div>
+            <button class="btn btn-success" onclick="cargarModuloImportador()" title="Importar vehículos desde Excel">
+                📥 Importar desde Excel
+            </button>
+            <button class="btn btn-primary" onclick="window.vehiculosView.nuevoVehiculo()">
+                + Nuevo Vehículo
+            </button>
+        </div>
     </div>
 
     <!-- Filtros -->
@@ -115,6 +120,11 @@
                         <div class="col-md-6">
                             <label class="form-label">Chasis</label>
                             <input type="text" class="form-control" name="chasis" id="vehiculo-chasis" placeholder="Número de chasis">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">🔗 Título Digital DNRPA</label>
+                            <input type="text" class="form-control" name="titulo_dnrpa" id="vehiculo-titulo-dnrpa" placeholder="Ej: 1169/229998/9BA23C65F8">
+                            <small class="form-text text-muted">Formato: Registro/Trámite/Control Web</small>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Titularidad</label>

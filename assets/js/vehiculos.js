@@ -116,6 +116,7 @@ class VehiculosView {
         document.getElementById('vehiculo-carga-maxima').value = vehiculo.carga_maxima_kg || '';
         document.getElementById('vehiculo-motor').value = vehiculo.motor || '';
         document.getElementById('vehiculo-chasis').value = vehiculo.chasis || '';
+        document.getElementById('vehiculo-titulo-dnrpa').value = vehiculo.titulo_dnrpa || '';
         document.getElementById('vehiculo-titularidad').value = vehiculo.titularidad || '';
         document.getElementById('vehiculo-titulo-automotor').value = vehiculo.titulo_automotor || '';
         document.getElementById('vehiculo-cedula-verde').value = vehiculo.cedula_verde || '';

@@ -1,0 +1,145 @@
+<div class="card">
+    <h3>📥 Importar Vehículos desde Excel</h3>
+
+    <!-- Campo oculto para CSRF token -->
+    <input type="hidden" name="csrf_token" id="import-csrf-token" value="">
+
+    <div id="import-loading" style="text-align: center; padding: 40px;">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Cargando datos de importación...</p>
+        </div>
+    </div>
+
+    <div id="import-preview" style="display: none;">
+        <div class="alert alert-info">
+            <strong>📋 Origen:</strong> <span id="import-origen"></span><br>
+            <strong>📅 Fecha de exportación:</strong> <span id="import-fecha"></span><br>
+            <strong>📊 Total de vehículos:</strong> <span id="import-total"></span>
+        </div>
+
+        <div class="form-grid" style="margin-bottom: 20px;">
+            <div class="form-group">
+                <label>Modo de importación</label>
+                <select id="import-modo" class="form-control">
+                    <option value="crear_nuevos">Crear solo vehículos nuevos (omitir duplicados)</option>
+                    <option value="actualizar_existentes">Actualizar vehículos existentes + crear nuevos</option>
+                </select>
+                <small class="form-text text-muted">
+                    Los duplicados se detectan por patente
+                </small>
+            </div>
+        </div>
+
+        <div id="import-stats" class="stats-grid" style="margin-bottom: 20px;">
+            <div class="stat-card">
+                <div style="font-size: 2em;">📦</div>
+                <h4 id="stat-total">0</h4>
+                <p>Total a procesar</p>
+            </div>
+            <div class="stat-card">
+                <div style="font-size: 2em;">✨</div>
+                <h4 id="stat-nuevos">0</h4>
+                <p>Vehículos nuevos</p>
+            </div>
+            <div class="stat-card">
+                <div style="font-size: 2em;">♻️</div>
+                <h4 id="stat-existentes">0</h4>
+                <p>Ya existen en BD</p>
+            </div>
+            <div class="stat-card">
+                <div style="font-size: 2em;">🔗</div>
+                <h4 id="stat-con-titulo">0</h4>
+                <p>Con Título DNRPA</p>
+            </div>
+        </div>
+
+        <h5>Vista previa (primeros 10 vehículos)</h5>
+        <div class="table-responsive" style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;">
+            <table class="table">
+                <thead style="position: sticky; top: 0; background: var(--bg-secondary); z-index: 1;">
+                    <tr>
+                        <th>Estado</th>
+                        <th>Patente</th>
+                        <th>Marca</th>
+                        <th>Modelo</th>
+                        <th>Año</th>
+                        <th>Titular</th>
+                        <th>Título DNRPA</th>
+                    </tr>
+                </thead>
+                <tbody id="import-preview-table"></tbody>
+            </table>
+        </div>
+
+        <div style="text-align: center;">
+            <button type="button" class="btn btn-primary btn-lg" onclick="ejecutarImportacion()" id="btn-importar">
+                📥 Iniciar Importación
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="cargarVehiculos()">
+                ❌ Cancelar
+            </button>
+        </div>
+    </div>
+
+    <div id="import-progress" style="display: none; text-align: center; padding: 40px;">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p id="import-progress-text">Importando vehículos...</p>
+        </div>
+    </div>
+
+    <div id="import-result" style="display: none;">
+        <div class="alert" id="import-result-alert">
+            <h4>✅ Importación Completada</h4>
+            <div id="import-result-content"></div>
+        </div>
+
+        <div class="stats-grid" style="margin-bottom: 20px;">
+            <div class="stat-card">
+                <div style="font-size: 2em;">✨</div>
+                <h4 id="result-creados">0</h4>
+                <p>Vehículos creados</p>
+            </div>
+            <div class="stat-card">
+                <div style="font-size: 2em;">♻️</div>
+                <h4 id="result-actualizados">0</h4>
+                <p>Vehículos actualizados</p>
+            </div>
+            <div class="stat-card">
+                <div style="font-size: 2em;">⏭️</div>
+                <h4 id="result-omitidos">0</h4>
+                <p>Omitidos (duplicados)</p>
+            </div>
+            <div class="stat-card">
+                <div style="font-size: 2em;">❌</div>
+                <h4 id="result-errores">0</h4>
+                <p>Errores</p>
+            </div>
+        </div>
+
+        <div id="import-errores" style="display: none; margin-top: 20px;">
+            <h5>⚠️ Errores encontrados:</h5>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Patente</th>
+                            <th>Error</th>
+                        </tr>
+                    </thead>
+                    <tbody id="import-errores-table"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <button type="button" class="btn btn-primary" onclick="cargarVehiculos()">
+                🚗 Ver Vehículos Importados
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="cargarImportador()">
+                🔄 Nueva Importación
+            </button>
+        </div>
+    </div>
+</div>

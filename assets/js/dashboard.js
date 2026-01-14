@@ -792,3 +792,38 @@ function cargarLogsModule() {
         })
         .catch(error => console.error('Error al cargar logs:', error));
 }
+
+// Función para cargar el módulo importador de vehículos
+function cargarModuloImportador() {
+    const container = document.getElementById('module-vehiculos');
+
+    // Guardar scroll actual
+    const scrollPos = window.scrollY;
+
+    fetch('modules/importar_vehiculos.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/importar_vehiculos.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/importar_vehiculos.js';
+                script.onload = function() {
+                    // Llamar la función después de que el script se haya cargado
+                    if (typeof cargarImportador === 'function') {
+                        cargarImportador();
+                    }
+                };
+                document.body.appendChild(script);
+            } else {
+                // Si el script ya existe, llamar la función directamente
+                if (typeof cargarImportador === 'function') {
+                    cargarImportador();
+                }
+            }
+
+            // Restaurar scroll
+            window.scrollTo(0, scrollPos);
+        })
+        .catch(error => console.error('Error al cargar importador:', error));
+}

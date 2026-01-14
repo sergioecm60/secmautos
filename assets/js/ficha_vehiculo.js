@@ -37,6 +37,28 @@ function mostrarFicha(vehiculo, asignaciones, multas, mantenimientos, pagos, com
     document.getElementById('ficha-anio').textContent = vehiculo.anio || '-';
     document.getElementById('ficha-motor').textContent = vehiculo.motor || '-';
     document.getElementById('ficha-chasis').textContent = vehiculo.chasis || '-';
+
+    // Título DNRPA con enlace
+    const tituloDnrpaElement = document.getElementById('ficha-titulo-dnrpa');
+    if (vehiculo.titulo_dnrpa && vehiculo.titulo_dnrpa.trim()) {
+        const codigo = vehiculo.titulo_dnrpa.trim();
+        tituloDnrpaElement.innerHTML = `
+            <span style="margin-right: 10px;">${codigo}</span>
+            <a href="https://www2.jus.gov.ar/dnrpa-site/#!/consultarTramite"
+               target="_blank"
+               class="btn btn-sm btn-primary"
+               title="Consultar en DNRPA"
+               style="font-size: 11px; padding: 2px 8px;">
+                🔗 Consultar en DNRPA
+            </a>
+            <small style="display: block; margin-top: 5px; color: var(--text-secondary);">
+                Ingrese el código en el sitio del DNRPA
+            </small>
+        `;
+    } else {
+        tituloDnrpaElement.textContent = '-';
+    }
+
     document.getElementById('ficha-titularidad').textContent = vehiculo.titularidad || '-';
     document.getElementById('ficha-km').textContent = vehiculo.kilometraje_actual ? `${vehiculo.kilometraje_actual.toLocaleString()} km` : '-';
 

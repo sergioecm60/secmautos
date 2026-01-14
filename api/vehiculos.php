@@ -62,6 +62,7 @@ switch ($method) {
             $anio = (int)($_POST['anio'] ?? 0);
             $motor = sanitizar_input($_POST['motor'] ?? '');
             $chasis = sanitizar_input($_POST['chasis'] ?? '');
+            $titulo_dnrpa = sanitizar_input($_POST['titulo_dnrpa'] ?? '');
             $titularidad = sanitizar_input($_POST['titularidad'] ?? '');
             $titulo_automotor = sanitizar_input($_POST['titulo_automotor'] ?? '');
             $cedula_verde = sanitizar_input($_POST['cedula_verde'] ?? '');
@@ -84,15 +85,15 @@ switch ($method) {
 
             $stmt = $pdo->prepare("
                 INSERT INTO vehiculos (
-                    patente, marca, modelo, color, tipo_vehiculo, carga_maxima_kg, anio, motor, chasis, titularidad,
+                    patente, marca, modelo, color, tipo_vehiculo, carga_maxima_kg, anio, motor, chasis, titulo_dnrpa, titularidad,
                     titulo_automotor, cedula_verde,
                     kilometraje_actual, estado, fecha_vtv, fecha_seguro,
                     fecha_patente, km_proximo_service, km_odometro_inicial, ciclo_mantenimiento_preventivo_km, observaciones
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
 
             $stmt->execute([
-                $patente, $marca, $modelo, $color, $tipo_vehiculo, $carga_maxima_kg, $anio, $motor, $chasis, $titularidad,
+                $patente, $marca, $modelo, $color, $tipo_vehiculo, $carga_maxima_kg, $anio, $motor, $chasis, $titulo_dnrpa, $titularidad,
                 $titulo_automotor, $cedula_verde,
                 $kilometraje_actual, $estado, $fecha_vtv, $fecha_seguro,
                 $fecha_patente, $km_proximo_service, $km_odometro_inicial, $ciclo_mantenimiento_preventivo_km, $observaciones
@@ -124,6 +125,7 @@ switch ($method) {
             $anio = (int)($_PUT['anio'] ?? 0);
             $motor = sanitizar_input($_PUT['motor'] ?? '');
             $chasis = sanitizar_input($_PUT['chasis'] ?? '');
+            $titulo_dnrpa = sanitizar_input($_PUT['titulo_dnrpa'] ?? '');
             $titularidad = sanitizar_input($_PUT['titularidad'] ?? '');
             $titulo_automotor = sanitizar_input($_PUT['titulo_automotor'] ?? '');
             $cedula_verde = sanitizar_input($_PUT['cedula_verde'] ?? '');
@@ -147,7 +149,7 @@ switch ($method) {
             $stmt = $pdo->prepare("
                 UPDATE vehiculos SET
                     patente = ?, marca = ?, modelo = ?, color = ?, tipo_vehiculo = ?, carga_maxima_kg = ?,
-                    anio = ?, motor = ?, chasis = ?, titularidad = ?, titulo_automotor = ?, cedula_verde = ?,
+                    anio = ?, motor = ?, chasis = ?, titulo_dnrpa = ?, titularidad = ?, titulo_automotor = ?, cedula_verde = ?,
                     kilometraje_actual = ?, estado = ?, fecha_vtv = ?, fecha_seguro = ?, fecha_patente = ?,
                     km_proximo_service = ?, km_odometro_inicial = ?, ciclo_mantenimiento_preventivo_km = ?, observaciones = ?
                 WHERE id = ?
@@ -155,7 +157,7 @@ switch ($method) {
 
             $stmt->execute([
                 $patente, $marca, $modelo, $color, $tipo_vehiculo, $carga_maxima_kg,
-                $anio, $motor, $chasis, $titularidad, $titulo_automotor, $cedula_verde,
+                $anio, $motor, $chasis, $titulo_dnrpa, $titularidad, $titulo_automotor, $cedula_verde,
                 $kilometraje_actual, $estado, $fecha_vtv, $fecha_seguro, $fecha_patente,
                 $km_proximo_service, $km_odometro_inicial, $ciclo_mantenimiento_preventivo_km, $observaciones, $id
             ]);
