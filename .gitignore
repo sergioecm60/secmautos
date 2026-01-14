@@ -58,3 +58,6 @@ db/*.sql
 !db/install.sql
 !db/add_titulo_dnrpa.sql
 !db/migracion_importacion_vehiculos.sql
+!db/create_missing_tables.sql
+!db/create_talleres.sql
+!db/create_telepases.sql
