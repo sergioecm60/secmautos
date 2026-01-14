@@ -4,12 +4,11 @@ class AsignacionesView {
         this.apiVehiculos = 'api/vehiculos.php';
         this.apiEmpleados = 'api/empleados.php';
         this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        
-        this.init();
     }
 
-    init() {
-        this.cargarDatos();
+    async init() {
+        await this.cargarDatos();
+        this.initEventListeners();
     }
 
     async cargarDatos() {
