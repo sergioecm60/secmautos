@@ -34,6 +34,14 @@ check_vehiculos.php
 analizar_excel.py
 analisis_excel.json
 temp_analisis_excel*.py
+generar_json*.py
+eliminar_duplicados.py
+filtrar_patentes.py
+buscar_tractores.py
+
+# Archivos de importación
+*importar*.json
+vehiculos_*.json
 
 # Archivos de backup y cache
 *.sql.gz
