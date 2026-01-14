@@ -17,11 +17,13 @@ switch ($method) {
                     p.*,
                     v.patente, v.marca, v.modelo,
                     e.nombre as nombre_empleado, e.apellido as apellido_empleado,
-                    m.motivo as motivo_multa, m.acta_numero as numero_acta_multa
+                    m.motivo as motivo_multa, m.acta_numero as numero_acta_multa,
+                    t.numero_dispositivo as numero_dispositivo_telepase
                 FROM pagos p
                 JOIN vehiculos v ON p.vehiculo_id = v.id
                 LEFT JOIN empleados e ON p.empleado_id = e.id
                 LEFT JOIN multas m ON p.multa_id = m.id
+                LEFT JOIN telepases t ON p.telepase_id = t.id
             ";
 
             $params = [];
@@ -71,17 +73,19 @@ switch ($method) {
             $monto = (float)($_POST['monto'] ?? 0);
             $comprobante = sanitizar_input($_POST['comprobante'] ?? '');
             $observaciones = sanitizar_input($_POST['observaciones'] ?? '');
-            $pagado = isset($_POST['pagado']) ? 1 : 0;
+            $pagado = isset($_POST['pagado']) ?1 : 0;
+            $multa_id = !empty($_POST['multa_id']) ? (int)$_POST['multa_id'] : null;
+            $telepase_id = !empty($_POST['telepase_id']) ? (int)$_POST['telepase_id'] : null;
 
-            if (empty($vehiculo_id) || empty($tipo) || empty($fecha_vencimiento)) {
-                json_response(['success' => false, 'message' => 'Vehículo, tipo y fecha de vencimiento son obligatorios'], 400);
+            if (empty($vehiculo_id) || empty($tipo)) {
+                json_response(['success' => false, 'message' => 'Vehículo y tipo son obligatorios'], 400);
             }
 
             $stmt = $pdo->prepare("
-                INSERT INTO pagos (vehiculo_id, tipo, aseguradora, poliza_numero, fecha_inicio, fecha_vencimiento, fecha_pago, monto, comprobante, observaciones, pagado)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO pagos (vehiculo_id, tipo, aseguradora, poliza_numero, fecha_inicio, fecha_vencimiento, fecha_pago, monto, comprobante, observaciones, pagado, multa_id, telepase_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
-            $stmt->execute([$vehiculo_id, $tipo, $aseguradora, $poliza_numero, $fecha_inicio, $fecha_vencimiento, $fecha_pago, $monto, $comprobante, $observaciones, $pagado]);
+            $stmt->execute([$vehiculo_id, $tipo, $aseguradora, $poliza_numero, $fecha_inicio, $fecha_vencimiento, $fecha_pago, $monto, $comprobante, $observaciones, $pagado, $multa_id, $telepase_id]);
 
             registrarLog($_SESSION['usuario_id'], 'REGISTRAR_PAGO', 'pagos', "Pago registrado para vehículo $vehiculo_id", $pdo);
 

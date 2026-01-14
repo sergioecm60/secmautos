@@ -11,7 +11,7 @@ assets/img/uploads/
 vendor/
 
 # Archivos temporales
-tmpclaude-*/
+tmpclaude-*
 *.tmp
 *.temp
 *.log
@@ -39,3 +39,12 @@ temp_analisis_excel*.py
 *.sql.gz
 *.sql.bz2
 .cache/
+
+# Documentación y cambios de base de datos (local)
+docs/
+dbs/
+docs y dbs/
+
+# Backups de base de datos
+db/*.sql
+!db/install.sql

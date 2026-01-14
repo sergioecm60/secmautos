@@ -48,6 +48,7 @@ requiereAutenticacion();
                 <a href="#" class="nav-btn" data-module="telepases">🎫 Telepases</a>
                 <a href="#" class="nav-btn" data-module="reportes">📈 Reportes</a>
                 <a href="#" class="nav-btn" data-module="usuarios">👤 Usuarios</a>
+                <a href="#" class="nav-btn" data-module="logs">📋 Logs</a>
                 <a href="#" class="nav-btn" data-module="configuracion">⚙️ Configuración</a>
             </nav>
         </div>
@@ -88,6 +89,7 @@ requiereAutenticacion();
         <div id="module-reportes" class="module"></div>
         <div id="module-autorizaciones" class="module"></div>
         <div id="module-usuarios" class="module"></div>
+        <div id="module-logs" class="module"></div>
         <div id="module-configuracion" class="module"></div>
     </div>
 

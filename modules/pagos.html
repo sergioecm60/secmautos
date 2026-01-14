@@ -43,6 +43,16 @@
                 📦 Otros
             </button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-combustible-tab" data-tipo="combustible" onclick="filtrarPorTipo('combustible')">
+                ⛽ Combustible
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-telepase-tab" data-tipo="telepase" onclick="filtrarPorTipo('telepase')">
+                💳 Telepase
+            </button>
+        </li>
     </ul>
 
     <!-- Filtros adicionales -->
@@ -115,6 +125,8 @@
                                 <option value="vtv">🔍 VTV (Verificación Técnica)</option>
                                 <option value="multa">⚠️ Multa</option>
                                 <option value="servicios">🛠️ Servicios</option>
+                                <option value="combustible">⛽ Combustible</option>
+                                <option value="telepase">💳 Telepase</option>
                                 <option value="otro">📦 Otro</option>
                             </select>
                         </div>
@@ -219,6 +231,86 @@
                             <div class="col-md-6">
                                 <label class="form-label">Fecha Vencimiento *</label>
                                 <input type="date" class="form-control" name="fecha_vencimiento_multa">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campos específicos para COMBUSTIBLE -->
+                    <div id="campos-combustible" class="campos-tipo" style="display: none;">
+                        <hr class="my-3">
+                        <h6 class="text-primary">⛽ Datos de Combustible</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Estación</label>
+                                <input type="text" class="form-control" name="estacion_combustible" placeholder="Ej: YPF, Shell, Axion">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Número de Comprobante</label>
+                                <input type="text" class="form-control" name="comprobante_combustible" placeholder="Ej: A-001234">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Tipo de Combustible</label>
+                                <select class="form-select" name="tipo_combustible">
+                                    <option value="Nafta">Nafta</option>
+                                    <option value="Nafta Super">Nafta Super</option>
+                                    <option value="Nafta Premium">Nafta Premium</option>
+                                    <option value="Diesel">Diesel</option>
+                                    <option value="Diesel Premium">Diesel Premium</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Litros</label>
+                                <input type="number" step="0.01" class="form-control" name="litros_combustible" placeholder="0.00">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Precio por Litro ($)</label>
+                                <input type="number" step="0.01" class="form-control" name="precio_litro_combustible" placeholder="0.00">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Odómetro (km)</label>
+                                <input type="number" class="form-control" name="odometro_combustible" placeholder="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campos específicos PARA TELEPASE -->
+                    <div id="campos-telepase" class="campos-tipo" style="display: none;">
+                        <hr class="my-3">
+                        <h6 class="text-primary">💳 Datos de Telepase</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Número de Dispositivo</label>
+                                <select class="form-select" name="dispositivo_telepase" id="select-telepase">
+                                    <option value="">Seleccionar dispositivo...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Concesionario</label>
+                                <input type="text" class="form-control" name="concesionario_telepase" placeholder="Ej: AUSA, Autopista Central">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Periodo</label>
+                                <input type="month" class="form-control" name="periodo_telepase">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Número de Comprobante</label>
+                                <input type="text" class="form-control" name="comprobante_telepase" placeholder="Ej: REC-001-2025">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Fecha Vencimiento *</label>
+                                <input type="date" class="form-control" name="fecha_vencimiento_telepase">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Fecha Vencimiento Recargo</label>
+                                <input type="date" class="form-control" name="fecha_recargo_telepase">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Estado</label>
+                                <select class="form-select" name="estado_telepase">
+                                    <option value="pendiente">Pendiente</option>
+                                    <option value="pagado">Pagado</option>
+                                    <option value="vencido">Vencido</option>
+                                </select>
                             </div>
                         </div>
                     </div>

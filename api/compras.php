@@ -123,6 +123,34 @@ switch ($method) {
         }
         break;
 
+    case 'DELETE':
+        parse_str(file_get_contents('php://input'), $_DELETE);
+
+        if (!verificar_csrf($_DELETE['csrf_token'] ?? '')) {
+            json_response(['success' => false, 'message' => 'Token CSRF inválido'], 403);
+        }
+
+        try {
+            $id = (int)($_DELETE['id'] ?? 0);
+
+            if (empty($id)) {
+                json_response(['success' => false, 'message' => 'ID de compra requerido'], 400);
+            }
+
+            $stmt = $pdo->prepare("DELETE FROM compras WHERE id = ?");
+            $stmt->execute([$id]);
+
+            if ($stmt->rowCount() > 0) {
+                registrarLog($_SESSION['usuario_id'], 'ELIMINAR_COMPRA', 'compras', "Compra eliminada (ID: $id)", $pdo);
+                json_response(['success' => true, 'message' => 'Compra eliminada exitosamente']);
+            } else {
+                json_response(['success' => false, 'message' => 'Compra no encontrada'], 404);
+            }
+        } catch (PDOException $e) {
+            json_response(['success' => false, 'message' => 'Error al eliminar compra: ' . $e->getMessage()], 500);
+        }
+        break;
+
     default:
         json_response(['success' => false, 'message' => 'Método no permitido'], 405);
         break;

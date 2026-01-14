@@ -1,6 +1,12 @@
 <?php
 require_once __DIR__ . '/../bootstrap.php';
 
+// Constantes de seguridad
+define('MAX_INTENTOS_USUARIO', 5);
+define('BLOQUEO_USUARIO_MINUTOS', 15);
+define('MAX_INTENTOS_IP', 10);
+define('BLOQUEO_IP_MINUTOS', 30);
+
 function loginUsuario($username, $password, $captcha, $pdo) {
     if (!isset($_SESSION['captcha']) || strval($_SESSION['captcha']) !== strval($captcha)) {
         unset($_SESSION['captcha']);

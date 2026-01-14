@@ -161,6 +161,30 @@ function renderTablaPagos(pagos) {
                     detalle += ' • ' + p.motivo_multa.substring(0, 50);
                 }
                 break;
+            case 'combustible':
+                const estacion = p.observaciones && p.observaciones.includes('Estación:') 
+                    ? p.observaciones.match(/Estación: ([^-]+)/)?.[1]?.trim() 
+                    : p.comprobante || '-';
+                const litros = p.observaciones && p.observaciones.includes('Litros:')
+                    ? p.observaciones.match(/Litros: ([^-]+)/)?.[1]?.trim()
+                    : '';
+                const tipoComb = p.observaciones && p.observaciones.includes('Tipo:')
+                    ? p.observaciones.match(/Tipo: ([^-]+)/)?.[1]?.trim()
+                    : '';
+                detalle = estacion !== '-' ? 'Estación: ' + estacion : 'Combustible';
+                if (litros) detalle += ' • ' + litros + 'L';
+                if (tipoComb) detalle += ' • ' + tipoComb;
+                break;
+            case 'telepase':
+                const dispositivo = p.observaciones && p.observaciones.includes('Dispositivo:')
+                    ? p.observaciones.match(/Dispositivo: ([^-]+)/)?.[1]?.trim()
+                    : p.comprobante || '-';
+                const periodo = p.observaciones && p.observaciones.includes('Periodo:')
+                    ? p.observaciones.match(/Periodo: ([^-]+)/)?.[1]?.trim()
+                    : '';
+                detalle = dispositivo !== '-' ? 'Dispositivo: ' + dispositivo : 'Telepase';
+                if (periodo) detalle += ' • ' + periodo;
+                break;
             case 'servicios':
             case 'otro':
                 detalle = p.observaciones || p.comprobante || '-';
@@ -206,6 +230,8 @@ function getTipoPagoBadge(tipo) {
         'vtv': '<span class="badge bg-success">🔍 VTV</span>',
         'multa': '<span class="badge bg-danger">⚠️ Multa</span>',
         'servicios': '<span class="badge bg-warning">🛠️ Servicios</span>',
+        'combustible': '<span class="badge bg-warning">⛽ Combustible</span>',
+        'telepase': '<span class="badge bg-info">💳 Telepase</span>',
         'otro': '<span class="badge bg-secondary">📦 Otro</span>'
     };
     return badges[tipo] || tipo;
@@ -251,6 +277,13 @@ function toggleCamposPorTipo() {
             document.getElementById('campos-multa').style.display = 'block';
             cargarSelectMultas();
             break;
+        case 'combustible':
+            document.getElementById('campos-combustible').style.display = 'block';
+            break;
+        case 'telepase':
+            document.getElementById('campos-telepase').style.display = 'block';
+            cargarSelectTelepases();
+            break;
         case 'servicios':
         case 'otro':
             document.getElementById('campos-general').style.display = 'block';
@@ -268,6 +301,37 @@ function cargarSelectMultas() {
             select.innerHTML += `<option value="${m.id}">${m.patente} - ${m.motivo.substring(0, 50)} - $${m.monto}</option>`;
         }
     });
+}
+
+// Cargar dispositivos de telepase en el select
+async function cargarSelectTelepases() {
+    const select = document.getElementById('select-telepase');
+    const vehiculoId = document.getElementById('pago-vehiculo').value;
+    
+    select.innerHTML = '<option value="">Seleccionar dispositivo...</option>';
+    
+    if (!vehiculoId) {
+        select.innerHTML += '<option value="">Primero seleccione un vehículo</option>';
+        return;
+    }
+    
+    try {
+        const res = await fetch(`api/telepases.php?vehiculo_id=${vehiculoId}`);
+        const data = await res.json();
+        
+        if (data.success && data.data.length > 0) {
+            data.data.forEach(t => {
+                if (t.estado === 'habilitado') {
+                    select.innerHTML += `<option value="${t.id}" data-numero="${t.numero_dispositivo}">${t.numero_dispositivo} (${t.estado})</option>`;
+                }
+            });
+        } else {
+            select.innerHTML += '<option value="">No hay dispositivos habilitados para este vehículo</option>';
+        }
+    } catch (error) {
+        console.error('Error cargando telepases:', error);
+        select.innerHTML += '<option value="">Error al cargar dispositivos</option>';
+    }
 }
 
 // Toggle fecha de pago
@@ -329,6 +393,12 @@ async function guardarPago() {
         case 'multa':
             fechaVencimiento = formData.get('fecha_vencimiento_multa');
             break;
+        case 'combustible':
+            fechaVencimiento = new Date().toISOString().split('T')[0]; // Fecha actual
+            break;
+        case 'telepase':
+            fechaVencimiento = formData.get('fecha_vencimiento_telepase');
+            break;
         case 'servicios':
         case 'otro':
             fechaVencimiento = formData.get('fecha_vencimiento_general');
@@ -380,6 +450,29 @@ async function guardarPago() {
             if (numeroActa) {
                 observaciones = `Acta: ${numeroActa}. ${observaciones}`;
             }
+            break;
+        case 'combustible':
+            const estacion = formData.get('estacion_combustible') || 'N/A';
+            const comprobanteCombustible = formData.get('comprobante_combustible') || 'N/A';
+            const tipoCombustible = formData.get('tipo_combustible') || 'N/A';
+            const litros = formData.get('litros_combustible') || 'N/A';
+            const precioLitro = formData.get('precio_litro_combustible') || 'N/A';
+            const odometroCombustible = formData.get('odometro_combustible') || 'N/A';
+            observaciones = `Estación: ${estacion}. Tipo: ${tipoCombustible}. Litros: ${litros}. Precio/L: $${precioLitro}. Odómetro: ${odometroCombustible}km. Comprobante: ${comprobanteCombustible}. ${observaciones}`;
+            finalFormData.append('comprobante', comprobanteCombustible);
+            break;
+        case 'telepase':
+            const dispositivoId = formData.get('dispositivo_telepase');
+            if (dispositivoId) {
+                finalFormData.append('telepase_id', dispositivoId);
+                // Obtener número de dispositivo del option seleccionado
+                const selectDispositivo = document.getElementById('select-telepase');
+                const selectedOption = selectDispositivo.options[selectDispositivo.selectedIndex];
+                const numeroDispositivo = selectedOption.getAttribute('data-numero') || 'N/A';
+                observaciones = `Dispositivo: ${numeroDispositivo}. ${observaciones}`;
+            }
+            finalFormData.append('concesionario', formData.get('concesionario_telepase') || '');
+            observaciones += ` Periodo: ${formData.get('periodo_telepase') || 'N/A'}.`;
             break;
         case 'servicios':
         case 'otro':
@@ -519,5 +612,16 @@ setTimeout(() => {
         cargarVehiculos();
         cargarMultas();
         cargarPagos();
+        
+        // Agregar event listener al select de vehículo
+        const vehiculoSelect = document.getElementById('pago-vehiculo');
+        if (vehiculoSelect) {
+            vehiculoSelect.addEventListener('change', () => {
+                const tipo = document.getElementById('pago-tipo').value;
+                if (tipo === 'telepase') {
+                    cargarSelectTelepases();
+                }
+            });
+        }
     }
 }, 100);

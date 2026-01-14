@@ -40,8 +40,8 @@ switch ($method) {
         $nombre = sanitizar_input($_POST['nombre'] ?? '');
         $apellido = sanitizar_input($_POST['apellido'] ?? '');
         $email = sanitizar_input($_POST['email'] ?? '');
-        $password = sanitizar_input($_POST['password'] ?? '');
-        $activo = isset($_POST['activo']) ?1 : 0;
+        $password = $_POST['password'] ?? ''; // NO sanitizar contraseñas
+        $activo = isset($_POST['activo']) ? 1 : 0;
 
         if (empty($username) || empty($password)) {
             json_response(['success' => false, 'message' => 'Usuario y contraseña son obligatorios'], 400);
@@ -105,9 +105,10 @@ switch ($method) {
         $nombre = sanitizar_input($data['nombre'] ?? '');
         $apellido = sanitizar_input($data['apellido'] ?? '');
         $email = sanitizar_input($data['email'] ?? '');
+        $rol = sanitizar_input($data['rol'] ?? 'user');
         $activo = isset($data['activo']) ? 1 : 0;
-        $cambiar_password = !empty(trim($data['password'] ?? ''));
-        $password = sanitizar_input($data['password'] ?? '');
+        $password = $data['password'] ?? ''; // NO sanitizar contraseñas
+        $cambiar_password = !empty(trim($password));
 
         if (empty($id) || empty($username)) {
             json_response(['success' => false, 'message' => 'El usuario es obligatorio'], 400);
@@ -123,6 +124,13 @@ switch ($method) {
         // Si se proporciona email, validarlo
         if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             json_response(['success' => false, 'message' => 'Email inválido'], 400);
+            return;
+        }
+
+        // Validar rol
+        $roles_validos = ['superadmin', 'admin', 'user'];
+        if (!in_array($rol, $roles_validos)) {
+            json_response(['success' => false, 'message' => 'Rol inválido'], 400);
             return;
         }
 
@@ -147,11 +155,11 @@ switch ($method) {
 
             if ($cambiar_password) {
                 $password_hash = password_hash($password, PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare("UPDATE usuarios SET username = ?, nombre = ?, apellido = ?, email = ?, activo = ?, password_hash = ? WHERE id = ?");
-                $stmt->execute([$username, $nombre, $apellido, $email ?: null, $activo, $password_hash, $id]);
+                $stmt = $pdo->prepare("UPDATE usuarios SET username = ?, nombre = ?, apellido = ?, email = ?, rol = ?, activo = ?, password_hash = ? WHERE id = ?");
+                $stmt->execute([$username, $nombre, $apellido, $email ?: null, $rol, $activo, $password_hash, $id]);
             } else {
-                $stmt = $pdo->prepare("UPDATE usuarios SET username = ?, nombre = ?, apellido = ?, email = ?, activo = ? WHERE id = ?");
-                $stmt->execute([$username, $nombre, $apellido, $email ?: null, $activo, $id]);
+                $stmt = $pdo->prepare("UPDATE usuarios SET username = ?, nombre = ?, apellido = ?, email = ?, rol = ?, activo = ? WHERE id = ?");
+                $stmt->execute([$username, $nombre, $apellido, $email ?: null, $rol, $activo, $id]);
             }
 
             registrarLog($_SESSION['usuario_id'], 'EDITAR_USUARIO', 'USUARIOS', "Usuario editado: ID $id", $pdo);

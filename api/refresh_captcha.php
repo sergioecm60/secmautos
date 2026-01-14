@@ -3,7 +3,6 @@ require_once __DIR__ . '/../bootstrap.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
-$captcha = generar_captcha();
+$captcha_data = generar_captcha();
 
-echo json_encode($captcha);
-exit;
+json_response($captcha_data);

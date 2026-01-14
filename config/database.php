@@ -4,12 +4,12 @@ date_default_timezone_set('America/Argentina/Buenos_Aires');
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
-ini_set('error_log', __DIR__ . '/logs/php_errors.log');
+ini_set('error_log', __DIR__ . '/../logs/php_errors.log');
 
 $host = getenv('DB_HOST') ?: 'localhost';
 $dbname = getenv('DB_NAME') ?: 'secmautos';
-$user = getenv('DB_USER') ?: 'root';
-$pass = getenv('DB_PASS') ?: '';
+$user = getenv('DB_USER') ?: 'secmautos';
+$pass = getenv('DB_PASS') ?: '15362478Pvyt..';
 $charset = getenv('DB_CHARSET') ?: 'utf8mb4';
 
 $dsn = "mysql:host={$host};dbname={$dbname};charset={$charset}";
@@ -26,26 +26,4 @@ try {
     error_log("Error de conexión a la base de datos: " . $e->getMessage());
     http_response_code(503);
     die("Error de conexión con la base de datos. Por favor, intente más tarde.");
-}
-
-function json_response($data, $status = 200) {
-    http_response_code($status);
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    exit;
-}
-
-function sanitizar_input($data) {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
-    return $data;
-}
-
-function sanitizeId($id) {
-    $id = (int)$id;
-    if ($id <= 0) {
-        return null;
-    }
-    return $id;
 }

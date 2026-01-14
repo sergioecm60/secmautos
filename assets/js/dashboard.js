@@ -48,24 +48,69 @@ function renderStats(data) {
     const container = document.getElementById('stats-grid');
     if (!data.success) return;
 
+    const d = data.data;
+
     const stats = [
-        { label: 'Total Vehículos', value: data.data.total_vehiculos, icon: '🚗' },
-        { label: 'Disponibles', value: data.data.disponibles, icon: '✅' },
-        { label: 'Asignados', value: data.data.asignados, icon: '🔄' },
-        { label: 'En Mantenimiento', value: data.data.mantenimiento, icon: '🔧' },
-        { label: 'Total Empleados', value: data.data.total_empleados, icon: '👥' },
-        { label: 'Alertas Activas', value: data.data.alertas_activas, icon: '⚠️' },
-        { label: 'Multas Pendientes', value: data.data.multas_pendientes, icon: '💰' },
-        { label: 'Mantenimientos Programados', value: data.data.mantenimientos_programados, icon: '📅' }
+        { label: 'Total Vehículos', value: d.total_vehiculos, icon: '🚗' },
+        { label: 'Disponibles', value: d.disponibles, icon: '✅' },
+        { label: 'Asignados', value: d.asignados, icon: '🔄' },
+        { label: 'En Mantenimiento', value: d.mantenimiento, icon: '🔧' },
+        { label: 'Total Empleados', value: d.total_empleados, icon: '👥' },
+        { label: 'Alertas Activas', value: d.alertas_activas, icon: '⚠️' },
+        { label: 'Multas Pendientes', value: d.multas_pendientes, icon: '💰' },
+        { label: 'Mantenimientos Programados', value: d.mantenimientos_programados, icon: '📅' }
     ];
 
-    container.innerHTML = stats.map(stat => `
-        <div class="stat-card">
-            <div style="font-size: 2em;">${stat.icon}</div>
-            <h4>${stat.value}</h4>
-            <p>${stat.label}</p>
-        </div>
-    `).join('');
+    // Estadísticas de pagos por tipo
+    const pagoStats = [
+        { label: 'Patentes', cantidad: d.pagos_patente_pendientes || 0, monto: d.pagos_patente_monto || 0, icon: '🏛️' },
+        { label: 'Seguros', cantidad: d.pagos_seguro_pendientes || 0, monto: d.pagos_seguro_monto || 0, icon: '🛡️' },
+        { label: 'VTV', cantidad: d.pagos_vtv_pendientes || 0, monto: d.pagos_vtv_monto || 0, icon: '🔍' },
+        { label: 'Multas', cantidad: d.pagos_multa_pendientes || 0, monto: d.pagos_multa_monto || 0, icon: '⚠️' },
+        { label: 'Telepases', cantidad: d.telepases_pendientes || 0, monto: d.telepases_monto || 0, icon: '🎫' },
+        { label: 'Servicios', cantidad: d.pagos_servicios_pendientes || 0, monto: d.pagos_servicios_monto || 0, icon: '🛠️' },
+        { label: 'Otros', cantidad: d.pagos_otro_pendientes || 0, monto: d.pagos_otro_monto || 0, icon: '📦' }
+    ];
+
+    const formatMonto = (monto) => {
+        return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(monto);
+    };
+
+    let html = `
+        ${stats.map(stat => `
+            <div class="stat-card">
+                <div style="font-size: 2em;">${stat.icon}</div>
+                <h4>${stat.value}</h4>
+                <p>${stat.label}</p>
+            </div>
+        `).join('')}
+    `;
+
+    // Solo mostrar sección de pagos si hay pagos pendientes
+    const totalPagos = d.total_pagos_pendientes || 0;
+    if (totalPagos > 0) {
+        html += `
+            <div style="grid-column: 1 / -1; margin-top: 25px; margin-bottom: 15px; padding-top: 20px; border-top: 2px solid var(--border-color);">
+                <h4 style="margin: 0;">💰 Pagos Pendientes por Tipo</h4>
+            </div>
+            ${pagoStats.filter(p => p.cantidad > 0).map(pago => `
+                <div class="stat-card" style="background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%); border-left: 4px solid var(--primary-color);">
+                    <div style="font-size: 2em;">${pago.icon}</div>
+                    <h4>${pago.cantidad}</h4>
+                    <p>${pago.label}</p>
+                    <small style="color: var(--text-secondary); font-weight: 600;">${formatMonto(pago.monto)}</small>
+                </div>
+            `).join('')}
+            <div class="stat-card" style="background: linear-gradient(135deg, #fff5f5 0%, #ffe6e6 100%); border: 2px solid #e74c3c;">
+                <div style="font-size: 2em;">💸</div>
+                <h4>${totalPagos}</h4>
+                <p>Total Pendiente</p>
+                <strong style="color: #e74c3c; font-size: 1.1em;">${formatMonto(d.total_monto_pendiente || 0)}</strong>
+            </div>
+        `;
+    }
+
+    container.innerHTML = html;
 }
 
 function renderAlertas(data) {
@@ -197,6 +242,9 @@ function cargarModulo(modulo) {
             break;
         case 'usuarios':
             cargarUsuarios();
+            break;
+        case 'logs':
+            cargarLogsModule();
             break;
         case 'configuracion':
             cargarConfiguracion();
@@ -725,4 +773,22 @@ function nuevoTelepase() {
             alert('❌ Error: El módulo de telepases aún no está completamente cargado. Por favor espera unos segundos e intenta nuevamente.');
         }
     }, 500);
+}
+
+// Función para cargar el módulo de logs
+function cargarLogsModule() {
+    const container = document.getElementById('module-logs');
+
+    fetch('modules/logs.html')
+        .then(r => r.text())
+        .then(html => {
+            container.innerHTML = html;
+
+            if (!document.querySelector('script[src="assets/js/logs.js"]')) {
+                const script = document.createElement('script');
+                script.src = 'assets/js/logs.js';
+                document.body.appendChild(script);
+            }
+        })
+        .catch(error => console.error('Error al cargar logs:', error));
 }

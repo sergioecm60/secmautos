@@ -129,6 +129,50 @@ switch ($method) {
         }
         break;
 
+    case 'DELETE':
+        parse_str(file_get_contents('php://input'), $_DELETE);
+
+        if (!verificar_csrf($_DELETE['csrf_token'] ?? '')) {
+            json_response(['success' => false, 'message' => 'Token CSRF inválido'], 403);
+        }
+
+        try {
+            $id = (int)($_DELETE['id'] ?? 0);
+
+            if (empty($id)) {
+                json_response(['success' => false, 'message' => 'ID de venta requerido'], 400);
+            }
+
+            $pdo->beginTransaction();
+
+            // Obtener el vehiculo_id antes de eliminar
+            $stmt = $pdo->prepare("SELECT vehiculo_id FROM ventas WHERE id = ?");
+            $stmt->execute([$id]);
+            $venta = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$venta) {
+                $pdo->rollBack();
+                json_response(['success' => false, 'message' => 'Venta no encontrada'], 404);
+            }
+
+            // Eliminar la venta
+            $stmt = $pdo->prepare("DELETE FROM ventas WHERE id = ?");
+            $stmt->execute([$id]);
+
+            // Reactivar el vehículo (quitar la baja)
+            $stmt = $pdo->prepare("UPDATE vehiculos SET estado = 'activo', fecha_baja = NULL WHERE id = ?");
+            $stmt->execute([$venta['vehiculo_id']]);
+
+            $pdo->commit();
+
+            registrarLog($_SESSION['usuario_id'], 'ELIMINAR_VENTA', 'ventas', "Venta eliminada (ID: $id) y vehículo reactivado", $pdo);
+            json_response(['success' => true, 'message' => 'Venta eliminada exitosamente. Vehículo reactivado.']);
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            json_response(['success' => false, 'message' => 'Error al eliminar venta: ' . $e->getMessage()], 500);
+        }
+        break;
+
     default:
         json_response(['success' => false, 'message' => 'Método no permitido'], 405);
         break;

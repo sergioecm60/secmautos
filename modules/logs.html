@@ -1,0 +1,91 @@
+<div class="card">
+    <h3>📋 Registro de Actividad del Sistema</h3>
+
+    <div class="form-grid" style="margin-bottom: 20px;">
+        <div class="form-group">
+            <label for="filtroUsuario">Usuario</label>
+            <select id="filtroUsuario" class="form-control">
+                <option value="">Todos los usuarios</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="filtroAccion">Acción</label>
+            <select id="filtroAccion" class="form-control">
+                <option value="">Todas las acciones</option>
+                <option value="LOGIN_EXITOSO">Login Exitoso</option>
+                <option value="LOGIN_FALLIDO">Login Fallido</option>
+                <option value="LOGOUT">Logout</option>
+                <option value="CREAR_USUARIO">Crear Usuario</option>
+                <option value="EDITAR_USUARIO">Editar Usuario</option>
+                <option value="ELIMINAR_USUARIO">Eliminar Usuario</option>
+                <option value="CREAR_VEHICULO">Crear Vehículo</option>
+                <option value="EDITAR_VEHICULO">Editar Vehículo</option>
+                <option value="ELIMINAR_VEHICULO">Eliminar Vehículo</option>
+                <option value="REGISTRAR_MANTENIMIENTO">Registrar Mantenimiento</option>
+                <option value="REGISTRAR_MULTA">Registrar Multa</option>
+                <option value="REGISTRAR_PAGO">Registrar Pago</option>
+                <option value="REGISTRAR_COMPRA">Registrar Compra</option>
+                <option value="REGISTRAR_VENTA">Registrar Venta</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="filtroEntidad">Módulo</label>
+            <select id="filtroEntidad" class="form-control">
+                <option value="">Todos los módulos</option>
+                <option value="AUTH">Autenticación</option>
+                <option value="USUARIOS">Usuarios</option>
+                <option value="VEHICULOS">Vehículos</option>
+                <option value="MANTENIMIENTOS">Mantenimientos</option>
+                <option value="MULTAS">Multas</option>
+                <option value="PAGOS">Pagos</option>
+                <option value="compras">Compras</option>
+                <option value="ventas">Ventas</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="filtroFechaDesde">Desde</label>
+            <input type="date" id="filtroFechaDesde" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label for="filtroFechaHasta">Hasta</label>
+            <input type="date" id="filtroFechaHasta" class="form-control">
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: flex-end;">
+            <button type="button" class="btn btn-primary" onclick="aplicarFiltrosLogs()">🔍 Filtrar</button>
+            <button type="button" class="btn btn-secondary" onclick="limpiarFiltrosLogs()" style="margin-left: 10px;">🔄 Limpiar</button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Fecha/Hora</th>
+                    <th>Usuario</th>
+                    <th>Acción</th>
+                    <th>Módulo</th>
+                    <th>Detalles</th>
+                    <th>IP</th>
+                </tr>
+            </thead>
+            <tbody id="logsTableBody">
+                <tr>
+                    <td colspan="7" style="text-align: center;">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                            <p>Cargando logs...</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="paginacionLogs" class="pagination-container" style="margin-top: 20px; text-align: center;"></div>
+</div>
