@@ -56,3 +56,5 @@ docs y dbs/
 # Backups de base de datos
 db/*.sql
 !db/install.sql
+!db/add_titulo_dnrpa.sql
+!db/migracion_importacion_vehiculos.sql
