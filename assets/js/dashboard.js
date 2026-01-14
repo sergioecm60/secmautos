@@ -779,6 +779,13 @@ function nuevoTelepase() {
 function cargarLogsModule() {
     const container = document.getElementById('module-logs');
 
+    if (container.innerHTML.trim() !== '' && !container.innerHTML.includes('en construcción')) {
+        if (window.initLogs) {
+            window.initLogs();
+        }
+        return;
+    }
+
     fetch('modules/logs.html')
         .then(r => r.text())
         .then(html => {
@@ -787,6 +794,11 @@ function cargarLogsModule() {
             if (!document.querySelector('script[src="assets/js/logs.js"]')) {
                 const script = document.createElement('script');
                 script.src = 'assets/js/logs.js';
+                script.onload = () => {
+                    if (window.initLogs) {
+                        window.initLogs();
+                    }
+                };
                 document.body.appendChild(script);
             }
         })

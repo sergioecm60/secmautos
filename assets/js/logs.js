@@ -9,6 +9,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+function initLogs() {
+    if (document.getElementById('logsTableBody')) {
+        cargarUsuariosParaFiltro();
+        cargarLogs();
+    }
+}
+
+window.initLogs = initLogs;
+
 function cargarUsuariosParaFiltro() {
     fetch('api/usuarios.php')
         .then(response => response.json())
