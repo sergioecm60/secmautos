@@ -63,6 +63,7 @@ class AsignacionesView {
         document.getElementById('asignacion-empleado').value = asignacion.empleado_id;
         document.getElementById('asignacion-km_salida').value = asignacion.km_salida;
         document.getElementById('asignacion-observaciones').value = asignacion.observaciones || '';
+        document.getElementById('asignacion-csrf').value = this.csrfToken;
 
         document.getElementById('modal-asignacion-title').textContent = 'Editar Asignación';
 
@@ -148,6 +149,7 @@ class AsignacionesView {
     abrirModalAsignacion() {
         document.getElementById('form-asignacion').reset();
         document.getElementById('asignacion-id').value = '';
+        document.getElementById('asignacion-csrf').value = this.csrfToken;
         document.getElementById('modal-asignacion-title').textContent = 'Nueva Asignación';
 
         const modalElement = document.getElementById('modalAsignacion');
@@ -159,7 +161,8 @@ class AsignacionesView {
         const vehiculo = this.vehiculosDisponibles.find(v => v.id == vehiculoId);
         const kmInput = document.getElementById('asignacion-km_salida');
         if (vehiculo) {
-            kmInput.value = vehiculo.kilometraje_actual;
+            kmInput.value = vehiculo.kilometraje_actual || 0;
+            console.log('Vehículo seleccionado:', vehiculo.patente, '- KM:', vehiculo.kilometraje_actual);
         } else {
             kmInput.value = '';
         }
@@ -175,9 +178,19 @@ class AsignacionesView {
             return;
         }
 
+        const data = {
+            vehiculo_id: formData.get('vehiculo_id'),
+            empleado_id: formData.get('empleado_id'),
+            km_salida: formData.get('km_salida'),
+            observaciones: formData.get('observaciones'),
+            csrf_token: formData.get('csrf_token') || this.csrfToken
+        };
+
+        console.log('Datos a enviar:', data);
+
         try {
             const method = id ? 'PUT' : 'POST';
-            const response = await this.fetchData(this.apiAsignaciones, method, formData);
+            const response = await this.fetchData(this.apiAsignaciones, method, new URLSearchParams(data));
             if (response.success) {
                 this.mostrarExito(id ? 'Asignación actualizada correctamente.' : 'Asignación creada correctamente.');
                 bootstrap.Modal.getInstance(document.getElementById('modalAsignacion')).hide();
