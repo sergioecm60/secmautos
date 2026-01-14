@@ -12,7 +12,7 @@
             <input type="text" class="form-control" id="filtro-asignacion-patente" placeholder="Buscar por patente">
         </div>
         <div class="col-md-4">
-            <input type="text" class="form-control" id="filtro-asignacion-empleado" placeholder="Buscar por empleado">
+            <input type="text" class="form-control" id="filtro-asignacion-empleado" placeholder="Buscar por conductor">
         </div>
         <div class="col-md-2">
             <button class="btn btn-secondary w-100" id="btn-filtrar-asignaciones">Filtrar</button>
@@ -26,7 +26,7 @@
             <thead>
                 <tr>
                     <th>Vehículo (Patente)</th>
-                    <th>Empleado</th>
+                    <th>Conductor</th>
                     <th>Fecha Salida</th>
                     <th>Km Salida</th>
                     <th>Observaciones</th>
@@ -35,6 +35,24 @@
             </thead>
             <tbody>
                 <!-- Filas se insertarán dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Tabla de Historial de Asignaciones -->
+    <div class="table-responsive mt-5">
+        <h4 class="mb-3">Historial de Asignaciones</h4>
+        <table class="table table-sm table-bordered" id="tabla-historial-asignaciones">
+            <thead>
+                <tr>
+                    <th>Vehículo</th>
+                    <th>Conductor</th>
+                    <th>Período</th>
+                    <th>Recorrido</th>
+                </tr>
+            </thead>
+            <tbody>
+                 <!-- Filas se insertarán dinámicamente -->
             </tbody>
         </table>
     </div>
@@ -78,7 +96,7 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="asignacion-empleado" class="form-label">Empleado</label>
+                        <label for="asignacion-empleado" class="form-label">Conductor</label>
                         <select class="form-select" id="asignacion-empleado" name="empleado_id" required>
                             <!-- Opciones se cargarán dinámicamente -->
                         </select>

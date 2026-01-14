@@ -9,11 +9,11 @@
     <!-- Filtros -->
     <div class="row g-2 mb-3">
         <div class="col-md-3">
-            <input type="text" class="form-control" id="filtro-multa-patente" placeholder="Buscar por patente">
+            <input type="text" class="form-control" id="filtro-multa-patente" placeholder="Buscar por conductor">
         </div>
         <div class="col-md-3">
             <select class="form-select" id="filtro-multa-estado">
-                <option value="">Todos los estados</option>
+                <option value="">Todos lados</option>
                 <option value="pendiente">Pendiente</option>
                 <option value="pagada">Pagada</option>
             </select>
@@ -30,7 +30,7 @@
                 <tr>
                     <th>Fecha</th>
                     <th>Vehículo (Patente)</th>
-                    <th>Empleado Responsable</th>
+                    <th>Conductor Responsable</th>
                     <th>Motivo</th>
                     <th>Monto</th>
                     <th>Estado</th>
@@ -68,7 +68,7 @@
                             <input type="datetime-local" class="form-control" id="multa-fecha" name="fecha_multa" required>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Empleado Asignado en ese momento</label>
+                            <label for="multa-empleado-info" class="form-label">Conductor Asignado en ese momento</label>
                             <p id="multa-empleado-info" class="form-control-plaintext">Seleccione vehículo y fecha para ver al responsable.</p>
                             <input type="hidden" id="multa-empleado-id" name="empleado_id">
                         </div>

@@ -149,7 +149,7 @@ class AutorizacionesView {
         const selectVehiculo = document.getElementById('autorizacion-vehiculo');
 
         if (selectEmpleado) {
-            selectEmpleado.innerHTML = '<option value="">Seleccionar empleado</option>' +
+            selectEmpleado.innerHTML = '<option value="">Seleccionar conductor</option>' +
                 this.data.empleados.map(e =>
                     `<option value="${e.id}">${e.apellido}, ${e.nombre} (DNI: ${e.dni || 'N/A'})</option>`
                 ).join('');

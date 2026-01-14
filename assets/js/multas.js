@@ -39,9 +39,9 @@ class MultasView {
         document.getElementById('btn-nueva-multa').addEventListener('click', () => this.abrirModalMulta());
         document.getElementById('btn-guardar-multa').addEventListener('click', () => this.guardarMulta());
         
-        // Autocompletar empleado al cambiar vehiculo o fecha
-        document.getElementById('multa-vehiculo').addEventListener('change', () => this.buscarEmpleadoResponsable());
-        document.getElementById('multa-fecha').addEventListener('change', () => this.buscarEmpleadoResponsable());
+        // Autocompletar conductor al cambiar vehículo o fecha
+        document.getElementById('multa-vehiculo').addEventListener('change', () => this.buscarConductorResponsable());
+        document.getElementById('multa-fecha').addEventListener('change', () => this.buscarConductorResponsable());
 
         // Delegación de eventos para botones de la tabla
         document.getElementById('tabla-multas').addEventListener('click', (e) => {
@@ -102,7 +102,7 @@ class MultasView {
         this.modal.show();
     }
 
-    async buscarEmpleadoResponsable() {
+    async buscarConductorResponsable() {
         const vehiculoId = document.getElementById('multa-vehiculo').value;
         const fecha = document.getElementById('multa-fecha').value;
         const infoP = document.getElementById('multa-empleado-info');
@@ -117,7 +117,7 @@ class MultasView {
         try {
             const url = `${this.apiAsignaciones}?vehiculo_id=${vehiculoId}&fecha=${fecha}`;
             const res = await this.fetchData(url);
-            
+
             if (res.success && res.data) {
                 infoP.textContent = `${res.data.nombre_empleado} (DNI: ${res.data.dni_empleado})`;
                 empleadoIdInput.value = res.data.empleado_id;
@@ -181,7 +181,7 @@ class MultasView {
                 document.getElementById('multa-empleado-id').value = multa.empleado_id || '';
                 
                 if (multa.empleado_id) {
-                    document.getElementById('multa-empleado-info').textContent = 'Empleado asignado en el registro original.';
+                    document.getElementById('multa-empleado-info').textContent = 'Conductor asignado en el registro original.';
                 }
                 
                 if (multa.pagada == 1) {

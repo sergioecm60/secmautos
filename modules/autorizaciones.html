@@ -12,7 +12,7 @@
 
     <div class="row g-2 mb-3">
         <div class="col-md-4">
-            <input type="text" class="form-control" id="filtro-autorizacion-empleado" placeholder="Buscar por empleado">
+            <input type="text" class="form-control" id="filtro-autorizacion-empleado" placeholder="Buscar por conductor">
         </div>
         <div class="col-md-4">
             <input type="text" class="form-control" id="filtro-autorizacion-patente" placeholder="Buscar por patente">
@@ -33,9 +33,8 @@
         <table class="table table-hover" id="tabla-autorizaciones">
             <thead>
                 <tr>
-                    <th>Empleado</th>
-                    <th>Vehículo</th>
-                    <th>Patente</th>
+                    <th>Conductor</th>
+                    <th>Vehículo (Patente)</th>
                     <th>Fecha Otorgamiento</th>
                     <th>Estado</th>
                     <th>Acciones</th>
@@ -61,9 +60,9 @@
                     <input type="hidden" name="id" id="autorizacion-id">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">Empleado *</label>
+                            <label class="form-label">Conductor *</label>
                             <select class="form-select" name="empleado_id" id="autorizacion-empleado" required>
-                                <option value="">Seleccionar empleado</option>
+                                <option value="">Seleccionar conductor</option>
                             </select>
                         </div>
                         <div class="col-md-6">
