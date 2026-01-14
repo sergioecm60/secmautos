@@ -97,7 +97,7 @@ switch ($method) {
                             $stmt = $pdo->prepare("
                                 UPDATE vehiculos SET
                                     marca = ?, modelo = ?, anio = ?, motor = ?, chasis = ?, titulo_dnrpa = ?,
-                                    titularidad = ?, tipo_vehiculo = ?
+                                    titularidad = ?, empleado_actual = ?, tipo_vehiculo = ?, estado = ?, observaciones = ?
                                 WHERE patente = ?
                             ");
 
@@ -108,8 +108,11 @@ switch ($method) {
                                 $vehiculo['motor'],
                                 $vehiculo['chasis'],
                                 $vehiculo['titulo_dnrpa'],
-                                $vehiculo['titular'],
-                                $vehiculo['tipo'] ?: 'Auto',
+                                $vehiculo['titularidad'],
+                                $vehiculo['empleado_actual'],  // NUEVO: empleado que usa el vehículo
+                                $vehiculo['tipo_vehiculo'] ?: 'Auto',
+                                $vehiculo['estado'] ?: 'disponible',
+                                $vehiculo['observaciones'],
                                 $vehiculo['patente']
                             ]);
 
@@ -122,8 +125,8 @@ switch ($method) {
                         $stmt = $pdo->prepare("
                             INSERT INTO vehiculos (
                                 patente, marca, modelo, anio, motor, chasis, titulo_dnrpa,
-                                titularidad, tipo_vehiculo, estado, kilometraje_actual
-                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'disponible', 0)
+                                titularidad, empleado_actual, tipo_vehiculo, estado, observaciones, kilometraje_actual
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
                         ");
 
                         $stmt->execute([
@@ -134,8 +137,11 @@ switch ($method) {
                             $vehiculo['motor'],
                             $vehiculo['chasis'],
                             $vehiculo['titulo_dnrpa'],
-                            $vehiculo['titular'],
-                            $vehiculo['tipo'] ?: 'Auto'
+                            $vehiculo['titularidad'],
+                            $vehiculo['empleado_actual'],  // NUEVO: empleado que usa el vehículo
+                            $vehiculo['tipo_vehiculo'] ?: 'Auto',
+                            $vehiculo['estado'] ?: 'disponible',
+                            $vehiculo['observaciones']
                         ]);
 
                         $stats['creados']++;

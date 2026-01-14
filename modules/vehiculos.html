@@ -22,11 +22,20 @@
                 <option value="disponible">Disponible</option>
                 <option value="asignado">Asignado</option>
                 <option value="mantenimiento">Mantenimiento</option>
+                <option value="vendido">Vendido</option>
                 <option value="baja">Baja</option>
             </select>
         </div>
         <div class="col-md-2">
             <button class="btn btn-secondary w-100" onclick="window.vehiculosView.filtrar()">Filtrar</button>
+        </div>
+        <div class="col-md-4">
+            <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" id="mostrar-vendidos" checked onchange="window.vehiculosView.filtrar()">
+                <label class="form-check-label" for="mostrar-vendidos">
+                    Mostrar vehículos vendidos
+                </label>
+            </div>
         </div>
     </div>
 
@@ -86,11 +95,13 @@
                                 <option value="Camioneta">Camioneta</option>
                                 <option value="Van">Van</option>
                                 <option value="Camion">Camión</option>
-                                <option value="Motocicleta">Motocicleta</option>
+                                <option value="Motovehiculo">Motovehículo</option>
                                 <option value="Triciclo">Triciclo</option>
                                 <option value="Cuatriciclo">Cuatriciclo</option>
                                 <option value="Acoplado">Acoplado</option>
                                 <option value="Motor Home">Motor Home</option>
+                                <option value="Tractor">Tractor</option>
+                                <option value="Maquinaria Agricola">Maquinaria Agrícola</option>
                             </select>
                         </div>
                         <div class="col-md-4">
@@ -184,6 +195,7 @@
                                 <option value="disponible">Disponible</option>
                                 <option value="asignado">Asignado</option>
                                 <option value="mantenimiento">Mantenimiento</option>
+                                <option value="vendido">Vendido</option>
                                 <option value="baja">Baja</option>
                             </select>
                         </div>

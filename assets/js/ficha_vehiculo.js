@@ -259,6 +259,7 @@ function getEstadoBadge(estado) {
         'disponible': '<span class="badge bg-success">Disponible</span>',
         'asignado': '<span class="badge bg-primary">Asignado</span>',
         'mantenimiento': '<span class="badge bg-warning">Mantenimiento</span>',
+        'vendido': '<span class="badge bg-secondary">Vendido</span>',
         'baja': '<span class="badge bg-danger">Baja</span>'
     };
     return badges[estado] || estado;

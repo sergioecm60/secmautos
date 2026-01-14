@@ -12,7 +12,9 @@
       "Bash(curl:*)",
       "Bash(php scripts/generar_alertas.php:*)",
       "Bash(python3:*)",
-      "Bash(/c/laragon/bin/python/python-3.13/python -m pip install:*)"
+      "Bash(/c/laragon/bin/python/python-3.13/python -m pip install:*)",
+      "Bash(python:*)",
+      "Bash(iconv:*)"
     ]
   }
 }

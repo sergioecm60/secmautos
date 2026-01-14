@@ -70,6 +70,7 @@ class VehiculosView {
             'disponible': '<span class="badge bg-success">Disponible</span>',
             'asignado': '<span class="badge bg-primary">Asignado</span>',
             'mantenimiento': '<span class="badge bg-warning">Mantenimiento</span>',
+            'vendido': '<span class="badge bg-secondary">Vendido</span>',
             'baja': '<span class="badge bg-danger">Baja</span>'
         };
         return badges[estado] || estado;
@@ -239,11 +240,16 @@ class VehiculosView {
     filtrar() {
         const patente = document.getElementById('filtro-patente').value.toLowerCase();
         const estado = document.getElementById('filtro-estado').value;
+        const mostrarVendidos = document.getElementById('mostrar-vendidos').checked;
 
         const filtrados = this.vehiculos.filter(v => {
             const cumplePatente = !patente || v.patente.toLowerCase().includes(patente);
             const cumpleEstado = !estado || v.estado === estado;
-            return cumplePatente && cumpleEstado;
+
+            // Si el checkbox de mostrar vendidos está desmarcado, excluir vendidos
+            const cumpleMostrarVendidos = mostrarVendidos || v.estado !== 'vendido';
+
+            return cumplePatente && cumpleEstado && cumpleMostrarVendidos;
         });
 
         this.renderTabla(filtrados);
